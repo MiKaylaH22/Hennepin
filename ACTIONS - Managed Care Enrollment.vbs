@@ -55,11 +55,11 @@ BeginDialog Enrollment_dlg, 0, 0, 266, 280, "Enrollment Information"
   CheckBox 80, 75, 25, 10, "Yes", Insurance_yes
   CheckBox 80, 90, 25, 10, "Yes", Pregnant_yes
   CheckBox 80, 105, 30, 10, "Yes", Interpreter_yes
-  DropListBox 170, 100, 85, 15, "Spanish - 01"+chr(9)+"Hmong - 02"+chr(9)+"Vietnamese - 03"+chr(9)+"Khmer - 04"+chr(9)+"Laotian - 05"+chr(9)+"Russian - 06"+chr(9)+"Somali - 07"+chr(9)+"ASL - 08"+chr(9)+"Arabic - 10"+chr(9)+"Serbo-Croatian - 11"+chr(9)+"Oromo - 12"+chr(9)+"Other - 98", Interpreter_type
+  DropListBox 170, 100, 85, 15, "Select one..."+chr(9)+"Spanish - 01"+chr(9)+"Hmong - 02"+chr(9)+"Vietnamese - 03"+chr(9)+"Khmer - 04"+chr(9)+"Laotian - 05"+chr(9)+"Russian - 06"+chr(9)+"Somali - 07"+chr(9)+"ASL - 08"+chr(9)+"Arabic - 10"+chr(9)+"Serbo-Croatian - 11"+chr(9)+"Oromo - 12"+chr(9)+"Other - 98", Interpreter_type
   CheckBox 80, 120, 25, 10, "Yes", foster_care_yes
   EditBox 80, 135, 75, 15, Medical_clinic_code
   EditBox 80, 155, 75, 15, Dental_clinic_code
-  DropListBox 100, 195, 120, 15, "Select one..."+chr(9)+"Blue Plus PMAP"+chr(9)+"Medica PMAP"+chr(9)+"Medica MSC plus"+chr(9)+"Medica MSC plus (with EW)"+chr(9)+"Medica MSHO"+chr(9)+"Hennepin Health PMAP"+chr(9)+"Health Partners MSC plus"+chr(9)+"Health Partners MSC plus (with EW)"+chr(9)+"Health Partners MSHO"+chr(9)+"UCare MSC plus"+chr(9)+"UCare MSC plus (with EW)"+chr(9)+"UCare MSHO", Health_plan
+  DropListBox 100, 195, 120, 15, "Select one..."+chr(9)+"Blue Plus"+chr(9)+"Medica"+chr(9)+"Medica MSC plus"+chr(9)+"Medica MSC plus (with EW)"+chr(9)+"Medica MSHO"+chr(9)+"Hennepin Health"+chr(9)+"Health Partners MSC plus"+chr(9)+"Health Partners MSC plus (with EW)"+chr(9)+"Health Partners MSHO"+chr(9)+"UCare MSC plus"+chr(9)+"UCare MSC plus (with EW)"+chr(9)+"UCare MSHO", Health_plan
   DropListBox 100, 215, 120, 15, "Select one..."+chr(9)+"First year change option"+chr(9)+"Health plan contract end"+chr(9)+"Initial enrollment"+chr(9)+"Move"+chr(9)+"Ninety Day change option"+chr(9)+"Open enrollment"+chr(9)+"PMI merge"+chr(9)+"Reenrollment", change_reason
   DropListBox 100, 235, 120, 15, "Select one..."+chr(9)+"Eligibility ended"+chr(9)+"Exclusion"+chr(9)+"First year change option"+chr(9)+"Health plan contract end"+chr(9)+"Jail - Incarceration"+chr(9)+"Move"+chr(9)+"Loss of disability"+chr(9)+"Ninety Day change option"+chr(9)+"Open Enrollment"+chr(9)+"PMI merge"+chr(9)+"Voluntary", disenrollment_reason
   ButtonGroup ButtonPressed
@@ -84,20 +84,6 @@ BeginDialog Enrollment_dlg, 0, 0, 266, 280, "Enrollment Information"
   GroupBox 0, 180, 260, 75, "RPPH information"
 EndDialog
 
-BeginDialog correct_pmi_check, 0, 0, 246, 60, "PMI check"
-  ButtonGroup ButtonPressed
-    OkButton 70, 40, 50, 15
-    CancelButton 125, 40, 50, 15
-  Text 10, 15, 225, 20, "Please verify that the PMI and client are correct then click OK. If the PMI was entered incorrectl then hit cancel, and start the script again. "
-EndDialog
-
-BeginDialog correct_REFM_check, 0, 0, 261, 65, "REFM check"
-  ButtonGroup ButtonPressed
-    OkButton 75, 40, 50, 15
-    CancelButton 130, 40, 50, 15
-  Text 15, 15, 235, 20, "Please verify that the information entered is correct then click OK. If the information was entered incorrectly hit cancel and start the script again. "
-EndDialog
-
 'Custom function----------------------------------------------------------------------------------------------------
 'Sending MMIS back to the beginning screen and checking for a password prompt
 Function check_for_MMIS(end_script) 'if end_script is set to true, the script will end; if set to false, script will continue once password is entered
@@ -108,9 +94,9 @@ Function check_for_MMIS(end_script) 'if end_script is set to true, the script wi
 		EMSearch "MMIS", row, col
 		IF row <> 1 then
 			If end_script = True then 
-				script_end_procedure("You do not appear to be in MMIS. You may be passworded out. Please check your MMIS screen and try again.")
+				script_end_procedure("You do not appear to be in MMIS, or you may be passworded out. Please navigate and log into MMIS, and try again.")
 			Else
-				warning_box = MsgBox("You do not appear to be in MMIS. You may be passworded out. Please check your MMIS screen and try again, or press ""cancel"" to exit the script.", vbOKCancel)
+				warning_box = MsgBox("You do not appear to be in MMIS. Please navigate to MMIS, or enter your password, and press ""OK"". Press ""cancel"" to exit the script.", vbOKCancel)
 				If warning_box = vbCancel then stopscript
 			End if
 		End if
@@ -126,7 +112,7 @@ IF MMIS_panel_check <> "RKEY" THEN
 		PF6
 		EMReadScreen session_terminated_check, 18, 1, 7
 	LOOP until session_terminated_check = "SESSION TERMINATED"
-	'Getting back in to MMIS and transmitting past the warning screen (workers should already have accepted the warning screen when they logged themself into MMIS the first time!)
+	'Getting back in to MMIS and transmitting past the warning screen (workers should already have accepted the warning screen when they logged themselves into MMIS the first time!)
 	EMWriteScreen "mw00", 1, 2
 	transmit
 	transmit
@@ -145,7 +131,6 @@ enrollment_month = CStr(enrollment_month)	'fix for changing a 1-digit month (1-9
 EMReadscreen PMI_number, 8, 4, 19
 PMI_number= trim(PMI_number)
 
-
 'do the dialog here
 Do
 	Do
@@ -154,10 +139,9 @@ Do
 		If pmi_number = "" then MsgBox "You must have a PMI number to continue!"
 		If health_plan = "Select one..." then MsgBox " You must select a health plan."
 		If change_reason = "Select one..." then MsgBox " You must select a change reason."
-		IF disenrollment_reason = "Select one..." then MsgBox " You must select a disenrollment reason."
 		If Interpreter_yes = 1 and Interpreter_type = "Select one..." then MsgBox "You must select an interpreter language."
 	Loop until Interpreter_yes = 0 or (Interpreter_yes = 1 and Interpreter_type <> "Select one...")
-Loop until (PMI_number <> "" and health_plan <> "Select one..." and change_reason <> "Select one..." and disenrollment_reason <> "Select one...")
+Loop until (PMI_number <> "" and health_plan <> "Select one..." and change_reason <> "Select one...")
 
 'checking for an active MMIS session
 Call check_for_MMIS(False)
@@ -165,7 +149,6 @@ Call check_for_MMIS(False)
 'formatting variables----------------------------------------------------------------------------------------------------
 If len(enrollment_month) = 1 THEN enrollment_month = "0" & enrollment_month
 IF len(enrollment_year) <> 2 THEN enrollment_year = right(enrollment_year, 2)
-interpreter_type = right(interpreter_type, 2)
 
 Do	'adds zeros to PMI number until number becomes 8 digits
   If len(PMI_number) < 8 then PMI_number = "0" & PMI_number
@@ -175,13 +158,13 @@ enrollment_date = enrollment_month & "/01/" & enrollment_year
 
 'Coding to be inputed in the MMIS----------------------------------------------------------------------------------------------------
 'Blue Plus plan
-If health_plan = "Blue Plus PMAP" then 
+If health_plan = "Blue Plus" then 
 	health_plan_code = "A065813800"
 	Contract_code_part_one = "MA"
 	Contract_code_part_two = "12"
 END IF 
 'Medica plans 
-If health_plan = "Medica PMAP" then 
+If health_plan = "Medica" then 
 	health_plan_code = "A405713900"
 	Contract_code_part_one = "MA"
 	Contract_code_part_two = "12"
@@ -202,7 +185,7 @@ If health_plan = "Medica MSHO" then
 	Contract_code_part_two = "20"
 END IF
 'Hennepin Health plan
-If health_plan = "Hennepin Health PMAP" then 
+If health_plan = "Hennepin Health" then 
 	health_plan_code = "A836618200"
 	Contract_code_part_one = "MA"
 	Contract_code_part_two = "12"
@@ -239,6 +222,95 @@ If health_plan = "UCare MSHO" then
 	Contract_code_part_one = "MA"
 	Contract_code_part_two = "20"
 END IF
+
+'variables for the confirmation box
+If disenrollment_reason = "Select one..." then 
+	disenrollment_reason = ""
+END IF
+'REFM check box values
+If insurance_yes = 1 then 
+	insurance_yn = "yes"
+   else
+	insurance_yn = "none"
+end if
+If pregnant_yes = 1 then
+	pregnant_yn = "yes"
+   else
+	pregnant_yn = "none"
+end if
+If interpreter_yes = 1 then
+	interpreter_yn = "yes"
+   else
+	interpreter_yn = "none"
+end if
+If foster_care_yes = 1 then
+	foster_care_yn = "yes"
+   else
+	foster_care_yn = "none"
+end if
+'interpreter type 
+If Interpreter_type = "Select one..." then 
+	Interpreter_type = "  "
+end if
+If Interpreter_type = "Spanish - 01" then
+	Interpreter_type = "Spanish - 01"
+end if
+If Interpreter_type = "Hmong - 02" then
+	Interpreter_type = "Hmong - 02"
+end if
+If Interpreter_type = "Vietnamese - 03" then
+	Interpreter_type = "Vietnamese - 03"
+end if
+If Interpreter_type = "Vietnamese - 03" then
+	Interpreter_type = "Vietnamese - 03"
+end if
+If Interpreter_type = "Laotian - 05" then
+	Interpreter_type = "Laotian - 05"
+end if
+If Interpreter_type = "Russian - 06" then
+	Interpreter_type = "Laotian - 05"
+end if
+If Interpreter_type = "Somali - 07" then
+	Interpreter_type = "Somali - 07"
+end if
+If Interpreter_type = "ASL - 08" then
+	Interpreter_type = "ASL - 08-"
+end if
+If Interpreter_type = "Arabic - 10" then
+	Interpreter_type = "Arabic - 10"
+end if
+If Interpreter_type = "Serbo-Croatian - 11" then
+	Interpreter_type = "Serbo-Croatian - 11"
+end if
+If Interpreter_type = "Oromo - 12" then
+	Interpreter_type = "Oromo - 12"
+end if
+If Interpreter_type = "Other - 98" then
+	Interpreter_type = "Other - 98"
+end if 
+
+'MORE MMIS CODING----------------------------------------------------------------------------------------------------
+'REFM check box values
+If insurance_yes = 1 then 
+	insurance_yn = "y"
+   else
+	insurance_yn = "n"
+end if
+If pregnant_yes = 1 then
+	pregnant_yn = "y"
+   else
+	pregnant_yn = "n"
+end if
+If interpreter_yes = 1 then
+	interpreter_yn = "y"
+   else
+	interpreter_yn = "n"
+end if
+If foster_care_yes = 1 then
+	foster_care_yn = "y"
+   else
+	foster_care_yn = "n"
+end if
 
 'change reasons
 If change_reason = "First year change option" then
@@ -301,29 +373,25 @@ If disenrollment_reason = "Voluntary" then
 	disenrollment_reason = "VL"
 END IF
 
-'REFM check box values
-If insurance_yes = 1 then 
-	insurance_yn = "y"
-   else
-	insurance_yn = "n"
-end if
-If pregnant_yes = 1 then
-	pregnant_yn = "y"
-   else
-	pregnant_yn = "n"
-end if
-If interpreter_yes = 1 then
-	interpreter_yn = "y"
-   else
-	interpreter_yn = "n"
-end if
-If foster_care_yes = 1 then
-	foster_care_yn = "y"
-   else
-	foster_care_yn = "n"
-end if
+'only pulls the interpreter code to enter into MMIS (last 2 right hand characters)
+interpreter_type = right(interpreter_type, 2)
 'End of MMIS coding==============================================
 
+'confirmation message box text and variables
+'Message box that asks the user if the options that were selected in the dialog box are correct prior to moving on.
+'This replaces the previous option that was stopping and asking the user to confirm twice
+MMIS_confirmation = MsgBox("**Please confirm that the recipient's enrollment information is correct**" & vbNewLine & vbNewLine & _
+"Recipient's PMI number:  " & PMI_number & vbNewLine & "Enrollment date:  " & enrollment_date & vbNewLine & vbNewLine & vbNewLine & _
+"REFM INFORMATION" & vbNewLine & "Other insurance:  " & insurance_yn & vbNewLine & "Pregnant: " & Pregnant_yn & vbNewLine & _ 
+"Intepreter: " & Interpreter_yn & "  Interpreter type:  " & Interpreter_type & vbNewLine & "Foster care:  " & foster_care_yn & vbNewLine & _
+"Medical clinic code:  " & Medical_clinic_code & vbNewLine & "Dental clinic code:  " & Dental_clinic_code & vbNewLine & vbNewLine & vbNewLine & _
+"RPPH INFORMATION" & vbNewLine & "Health Plan:  " & Health_plan & vbNewLine & "Change reason:  " & change_reason & vbNewLine & "Disenrollment reason:  " & disenrollment_reason, vbOKCancel, "Confirm recipient information")
+If MMIS_confirmation = 2 then stopscript
+If MMIS_confirmation = 0 then 
+	MMIS_confirmation = TRUE
+END IF 
+
+'UPDATING MMIS----------------------------------------------------------------------------------------------------
 'Now we are in RKEY, and it navigates into the case, transmits, and makes sure we've moved to the next screen.
 EMWriteScreen "c", 2, 19
 EMWriteScreen PMI_number, 4, 19 
@@ -331,11 +399,7 @@ transmit
 EMReadscreen RKEY_check, 4, 1, 52
 If RKEY_check = "RKEY" then script_end_procedure("The listed PMI number was not found. Check your PMI number and try again.")
 
-'Now it gets to RELG for member 01 of this case.
-EMWriteScreen "rcin", 1, 8
-transmit
-EMWriteScreen "x", 11, 2
-'check Rpol to see if there is other insurance available, if so worker processes manually
+'check RPOL to see if there is other insurance available, if so worker processes manually
 EMWriteScreen "rpol", 1, 8
 transmit
 'making sure script got to right panel
@@ -347,21 +411,14 @@ if policy_number <> " " then
 	pf6
 	stopscript
 end if
+
+'nav to RPPH
 EMWriteScreen "rpph", 1, 8
 transmit
+
 'making sure script got to right panel
 EMReadScreen RPPH_check, 4, 1, 52
 If RPPH_check <> "RPPH" then script_end_procedure("The script was unable to navigate to RPPH process manually if needed.")
-
-'Grabs client's name
-EMreadscreen client_first_name, 13, 3, 20
-client_first_name  = replace(client_first_name, " ", "")
-EMreadscreen client_last_name, 18, 3, 2
-client_last_name  = replace(client_last_name, " ", "")
-'clears and enters info for relg
-Emreadscreen managed_care_span, 1, 13, 5
-'resets to bottom of the span list. 
-pf11
 
 'Checks for exclusion code only deletes if YY or blank, if any other span entered it stops script.
 EMReadscreen XCL_code, 2, 6, 2
@@ -372,6 +429,16 @@ Else
 	MSGbox "There is an exclusion code other than YY. Please process manually."
 	stopscript
 End if
+
+'Grabs client's name for case note
+EMreadscreen client_first_name, 13, 3, 20
+client_first_name  = replace(client_first_name, " ", "")
+EMreadscreen client_last_name, 18, 3, 2
+client_last_name  = replace(client_last_name, " ", "")
+'reads managed care enrollment dates
+Emreadscreen managed_care_span, 1, 13, 5
+'resets to bottom of the span list. 
+pf11
 
 'enter enrollment date
 EMsetcursor 13, 5
@@ -390,18 +457,6 @@ EMsendkey change_reason
 'enter disenrollment reason
 EMsetcursor 13, 75
 EMsendkey disenrollment_reason
-'Asks worker to make sure the script has entered into the right case and cancels out to RKEY if worker hits cancel to no save anything. 
-Dialog correct_pmi_check
-IF buttonpressed = 0 then
-	pf6
-	stopscript
-End IF
-
-'error handling to ensure that enrollment date and exclusion dates don't conflict
-EMReadScreen RPPH_error_check, 4, 24, 2
-If RPPH_error_check <> "    " then 
-	MsgBox "The enrollment date you are entering is conflicting with the exclusion date.  Please review."
-END IF 
 
 'REFM screen
 EMWriteScreen "refm", 1, 8
@@ -409,12 +464,6 @@ transmit
 'making sure script got to right panel
 EMReadScreen REFM_check, 4, 1, 52
 If REFM_check <> "REFM" then script_end_procedure("The script was unable to navigate to REFM process manually if needed.")
-'checks for edit after hitting transmit
-Emreadscreen edit_check, 1, 24, 2
-If edit_check <> " " then
-	msgbox "There is an edit on this action. Please review the edit and proceed manually."
-	stopscript
-end if
 
 'form rec'd
 EMsetcursor 10, 16
@@ -429,7 +478,7 @@ EMsendkey pregnant_yn
 EMsetcursor 13, 29
 EMsendkey interpreter_yn
 'interpreter type
-if interpreter_type <> "" then
+if interpreter_type <> "Select one..." then
 	EMsetcursor 13, 52
 	EMsendKey interpreter_type
 end if
@@ -442,23 +491,19 @@ EMsendkey Dental_clinic_code
 'foster care y/n
 EMsetcursor 21, 15
 EMsendkey foster_care_yn
+PF3
 
-'Asks worker to make sure the script has entered the correct information and cancels out to RKEY if worker hits cancel to no save anything. 
-Dialog correct_REFM_check
-IF buttonpressed = 0 then
-	msgbox "You have identified the REFM panel is not correct.  Please check REFM, and case note manually or run the script again."
-	stopscript
-End IF
-transmit
+'error handling to ensure that enrollment date and exclusion dates don't conflict
+EMReadScreen REFM_error_check, 19, 24, 2 'checks for an inhibiting edit
+If enrollment_year < "16" AND REFM_error_check = "WARNING: MA12,01/16" Then
+	script_end_procedure("This health plan is not available until 01/01/16." & vbNewLine & "Make sure you change the enrollment date when using the script again.")
+ELSEIF REFM_error_check <> "WARNING: MA12,01/16" Then
+	IF REFM_error_check <> "                   " then
+		script_end_procedure("You have entered information that is causing a warning error, or an inhibiting error." & vbNewLine & "Refer to the MMIS USER MANUAL to resolve if necessary.")
+	END IF 
+END IF 
 
-'checks for edit after hitting transmit
-EMReadscreen edit_check, 1, 24, 2 'checks for an inhibiting edit
-If edit_check <> " " then
-	msgbox "There is an edit on this action. Please review the edit and proceed manually."
-	stopscript
-end if
-
-'Saves & case notes
+'Save and case note
 pf3
 EMWriteScreen "c", 2, 19
 transmit
@@ -467,5 +512,8 @@ pf11
 EMSendkey "***HMO Note*** " & Client_first_name & " " & client_last_name & " enrolled into " & health_plan & " " & Enrollment_date & " " & worker_signature
 pf3
 pf3
+IF REFM_error_check = "WARNING: MA12,01/16" Then
+ PF3
+END IF
 
 script_end_procedure("")
