@@ -8,16 +8,17 @@ Execute text_from_the_other_script
 'STATS GATHERING----------------------------------------------------------------------------------------------------
 name_of_script = "NOTES - EMERGENCY SCREENING.vbs"
 start_time = timer
-
-'Declared variables for the FuncLib
-'DIM name_of_script, start_time, FuncLib_URL, run_locally, default_directory, use_master_branch, req, fso, row
+STATS_counter = 1               'sets the stats counter at one
+STATS_manualtime = 0         'manual run time in seconds
+STATS_denomination = "C"        'C is for each case
+'END OF stats block=========================================================================================================
 
 'LOADING FUNCTIONS LIBRARY FROM GITHUB REPOSITORY===========================================================================
 IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded once
-	IF run_locally = FALSE or run_locally = "" THEN		'If the scripts are set to run locally, it skips this and uses an FSO below.
-		IF use_master_branch = TRUE THEN			'If the default_directory is C:\DHS-MAXIS-Scripts\Script Files, you're probably a scriptwriter and should use the master branch.
+	IF run_locally = FALSE or run_locally = "" THEN	   'If the scripts are set to run locally, it skips this and uses an FSO below.
+		IF use_master_branch = TRUE THEN			   'If the default_directory is C:\DHS-MAXIS-Scripts\Script Files, you're probably a scriptwriter and should use the master branch.
 			FuncLib_URL = "https://raw.githubusercontent.com/MN-Script-Team/BZS-FuncLib/master/MASTER%20FUNCTIONS%20LIBRARY.vbs"
-		Else																		'Everyone else should use the release branch.
+		Else											'Everyone else should use the release branch.
 			FuncLib_URL = "https://raw.githubusercontent.com/MN-Script-Team/BZS-FuncLib/RELEASE/MASTER%20FUNCTIONS%20LIBRARY.vbs"
 		End if
 		SET req = CreateObject("Msxml2.XMLHttp.6.0")				'Creates an object to get a FuncLib_URL
@@ -26,22 +27,12 @@ IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded
 		IF req.Status = 200 THEN									'200 means great success
 			Set fso = CreateObject("Scripting.FileSystemObject")	'Creates an FSO
 			Execute req.responseText								'Executes the script code
-		ELSE														'Error message, tells user to try to reach github.com, otherwise instructs to contact Veronica with details (and stops script).
-			MsgBox 	"Something has gone wrong. The code stored on GitHub was not able to be reached." & vbCr &_
-					vbCr & _
-					"Before contacting Veronica Cary, please check to make sure you can load the main page at www.GitHub.com." & vbCr &_
-					vbCr & _
-					"If you can reach GitHub.com, but this script still does not work, ask an alpha user to contact Veronica Cary and provide the following information:" & vbCr &_
-					vbTab & "- The name of the script you are running." & vbCr &_
-					vbTab & "- Whether or not the script is ""erroring out"" for any other users." & vbCr &_
-					vbTab & "- The name and email for an employee from your IT department," & vbCr & _
-					vbTab & vbTab & "responsible for network issues." & vbCr &_
-					vbTab & "- The URL indicated below (a screenshot should suffice)." & vbCr &_
-					vbCr & _
-					"Veronica will work with your IT department to try and solve this issue, if needed." & vbCr &_
-					vbCr &_
-					"URL: " & FuncLib_URL
-					script_end_procedure("Script ended due to error connecting to GitHub.")
+		ELSE														'Error message
+			critical_error_msgbox = MsgBox ("Something has gone wrong. The Functions Library code stored on GitHub was not able to be reached." & vbNewLine & vbNewLine &_
+                                            "FuncLib URL: " & FuncLib_URL & vbNewLine & vbNewLine &_
+                                            "The script has stopped. Please check your Internet connection. Consult a scripts administrator with any questions.", _
+                                            vbOKonly + vbCritical, "BlueZone Scripts Critical Error")
+            StopScript
 		END IF
 	ELSE
 		FuncLib_URL = "C:\BZS-FuncLib\MASTER FUNCTIONS LIBRARY.vbs"
@@ -54,23 +45,9 @@ IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded
 END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
-'Required for statistical purposes==========================================================================================
-STATS_counter = 1               'sets the stats counter at one
-STATS_manualtime = 0         'manual run time in seconds
-STATS_denomination = "C"        'C is for each case
-'END OF stats block=========================================================================================================
-
-'Declared variables for main script
-'DIM emergency_screening_dialog, case_number, HH_members, eviction_check, utility_disconnect_check
-'DIM homelessness_check, security_deposit_check, affordable_housing_yes, affordable_housing_no
-'DIM EMER_HSR_manual_button, affordbable_housing, meets_residency, net_income, ButtonPressed, worker_signature
-'DIM err_msg, footer_month, footer_year, begin_search_month, begin_search_year, EMER_type, EMER_amt_issued
-'DIM EMER_elig_start_date, EMER_elig_end_date, monthly_standard, EMER_available_date, emer_issued, col
-'DIM last_page_check, crisis, EMER_last_used_dates, screening_determination, Screening_options, script_repository
-
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 BeginDialog emergency_screening_dialog, 0, 0, 286, 255, "Emergency Screening dialog"
-  EditBox 60, 15, 65, 15, case_number
+  EditBox 60, 15, 65, 15, MAXIS_case_number
   ComboBox 255, 15, 25, 15, "1"+chr(9)+"2"+chr(9)+"3"+chr(9)+"4"+chr(9)+"5"+chr(9)+"6"+chr(9)+"7"+chr(9)+"8"+chr(9)+"9"+chr(9)+"10"+chr(9)+"11"+chr(9)+"12"+chr(9)+"13"+chr(9)+"14"+chr(9)+"15"+chr(9)+"16"+chr(9)+"17"+chr(9)+"18"+chr(9)+"19"+chr(9)+"20", HH_members
   CheckBox 15, 55, 40, 10, "Eviction", eviction_check
   CheckBox 65, 55, 70, 10, "Utility disconnect", utility_disconnect_check
@@ -98,15 +75,9 @@ EndDialog
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
 EMConnect ""
-CALL MAXIS_case_number_finder(case_number)
+CALL MAXIS_case_number_finder(MAXIS_case_number)
 
 'DATE CALCULATIONS----------------------------------------------------------------------------------------------------
-'creating current month as footer month/year'
-footer_month = datepart("m", date)
-If len(footer_month) = 1 then footer_month = "0" & footer_month
-footer_year = datepart("yyyy", date)
-footer_year = right(footer_year, 2)
-
 'creating month variable 13 months prior to current footer month/year to search for EMER programs issued
 begin_search_month = dateadd("m", -13, date)
 begin_search_year = datepart("yyyy", begin_search_month)
@@ -118,34 +89,36 @@ If len(begin_search_month) = 1 then begin_search_month = "0" & begin_search_mont
 'Running the initial dialog
 DO
 	DO
-		err_msg = ""
-		Dialog emergency_screening_dialog
-		cancel_confirmation
-		'Opening the the HSR manual to the NOMI page
-		IF buttonpressed = EMER_HSR_manual_button then CreateObject("WScript.Shell").Run("https://dept.hennepin.us/hsphd/manuals/hsrm/Pages/Emergency_Assistance_Policy.aspx")
-		If case_number = "" or IsNumeric(case_number) = False or len(case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If HH_members = "" or IsNumeric(HH_members) = False then err_msg = err_msg & vbNewLine & "* Enter the number of household members."
-		If affordbable_housing = "Select one..." then err_msg = err_msg & vbNewLine & "* Answer the affordable living situation question."
-		If meets_residency = "Select one..." then err_msg = err_msg & vbNewLine & "* Answer the MN residency question."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
-		If net_income = "" or IsNumeric(net_income) = False then err_msg = err_msg & vbNewLine & "* Enter the household's net income."
-		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
-	LOOP until err_msg = ""
-LOOP until ButtonPressed = -1
-
-'Checking for an active MAXIS session
-Call check_for_MAXIS(True)
+		DO
+			err_msg = ""
+			Dialog emergency_screening_dialog
+			cancel_confirmation
+			'Opening the the HSR manual to the NOMI page
+			IF buttonpressed = EMER_HSR_manual_button then CreateObject("WScript.Shell").Run("https://dept.hennepin.us/hsphd/manuals/hsrm/Pages/Emergency_Assistance_Policy.aspx")
+			If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
+			If HH_members = "" or IsNumeric(HH_members) = False then err_msg = err_msg & vbNewLine & "* Enter the number of household members."
+			If affordbable_housing = "Select one..." then err_msg = err_msg & vbNewLine & "* Answer the affordable living situation question."
+			If meets_residency = "Select one..." then err_msg = err_msg & vbNewLine & "* Answer the MN residency question."
+			If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
+			If net_income = "" or IsNumeric(net_income) = False then err_msg = err_msg & vbNewLine & "* Enter the household's net income."
+			IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
+		LOOP until err_msg = ""
+	LOOP until ButtonPressed = -1
+	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
+Loop until are_we_passworded_out = false					'loops until user passwords back in					
+		
 'navigating to INQX'
 back_to_self
 EMWriteScreen "________", 18, 43
-EMWriteScreen case_number, 18, 43
-EMWriteScreen footer_month, 20, 43	'entering current footer month/year
-EMWriteScreen footer_year, 20, 46
+EMWriteScreen MAXIS_case_number, 18, 43
+EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
+EMWriteScreen CM_yr, 20, 46
+
 Call navigate_to_MAXIS_screen("MONY", "INQX")
 EMWriteScreen begin_search_month, 6, 38		'entering footer month/year 13 months prior to current footer month/year'
 EMWriteScreen begin_search_year, 6, 41
-EMWriteScreen footer_month, 6, 53		'entering current footer month/year
-EMWriteScreen footer_year, 6, 56
+EMWriteScreen CM_mo, 6, 53		'entering current footer month/year
+EMWriteScreen CM_yr, 6, 56
 EMWriteScreen "x", 9, 50		'selecting EA
 EMWriteScreen "x", 11, 50		'selecting EGA
 transmit
@@ -238,10 +211,6 @@ vbNewLine & "Emergency programs will be available to the HH again on: " & EMER_a
 IF Screening_options = vbCancel then script_end_procedure("")	'ends the script
 IF Screening_options = vbYes then call run_from_GitHub(script_repository & "/NOTES/NOTES - EMERGENCY.vbs")	'run the NOTES EMER script
 IF Screening_options = vbNO then
-	case_note_option = Msgbox("Would you like to case note the emergency screening information?", vbYesNoCancel, "Screening case note")
-		If case_note_option = vbCancel then script_end_procedure("")
-		If case_note_option = VbNo then script_end_procedure("A case note has not been made.")
-		If case_note_option = vbYes then 'just the case note option
 	'The case note
 	Call start_a_blank_CASE_NOTE
 	Call write_variable_in_CASE_NOTE("--//--Emergency Programs Screening--//--")
@@ -260,7 +229,6 @@ IF Screening_options = vbNO then
 	Call write_variable_in_CASE_NOTE("* Date EMER programs will be available to HH: " & EMER_available_date)
 	Call write_variable_in_CASE_NOTE("---")
 	Call write_variable_in_CASE_NOTE(worker_signature)
-	END IF
 END IF
 
 script_end_procedure("")
