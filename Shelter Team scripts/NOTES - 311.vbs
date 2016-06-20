@@ -46,38 +46,34 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog 311_dialog, 0, 0, 301, 255, "311"
-  EditBox 85, 15, 55, 15, MAXIS_case_number
-  EditBox 235, 15, 55, 15, review_date
-  OptionGroup RadioGroup1
-    RadioButton 165, 40, 45, 10, "Called 311", called_311
-    RadioButton 220, 40, 70, 10, "Checked Web-site", web_site
-  EditBox 85, 55, 205, 15, property_address
-  EditBox 85, 80, 205, 15, open_work_orders
-  EditBox 85, 105, 205, 15, violations
-  EditBox 85, 130, 205, 15, rental_license
-  EditBox 85, 155, 205, 15, rep_name
-  OptionGroup RadioGroup2
-    RadioButton 90, 185, 25, 10, "Yes", passed_yes
-    RadioButton 120, 185, 20, 10, "No", passed_no
-  EditBox 210, 180, 80, 15, vendor_number
-  EditBox 85, 205, 205, 15, other_notes
-  EditBox 85, 230, 95, 15, worker_signature
+BeginDialog Property_review_dialog, 0, 0, 301, 255, "311"
+  EditBox 85, 10, 55, 15, MAXIS_case_number
+  EditBox 235, 10, 55, 15, review_date
+  DropListBox 195, 30, 95, 15, "Select one..."+chr(9)+"Called 311"+chr(9)+"Checked web-site", property_reviewed
+  EditBox 85, 50, 205, 15, property_address
+  EditBox 85, 75, 205, 15, open_work_orders
+  EditBox 85, 100, 205, 15, violations
+  EditBox 85, 125, 205, 15, rental_license
+  EditBox 85, 150, 205, 15, rep_name
+  DropListBox 85, 175, 90, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No"+chr(9)+"Inspection pending", passed_inspection
+  EditBox 225, 175, 65, 15, vendor_number
+  EditBox 85, 200, 205, 15, other_notes
+  EditBox 85, 225, 95, 15, worker_signature
   ButtonGroup ButtonPressed
-    OkButton 185, 230, 50, 15
-    CancelButton 240, 230, 50, 15
-  Text 170, 185, 35, 10, "Vendor #:"
-  Text 20, 85, 60, 10, "Open work orders:"
-  Text 10, 110, 75, 10, "Current rental license:"
-  Text 20, 235, 60, 10, "Worker signature: "
-  Text 15, 185, 70, 10, "Passed inspection?:"
-  Text 150, 20, 80, 10, "Date of property review:"
-  Text 20, 60, 60, 10, "Property address:"
-  Text 35, 210, 45, 10, "Other notes: "
-  Text 10, 135, 75, 10, "Representative name:"
-  Text 45, 160, 35, 10, "Violations:"
-  Text 35, 20, 45, 10, "Case number:"
-  Text 15, 40, 145, 10, "What was the source of the property review:"
+    OkButton 185, 225, 50, 15
+    CancelButton 240, 225, 50, 15
+  Text 10, 105, 75, 10, "Current rental license:"
+  Text 20, 230, 60, 10, "Worker signature: "
+  Text 15, 180, 70, 10, "Passed inspection?:"
+  Text 150, 15, 80, 10, "Date of property review:"
+  Text 20, 55, 60, 10, "Property address:"
+  Text 35, 205, 45, 10, "Other notes: "
+  Text 10, 130, 75, 10, "Representative name:"
+  Text 45, 155, 35, 10, "Violations:"
+  Text 35, 15, 45, 10, "Case number:"
+  Text 35, 35, 145, 10, "What was the source of the property review:"
+  Text 190, 180, 35, 10, "Vendor #:"
+  Text 20, 80, 60, 10, "Open work orders:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,20 +81,23 @@ EndDialog
 EMConnect ""
 CALL MAXIS_case_number_finder(MAXIS_case_number)
 
+review_date = date & ""
+
 'Running the initial dialog
 DO
 	DO
 		err_msg = ""
-		Dialog 311_dialog
+		Dialog Property_review_dialog
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If called_311 <> 1 OR web_site <> 1 then err_msg = err_msg & vbNewLine & "* Please select the source of the property review. Called 311 or web-site."
+		If Isdate(review_date) = False then then err_msg = err_msg & vbNewLine & "* Please enter the date the property was reviewed."
+		If property_reviewed = "Select one..." then err_msg = err_msg & vbNewLine & "* Please select the source of the property review. Called 311 or web-site."
 		If property_address = "" then err_msg = err_msg & vbNewLine & "* Enter the property address."
 		If open_work_orders = "" then err_msg = err_msg & vbNewLine & "* Enter work order status/information."
 		If rental_license = "" then err_msg = err_msg & vbNewLine & "* Enter information about the current rental license."
 		If rep_name = "" then err_msg = err_msg & vbNewLine & "* Enter the representative's name."
 		If violations = "" then err_msg = err_msg & vbNewLine & "* Enter the household's net income."
-		If passed_yes <> 1 OR passed_no <> 1 then err_msg = err_msg & vbNewLine & "* Answer the 'Passed inspection' question."
+		If passed_inspection = "Select one..." then err_msg = err_msg & vbNewLine & "* Has the property passed the inspection?"
 		If vendor_number = "" then err_msg = err_msg & vbNewLine & "* Enter the property's vendor #."
 		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
@@ -118,15 +117,15 @@ start_a_blank_CASE_NOTE
 
 msgbox "good deal"
 stopscript
-Call write_variable_in_CASE_NOTE("###" &  )
-Call write_bullet_and_variable_in_CASE_NOTE("Number of HH members", HH_members)
-Call  write_bullet_and_variable_in_CASE_NOTE("Crisis/Type of Emergency", crisis)
-Call write_bullet_and_variable_in_CASE_NOTE("Living situation is", affordbable_housing)
-Call write_bullet_and_variable_in_CASE_NOTE("Representative name", rep_name)
-Call write_bullet_and_variable_in_CASE_NOTE("Violations", Violations)
-Call write_bullet_and_variable_in_CASE_NOTE("Passed inspection", )
-Call write_bullet_and_variable_in_CASE_NOTE("Vendor #", vendor_number)
-Call write_variable_in_CASE_NOTE("---")
-Call write_variable_in_CASE_NOTE(worker_signature)
-
+'Call write_variable_in_CASE_NOTE("###"   )
+'Call write_bullet_and_variable_in_CASE_NOTE("Number of HH members", HH_members)
+'Call  write_bullet_and_variable_in_CASE_NOTE("Crisis/Type of Emergency", crisis)
+'Call write_bullet_and_variable_in_CASE_NOTE("Living situation is", affordbable_housing)
+'Call write_bullet_and_variable_in_CASE_NOTE("Representative name", rep_name)
+'Call write_bullet_and_variable_in_CASE_NOTE("Violations", Violations)
+'Call write_bullet_and_variable_in_CASE_NOTE("Passed inspection", )
+'Call write_bullet_and_variable_in_CASE_NOTE("Vendor #", vendor_number)
+'Call write_variable_in_CASE_NOTE("---")
+'Call write_variable_in_CASE_NOTE(worker_signature)
+'
 script_end_procedure("")
