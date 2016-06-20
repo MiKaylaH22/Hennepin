@@ -9,7 +9,7 @@ Execute text_from_the_other_script
 name_of_script = "NOTES - 311.vbs"
 start_time = timer
 STATS_counter = 1               'sets the stats counter at one
-STATS_manualtime = 0         'manual run time in seconds
+STATS_manualtime = 0         	'manual run time in seconds
 STATS_denomination = "C"        'C is for each case
 'END OF stats block=========================================================================================================
 
