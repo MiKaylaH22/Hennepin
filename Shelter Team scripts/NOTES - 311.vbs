@@ -52,9 +52,9 @@ BeginDialog Property_review_dialog, 0, 0, 301, 255, "311"
   DropListBox 195, 30, 95, 15, "Select one..."+chr(9)+"Called 311"+chr(9)+"Checked web-site", property_reviewed
   EditBox 85, 50, 205, 15, property_address
   EditBox 85, 75, 205, 15, open_work_orders
-  EditBox 85, 100, 205, 15, violations
-  EditBox 85, 125, 205, 15, rental_license
-  EditBox 85, 150, 205, 15, rep_name
+  EditBox 85, 100, 205, 15, rental_license
+  EditBox 85, 125, 205, 15, rep_name
+  EditBox 85, 150, 205, 15, violations
   DropListBox 85, 175, 90, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No"+chr(9)+"Inspection pending", passed_inspection
   EditBox 225, 175, 65, 15, vendor_number
   EditBox 85, 200, 205, 15, other_notes
@@ -81,6 +81,7 @@ EndDialog
 EMConnect ""
 CALL MAXIS_case_number_finder(MAXIS_case_number)
 
+'autofilling the review_date variable with the current date
 review_date = date & ""
 
 'Running the initial dialog
@@ -90,7 +91,7 @@ DO
 		Dialog Property_review_dialog
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If Isdate(review_date) = False then then err_msg = err_msg & vbNewLine & "* Please enter the date the property was reviewed."
+		If Isdate(review_date) = False then err_msg = err_msg & vbNewLine & "* Please enter the date the property was reviewed."
 		If property_reviewed = "Select one..." then err_msg = err_msg & vbNewLine & "* Please select the source of the property review. Called 311 or web-site."
 		If property_address = "" then err_msg = err_msg & vbNewLine & "* Enter the property address."
 		If open_work_orders = "" then err_msg = err_msg & vbNewLine & "* Enter work order status/information."
@@ -105,27 +106,25 @@ DO
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
 Loop until are_we_passworded_out = false					'loops until user passwords back in					
 		
-'navigating to INQX'
+'adding the case number 
 back_to_self
 EMWriteScreen "________", 18, 43
 EMWriteScreen MAXIS_case_number, 18, 43
 EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
 EMWriteScreen CM_yr, 20, 46
 
-
+'The case note'
 start_a_blank_CASE_NOTE
+Call write_variable_in_CASE_NOTE("###" & property_reviewed & " on " & review_date & "###"   )
+Call write_bullet_and_variable_in_CASE_NOTE("Property address", property_address)
+Call  write_bullet_and_variable_in_CASE_NOTE("Open work orders", open_work_orders)
+Call write_bullet_and_variable_in_CASE_NOTE("Current rental license", rental_license)
+Call write_bullet_and_variable_in_CASE_NOTE("Representative name", rep_name)
+Call write_bullet_and_variable_in_CASE_NOTE("Violations", Violations)
+Call write_bullet_and_variable_in_CASE_NOTE("Passed inspection", passed_inspection)
+Call write_bullet_and_variable_in_CASE_NOTE("Vendor #", vendor_number)
+Call write_bullet_and_variable_in_CASE_NOTE("Other notes:", other_notes)
+Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE(worker_signature)
 
-msgbox "good deal"
-stopscript
-'Call write_variable_in_CASE_NOTE("###"   )
-'Call write_bullet_and_variable_in_CASE_NOTE("Number of HH members", HH_members)
-'Call  write_bullet_and_variable_in_CASE_NOTE("Crisis/Type of Emergency", crisis)
-'Call write_bullet_and_variable_in_CASE_NOTE("Living situation is", affordbable_housing)
-'Call write_bullet_and_variable_in_CASE_NOTE("Representative name", rep_name)
-'Call write_bullet_and_variable_in_CASE_NOTE("Violations", Violations)
-'Call write_bullet_and_variable_in_CASE_NOTE("Passed inspection", )
-'Call write_bullet_and_variable_in_CASE_NOTE("Vendor #", vendor_number)
-'Call write_variable_in_CASE_NOTE("---")
-'Call write_variable_in_CASE_NOTE(worker_signature)
-'
 script_end_procedure("")
