@@ -64,13 +64,13 @@ MAXIS_footer_month = CM_plus_1_mo
 MAXIS_footer_year = CM_plus_1_yr
 'other dates for script
 
-current_month = "0" & right(datepart("m", date), 2)
-current_day = "0" & right(datepart("d", date), 2)
-current_year = right(datepart("YYYY", date), 2)
+current_month = "0" & datepart("m", date)
+current_day = "01" 
+current_year = datepart("YYYY", date)
 
 'THE SCRIPT----------------------------------------------------------------------------------------------------
 EMConnect ""
-
+msgbox current_month & current_day & current_year
 'Script warning, this is only for adult workers (non- magi) at this time
 continue_prompt = MsgBox("***AT THIS TIME, THIS SCRIPT IS ONLY FOR ADULT/ADS WORKERS***"& Chr(13) & Chr(13) &_
 "This script will update REVW for each adult starred IR, after checking JOBS/BUSI/RBIC for discrepancies. It skips cases that are also reviewing for SNAP." & Chr(13) &_
