@@ -110,7 +110,7 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("---Utility information---")
+Call write_variable_in_CASE_NOTE("### Utility information ###")
 Call write_variable_in_CASE_NOTE ("Client has a bill with the following companies:")
 Call write_variable_in_CASE_NOTE ("------------------------------------------------")
 IF vendor_type_1 <> "Select one..." then 

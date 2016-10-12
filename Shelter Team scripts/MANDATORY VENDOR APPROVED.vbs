@@ -148,7 +148,7 @@ End if
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE(">>MANDATORY VENDORS APPROVED FOR 12 MONTHS<<")
+Call write_variable_in_CASE_NOTE("### MANDATORY VENDORS APPROVED FOR 12 MONTHS ###")
 Call write_variable_in_CASE_NOTE("* Mandatory vendor approved by Program Manager. Removal of vendor requires Program Manager approval.")
 Call write_bullet_and_variable_in_CASE_NOTE("Client put on mandatory vendor due to", vendor_reason)
 If client_referred = 1 then call write_variable_in_CASE_NOTE("* Referred client to Lutheran Social Services for budgeting classes at: 1(888) 577-2227. ")

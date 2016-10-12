@@ -115,7 +115,7 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note'
 start_a_blank_CASE_NOTE
-Call write_variable_in_CASE_NOTE("###" & property_reviewed & " on " & review_date & "###"   )
+Call write_variable_in_CASE_NOTE("### " & property_reviewed & " on " & review_date & " ###"   )
 Call write_bullet_and_variable_in_CASE_NOTE("Property address", property_address)
 Call write_bullet_and_variable_in_CASE_NOTE("Open work orders", open_work_orders)
 Call write_bullet_and_variable_in_CASE_NOTE("Current rental license", rental_license)
@@ -123,7 +123,7 @@ Call write_bullet_and_variable_in_CASE_NOTE("Representative name", rep_name)
 Call write_bullet_and_variable_in_CASE_NOTE("Violations", Violations)
 Call write_bullet_and_variable_in_CASE_NOTE("Passed inspection", passed_inspection)
 Call write_bullet_and_variable_in_CASE_NOTE("Vendor #", vendor_number)
-Call write_bullet_and_variable_in_CASE_NOTE("Other notes:", other_notes)
+Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
 

@@ -110,7 +110,6 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note'
 start_a_blank_CASE_NOTE
-
 Call write_variable_in_CASE_NOTE("### All County Funds Request Pending ###")
 Call write_bullet_and_variable_in_CASE_NOTE(ticket_amount & " issued for BUS TICKET at " & region_issued & " to", what_city)
 Call write_variable_in_CASE_NOTE("---")

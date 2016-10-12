@@ -94,7 +94,6 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note'
 start_a_blank_CASE_NOTE
-
 Call write_variable_in_CASE_NOTE("### NSPOW CHECKED ###")
 Call write_variable_in_CASE_NOTE("* NSPOW checked on" & date1 & " for " & client_name & " by " & worker_name)
 Call write_variable_in_CASE_NOTE("* NOT ON WEBSITE.")

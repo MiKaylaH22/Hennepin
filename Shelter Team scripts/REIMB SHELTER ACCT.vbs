@@ -96,7 +96,7 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note'
 start_a_blank_CASE_NOTE
-Call write_variable_in_CASE_NOTE("~~HCEA-ACF shelter account~~")
+Call write_variable_in_CASE_NOTE("### HCEA-ACF shelter account ###")
 Call write_bullet_and_variable_in_CASE_NOTE("Refund reason", refund_reason)
 Call write_bullet_and_variable_in_CASE_NOTE("Amount released to client", amt_to_client)
 Call write_bullet_and_variable_in_CASE_NOTE("Amount vendored to LL for rent/deposit", amt_to_LL)

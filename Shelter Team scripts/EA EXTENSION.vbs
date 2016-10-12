@@ -5,7 +5,7 @@ text_from_the_other_script = fso_command.ReadAll
 fso_command.Close
 Execute text_from_the_other_script
 
-'STATS GATHERING----------------------------------------------------------------------------------------------------
+'STATS GATHERING-----------------------------------------------------1-----------------------------------------------
 name_of_script = "NOTES - EA EXTENSION.vbs"
 start_time = timer
 STATS_counter = 1               'sets the stats counter at one
@@ -48,8 +48,8 @@ END IF
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 BeginDialog ea_extension, 0, 0, 321, 105, "EA Extension"
   EditBox 60, 10, 50, 15, MAXIS_case_number
-  EditBox 115, 30, 45, 15, start_date
-  EditBox 195, 30, 40, 15, end_date
+  EditBox 110, 30, 45, 15, start_date
+  EditBox 190, 30, 45, 15, end_date
   EditBox 65, 55, 235, 15, other_notes
   EditBox 65, 75, 120, 15, worker_signature
   ButtonGroup ButtonPressed
@@ -58,7 +58,7 @@ BeginDialog ea_extension, 0, 0, 321, 105, "EA Extension"
   Text 15, 60, 40, 10, "Other notes:"
   Text 10, 15, 45, 10, "Case number:"
   Text 10, 35, 100, 10, "EA extended for 30 days from:"
-  Text 165, 35, 30, 10, "through"
+  Text 160, 35, 30, 10, "through"
   Text 5, 80, 60, 10, "Worker Signature:"
   Text 240, 35, 65, 10, "with HSS approval."
 EndDialog
@@ -72,7 +72,7 @@ CALL MAXIS_case_number_finder(MAXIS_case_number)
 DO
 	DO
 		err_msg = ""
-		Dialog bus_ticket_dialog
+		Dialog ea_extension
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
 		If start_date = "" then err_msg = err_msg & vbNewLine & "* Enter start date."		
@@ -92,9 +92,8 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note'
 start_a_blank_CASE_NOTE
-
 Call write_variable_in_CASE_NOTE("### EA Extension ###")
-Call write_bullet_and_variable_in_CASE_NOTE("EA extended for 30 days from " & start_date & " through ", end_date & ".")
+Call write_bullet_and_variable_in_CASE_NOTE("EA extended for 30 days from " & start_date & " through", end_date & ".")
 Call write_variable_in_CASE_NOTE("* Client stay in shelter beyond the first 30 days.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE("---")

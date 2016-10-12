@@ -162,7 +162,7 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("<<<PERMANENT HOUSING FOUND/SHELTER ACCT VENDOR TO LL>>>")
+Call write_variable_in_CASE_NOTE("### PERMANENT HOUSING FOUND/SHELTER ACCT VENDOR TO LL ###")
 Call write_bullet_and_variable_in_CASE_NOTE("Move in date", move_date)
 Call write_bullet_and_variable_in_CASE_NOTE("Monthly rent", monthly_rent)
 Call write_bullet_and_variable_in_CASE_NOTE("Amount vendored to HCEA shelter account", vendored_to_HCEA)

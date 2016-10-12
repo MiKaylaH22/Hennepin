@@ -46,35 +46,38 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog client_sheltered_window_A, 0, 0, 301, 265, "Client Sheltered Window A"
-  EditBox 75, 5, 65, 15, MAXIS_case_number
-  EditBox 75, 30, 65, 15, client_housed_at
-  EditBox 260, 30, 30, 15, nights_housed
-  EditBox 105, 55, 35, 15, adults_vouchered
-  EditBox 260, 55, 30, 15, children_vouchered
-  EditBox 105, 80, 185, 15, reason_for_homelessness
-  EditBox 70, 120, 220, 15, name_of_person_verifying
-  EditBox 70, 140, 220, 15, relationship
-  EditBox 70, 160, 220, 15, phone_number
-  CheckBox 15, 190, 280, 10, "Informed client that they will need to see Rapid ReHousing Screener first, then see ", informed_client_checkbox
-  EditBox 70, 215, 220, 15, other_notes
-  EditBox 70, 240, 110, 15, worker_signature
+BeginDialog client_sheltered_window_A, 0, 0, 301, 245, "Client Sheltered Window A"
+  DropListBox 200, 5, 90, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
+  EditBox 75, 25, 65, 15, voucher_date
+  EditBox 260, 25, 30, 15, nights_housed
+  EditBox 110, 45, 30, 15, adults_vouchered
+  EditBox 260, 45, 30, 15, children_vouchered
+  CheckBox 10, 65, 130, 10, "Check here if any adults are pregnant", PX_check
+  EditBox 110, 80, 180, 15, reason_for_homelessness
+  EditBox 60, 115, 230, 15, name_of_person_verifying
+  EditBox 60, 135, 230, 15, relationship
+  EditBox 60, 155, 230, 15, phone_number
+  CheckBox 15, 180, 280, 10, "Informed client that they will need to see Rapid ReHousing Screener first, then see ", informed_client_checkbox
+  EditBox 70, 205, 220, 15, other_notes
+  EditBox 70, 225, 110, 15, worker_signature
   ButtonGroup ButtonPressed
-    OkButton 185, 240, 50, 15
-    CancelButton 240, 240, 50, 15
-  Text 20, 35, 55, 10, "Client housed at:"
-  Text 25, 10, 45, 10, "Case number:"
-  Text 35, 125, 25, 10, "Name:"
-  Text 25, 145, 45, 10, "Relationship:"
-  Text 15, 165, 50, 10, "Phone Number:"
-  Text 25, 220, 40, 10, "Other notes:"
-  Text 5, 245, 60, 10, "Worker Signature:"
-  Text 5, 60, 100, 10, "Number of Aduilts vouchered:"
-  Text 145, 35, 115, 10, "for the following number of nights:"
-  Text 155, 60, 105, 10, "Number of Children vouchered:"
-  GroupBox 10, 105, 285, 80, "Homelessness verified by contacting:"
+    OkButton 185, 225, 50, 15
+    CancelButton 240, 225, 50, 15
+  Text 35, 120, 25, 10, "Name:"
+  Text 15, 140, 45, 10, "Relationship:"
+  Text 10, 160, 50, 10, "Phone Number:"
+  Text 25, 210, 40, 10, "Other notes:"
+  Text 5, 230, 60, 10, "Worker Signature:"
+  Text 10, 50, 100, 10, "Number of Aduilts vouchered:"
+  Text 195, 30, 60, 10, "How many nights?"
+  Text 155, 50, 105, 10, "Number of Children vouchered:"
+  GroupBox 5, 100, 290, 75, "Homelessness verified by contacting:"
   Text 15, 85, 90, 10, "Reason for homelessness:"
-  Text 25, 200, 150, 10, "the Shelter team for interview and revoucher."
+  Text 25, 190, 150, 10, "the Shelter team for interview and revoucher."
+  Text 150, 10, 45, 10, "Shelter name:"
+  Text 25, 10, 45, 10, "Case number:"
+  EditBox 75, 5, 65, 15, MAXIS_case_number
+  Text 5, 30, 70, 10, "Shelter voucher date:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,10 +92,11 @@ DO
 		Dialog client_sheltered_window_A
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If client_housed_at = "" then err_msg = err_msg & vbNewLine & "* Enter the name of the shelter where client(s) housed"		
+		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Select the name of the shelter where client(s) housed"	
+		If isdate(voucher_date) = false then err_msg = err_msg & vbNewLine & "* Enter a valid shelter voucher date"
 		If nights_housed = "" then err_msg = err_msg & vbNewLine & "* Enter the number of nights clients housed"
-		If adults_vouchered = "" then err_msg = err_msg & vbNewLine & "* Enter the number of adults vouchered"
-		If children_vouchered = "" then err_msg = err_msg & vbNewLine & "* Enter the number of children vouchered"
+		If isnumeric(adults_vouchered) = false then err_msg = err_msg & vbNewLine & "* Enter the number of adults vouchered"
+		If isnumeric(children_vouchered) = false then err_msg = err_msg & vbNewLine & "* Enter the number of children vouchered"
 		If reason_for_homelessness = "" then err_msg = err_msg & vbNewLine & "* Enter the reason for client's homelessness"
 		If name_of_person_verifying = "" then err_msg = err_msg & vbNewLine & "* Enter the name of the person who verified client's homelessness"	
 		If relationship = "" then err_msg = err_msg & vbNewLine & "* Enter the relationship to the client of the person who verified client's homelessness"
@@ -110,19 +114,34 @@ EMWriteScreen MAXIS_case_number, 18, 43
 EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
 EMWriteScreen CM_yr, 20, 46
 
+'creating date variable to add to header 
+exit_date = dateadd("d", nights_housed, voucher_date)
+header_date = voucher_date & " - " & exit_date
+
+Household_comp = ""
+If PX_check = 1 then 
+	adults_vouchered = adults_vouchered - 1
+	Household_comp = Household_comp & "1 PX, "
+END IF 
+If adults_vouchered <> "0" or adults_vouchered <> "" then Household_comp = Household_comp & adults_vouchered & "A, "
+If children_vouchered <> "0" or children_vouchered <> "" then Household_comp = Household_comp & children_vouchered & "C, "
+
+Household_comp = trim(Household_comp)
+'takes the last comma off of Household_comp when autofilled into dialog if more more than one app date is found and additional app is selected
+If right(Household_comp, 1) = "," THEN Household_comp = left(Household_comp, len(Household_comp) - 1) 
+
 'The case note'
 start_a_blank_CASE_NOTE
-
-Call write_variable_in_CASE_NOTE("### APPROVED FOR SHELTER BY " & worker_signature & " ###")
-Call write_variable_in_CASE_NOTE("* Client has been housed at " & client_housed_at & " for " & nights_housed & " nights")
-Call write_variable_in_CASE_NOTE("* Voucher keyed for " & adults_vouchered & " adults and " & children_vouchered & " children")
-If informed_client_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Client will need to see Rapid ReHousing Screener first, then see shelter team for interview and revoucher. ")
+Call write_variable_in_CASE_NOTE("### App'd shelter at " & shelter_droplist & " for " & header_date & " for " & nights_housed & " nights###")
+Call write_bullet_and_variable_in_CASE_NOTE("Voucher keyed for", Household_comp)
 Call write_bullet_and_variable_in_CASE_NOTE("* Reason for client's homelessness", reason_for_homelessness)
 Call write_variable_in_CASE_NOTE("---")
-Call write_variable_in_CASE_NOTE("* Homelessness verified by contacting")
-Call write_bullet_and_variable_in_CASE_NOTE("Name", name_of_person_verifying)
-Call write_bullet_and_variable_in_CASE_NOTE("Relationship to the client", relationship)
-Call write_bullet_and_variable_in_CASE_NOTE("Phone Number of person verifying client's homelessness", phone_number)
+Call write_variable_in_CASE_NOTE("* Homelessness verified by contacting:")
+Call write_bullet_and_variable_in_CASE_NOTE("   Name", name_of_person_verifying)
+Call write_bullet_and_variable_in_CASE_NOTE("   Relationship to the client", relationship)
+Call write_bullet_and_variable_in_CASE_NOTE("   Phone Number of person verifying client's homelessness", phone_number)
+If informed_client_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Client will need to see Rapid ReHousing Screener first, then see shelter team for interview and revoucher. ")
+Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
 

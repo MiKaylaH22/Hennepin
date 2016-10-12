@@ -146,7 +146,7 @@ amt_issued = "$" & amt_issued
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("//Personal needs " & case_note_header & "//")
+Call write_variable_in_CASE_NOTE("### Personal needs " & case_note_header & " ###")
 If case_note_header = "received" then 
 	Call write_variable_in_CASE_NOTE("* Client received 10% + $20 in personal needs funds. ")
 	Call write_bullet_and_variable_in_CASE_NOTE("Amt issued", amt_issued)

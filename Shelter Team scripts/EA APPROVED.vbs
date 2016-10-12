@@ -49,18 +49,18 @@ END IF
 BeginDialog EA_approval_dialog, 0, 0, 316, 110, "EA Approved "
   EditBox 65, 10, 55, 15, MAXIS_case_number
   EditBox 200, 10, 100, 15, approval_dates
-  EditBox 65, 35, 95, 15, shelter_name
+  DropListBox 65, 35, 95, 15, "Select one..."+chr(9)+"FMF "+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
   CheckBox 170, 40, 140, 10, "Send mandatory vendor MEMO to client.", send_MEMO_checkbox
   EditBox 65, 60, 235, 15, other_notes
   EditBox 65, 85, 125, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 195, 85, 50, 15
     CancelButton 250, 85, 50, 15
-  Text 5, 90, 60, 10, "Worker signature: "
   Text 135, 15, 65, 10, "EA approval dates:"
   Text 20, 65, 40, 10, "Other notes: "
   Text 15, 15, 45, 10, "Case number:"
-  Text 20, 40, 45, 10, "Shelter name:"
+  Text 15, 40, 45, 10, "Shelter name:"
+  Text 5, 90, 60, 10, "Worker signature: "
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ DO
         cancel_confirmation
 		IF len(case_number) > 8 or IsNumeric(case_number) = False THEN err_msg = err_msg & vbNewLine & "* Please enter a valid case number."
 		IF approval_dates = "" then err_msg = err_msg & vbNewLine & "* Please enter the EA approval dates."
-		If shelter_name = "" then err_msg = err_msg & vbNewLine & "* Please enter the name of the shelter."
+		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Please select the name of the shelter."
 		IF worker_signature = "" then err_msg = err_msg & vbNewLine & "* Please enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
@@ -138,7 +138,7 @@ END IF
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("**EA approved for: " & approval_dates & " for shelter stay at " & shelter_name & "**")
+Call write_variable_in_CASE_NOTE("### EA approved for: " & approval_dates & " for shelter stay at " & shelter_droplist & " ###")
 If send_MEMO_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Sent SPEC/MEMO to client re: mandatory vendoring for the next 12 months.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")

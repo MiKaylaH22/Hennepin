@@ -98,6 +98,8 @@ start_a_blank_CASE_NOTE
 Call write_variable_in_CASE_NOTE("### SHELTER ALTERNATIVE ###")
 Call write_variable_in_CASE_NOTE("* Client seeking shelter for " & number_of_adults_sheltered & " adult(s) and " & number_of_children_sheltered & " child(ren)")
 Call write_bullet_and_variable_in_CASE_NOTE("They were not authorized for shelter because", reason_not_authorized)
+Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
+Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
 Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 

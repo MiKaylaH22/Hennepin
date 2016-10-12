@@ -116,7 +116,7 @@ End if
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE(">>>CLIENT APPROVED FOR SHELTER<<<")
+Call write_variable_in_CASE_NOTE("### CLIENT APPROVED FOR SHELTER ###")
 Call write_variable_in_CASE_NOTE("* Client has been housed at a " & shelter_type & " shelter for " & num_nights & " nights.")
 Call write_bullet_and_variable_in_CASE_NOTE("Dates shelter has been issued for", shelter_dates)
 If shelter_policy_checkbox = 1 then call write_variable_in_CASE_NOTE("* Explained shelter policies, self pay and client option to shelter such as bus tickets, temporary housing, private shelters, etc.")

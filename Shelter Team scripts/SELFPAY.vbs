@@ -46,29 +46,31 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog selfpay_dialog, 0, 0, 326, 140, "Self Pay"
+BeginDialog selfpay_dialog, 0, 0, 306, 135, "Self Pay"
   EditBox 60, 5, 60, 15, MAXIS_case_number
   EditBox 205, 5, 30, 15, dollar_amount1
   EditBox 255, 5, 45, 15, date1
-  EditBox 115, 30, 30, 15, dollar_amount2
-  EditBox 165, 30, 40, 15, facility_name
+  EditBox 110, 30, 30, 15, dollar_amount2
+  DropListBox 155, 30, 80, 15, "Select one..."+chr(9)+"FMF "+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
   EditBox 255, 30, 20, 15, number_of_days
-  EditBox 255, 55, 45, 15, date2
+  EditBox 195, 55, 45, 15, voucher_date_start
+  EditBox 260, 55, 40, 15, voucher_date_end
   EditBox 95, 80, 205, 15, other_notes
   EditBox 95, 105, 90, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 195, 105, 50, 15
     CancelButton 250, 105, 50, 15
-  Text 85, 60, 170, 10, "Hennepin County will not provide shelter again until:"
-  Text 10, 35, 100, 10, "and has been told to self-pay $"
-  Text 50, 85, 40, 10, "Other notes:"
-  Text 150, 35, 10, 10, "at"
+  Text 145, 35, 10, 10, "at"
   Text 140, 10, 65, 10, "Client will receive $"
   Text 30, 110, 60, 10, "Worker Signature:"
-  Text 280, 35, 20, 10, "days."
+  Text 280, 35, 25, 10, "nights."
   Text 10, 10, 45, 10, "Case number:"
   Text 240, 10, 10, 10, "on"
-  Text 210, 35, 35, 10, "Shelter for"
+  Text 240, 35, 10, 10, "for"
+  Text 10, 60, 180, 10, "Once self pay is verfied, client can be vouchered from:"
+  Text 10, 35, 100, 10, "and has been told to self-pay $"
+  Text 245, 60, 10, 10, "to"
+  Text 50, 85, 40, 10, "Other notes:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,12 +85,13 @@ DO
 		Dialog selfpay_dialog
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If dollar_amount1 = "" then err_msg = err_msg & vbNewLine & "* Enter a dollar amount."		
+		If isnumeric(dollar_amount1) = false then err_msg = err_msg & vbNewLine & "* Enter a numeric dollar amount."		
 		If date1 = "" then err_msg = err_msg & vbNewLine & "* Enter a date."
-		If dollar_amount2 = "Select one..." then err_msg = err_msg & vbNewLine & "* Enter a dollar amount."
-		If facility_name = "" then err_msg = err_msg & vbNewLine & "* Enter a facility name"
+		If isnumeric(dollar_amount2) = False then err_msg = err_msg & vbNewLine & "* Enter a numeric dollar amount."
+		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Select the facility name"
 		If number_of_days = "" then err_msg = err_msg & vbNewLine & "* Enter the number of days of stay."
-		If date2 = "" then err_msg = err_msg & vbNewLine & "* Enter a date."
+		If voucher_date_start = "" then err_msg = err_msg & vbNewLine & "* Enter a voucher start date or 'n/a'."
+		If voucher_date_end = "" then err_msg = err_msg & vbNewLine & "* Enter a voucher end date or 'n/a'."
 		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
@@ -105,8 +108,8 @@ EMWriteScreen CM_yr, 20, 46
 'The case note'
 start_a_blank_CASE_NOTE
 Call write_variable_in_CASE_NOTE("### Self Pay ###")
-Call write_variable_in_CASE_NOTE("* Client will receive " & dollar_amount1 & " on " & date1 & " and has been told to self-pay at " & facility_name & " Shelter for " & number_of_days & " days")
-Call write_bullet_and_variable_in_CASE_NOTE("HC will not provide shelter again until", date2)
+Call write_variable_in_CASE_NOTE("* Client will receive $" & dollar_amount1 & " on " & date1 & ", and has been told to self-pay $" & dollar_amount2 & " at " & shelter_droplist & " Shelter for " & number_of_days & " nights.")
+Call write_variable_in_CASE_NOTE("* Once self pay has been verfied, client can be vouchered from " & voucher_date_start & " to " & voucher_date_end)
 Call write_variable_in_CASE_NOTE("* Self-Pay calculation agreement form given to client.")
 Call write_variable_in_CASE_NOTE("* Shelter informed of need to self-pay")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)

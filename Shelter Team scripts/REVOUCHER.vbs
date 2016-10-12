@@ -48,7 +48,7 @@ END IF
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 BeginDialog revoucher_dialog, 0, 0, 146, 75, "Select a revoucher option"
   EditBox 80, 10, 60, 15, MAXIS_case_number
-  DropListBox 80, 30, 60, 10, "Select one.."+chr(9)+"Family"+chr(9)+"Single", revoucher_option
+  DropListBox 80, 30, 60, 10, "Select one..."+chr(9)+"Family"+chr(9)+"Single", revoucher_option
   ButtonGroup ButtonPressed
     OkButton 35, 50, 50, 15
     CancelButton 90, 50, 50, 15
@@ -57,10 +57,10 @@ BeginDialog revoucher_dialog, 0, 0, 146, 75, "Select a revoucher option"
 EndDialog
 
 BeginDialog family_revoucher_dialog, 0, 0, 341, 330, "Family revoucher"
-  DropListBox 55, 10, 60, 15, "Select one..."+chr(9)+"ACF"+chr(9)+"EA", voucher_type
+  DropListBox 55, 10, 60, 15, "Select one..."+chr(9)+"ACF"+chr(9)+"EA"+chr(9)+"Self pay", voucher_type
   EditBox 195, 10, 55, 15, revoucher_date
   EditBox 305, 10, 25, 15, num_nights
-  EditBox 55, 35, 110, 15, shelter_name
+  DropListBox 55, 35, 115, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
   EditBox 225, 35, 25, 15, children
   EditBox 305, 35, 25, 15, adults
   EditBox 55, 75, 275, 15, goal_one
@@ -77,25 +77,25 @@ BeginDialog family_revoucher_dialog, 0, 0, 341, 330, "Family revoucher"
   ButtonGroup ButtonPressed
     OkButton 225, 305, 50, 15
     CancelButton 280, 305, 50, 15
-  Text 265, 15, 40, 10, "# of nights:"
   Text 55, 290, 40, 10, "Other notes: "
   Text 180, 40, 45, 10, "# of Children:"
   GroupBox 5, 60, 330, 95, "Goals accomplished:"
-  Text 15, 120, 40, 10, "Goal three:"
-  Text 15, 140, 35, 10, "Goal four:"
-  Text 15, 100, 35, 10, "Goal two:"
+  Text 25, 120, 25, 10, "Goal 3:"
+  Text 25, 140, 25, 10, "Goal 4:"
+  Text 25, 100, 25, 10, "Goal 2:"
   Text 5, 15, 45, 10, "Voucher type:"
-  Text 265, 40, 40, 10, "# of Adults:"
-  Text 15, 80, 35, 10, "Goal one:"
-  Text 15, 185, 35, 10, "Goal one:"
-  Text 15, 205, 35, 10, "Goal two:"
+  Text 265, 15, 40, 10, "# of nights:"
+  Text 25, 80, 25, 10, "Goal 1:"
+  Text 25, 185, 25, 10, "Goal 1:"
+  Text 25, 205, 25, 10, "Goal 2:"
   GroupBox 5, 165, 330, 95, "Goals for the next voucher:"
-  Text 15, 225, 40, 10, "Goal three:"
-  Text 15, 245, 35, 10, "Goal four:"
+  Text 25, 225, 25, 10, "Goal 3:"
+  Text 25, 245, 25, 10, "Goal 4:"
   Text 35, 310, 60, 10, "Worker signature: "
   Text 130, 15, 60, 10, "Date of revoucher:"
-  Text 5, 40, 50, 10, "Shelter name:"
+  Text 5, 40, 45, 10, "Shelter name:"
   Text 15, 270, 85, 10, "Bus tokens/cards issued:"
+  Text 265, 40, 40, 10, "# of Adults:"
 EndDialog
 
 BeginDialog single_revoucher_dialog, 0, 0, 341, 345, "Single revoucher"
@@ -121,16 +121,16 @@ BeginDialog single_revoucher_dialog, 0, 0, 341, 345, "Single revoucher"
   Text 55, 290, 40, 10, "Other notes: "
   Text 125, 40, 85, 10, "Dates shelter issued for:"
   GroupBox 5, 60, 330, 95, "Goals accomplished (18-21 YRS):"
-  Text 15, 120, 40, 10, "Goal three:"
-  Text 15, 140, 35, 10, "Goal four:"
-  Text 15, 100, 35, 10, "Goal two:"
+  Text 25, 120, 25, 10, "Goal 3:"
+  Text 25, 140, 25, 10, "Goal 4:"
+  Text 25, 100, 25, 10, "Goal 2:"
   Text 5, 15, 45, 10, "Voucher type:"
-  Text 15, 80, 35, 10, "Goal one:"
-  Text 15, 185, 35, 10, "Goal one:"
-  Text 15, 205, 35, 10, "Goal two:"
+  Text 25, 80, 25, 10, "Goal 1:"
+  Text 25, 185, 25, 10, "Goal 1:"
+  Text 25, 205, 25, 10, "Goal 2:"
   GroupBox 5, 165, 330, 95, "Goals for the next voucher:"
-  Text 15, 225, 40, 10, "Goal three:"
-  Text 15, 245, 35, 10, "Goal four:"
+  Text 25, 225, 25, 10, "Goal 3:"
+  Text 25, 245, 25, 10, "Goal 4:"
   Text 35, 310, 60, 10, "Worker signature: "
   Text 130, 15, 60, 10, "Date of revoucher:"
   Text 5, 40, 45, 10, "Shelter type:"
@@ -168,7 +168,7 @@ If revoucher_option = "Family" then
 			IF voucher_type = "Select one..." then err_msg = err_msg & vbNewLine & "* Select a voucher type."
 			If isDate(revoucher_date) = False then err_msg = err_msg & vbNewLine & "* Enter the revoucher date."
 			If IsNumeric(num_nights) = False then err_msg = err_msg & vbNewLine & "* Enter the number of nights issued."
-			If shelter_name = "" then err_msg = err_msg & vbNewLine & "* Enter the shelter name."
+			If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Choose a shelter name."
 			If IsNumeric(children) = False then err_msg = err_msg & vbNewLine & "* Enter the number of children."
 			If IsNumeric(adults) = False then err_msg = err_msg & vbNewLine & "* Enter the number of adults."
 			If goal_one = "" AND goal_two = "" AND goal_three = "" AND goal_four = "" then err_msg = err_msg & vbNewLine & "* Enter at least one goal accomplished."
@@ -208,34 +208,33 @@ EMWriteScreen case_number, 18, 43
 EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
 EMWriteScreen CM_yr, 20, 46
 
+exit_date = dateadd("d", num_nights, revoucher_date)
+header_date = revoucher_date & " - " & exit_date
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("~~" & revoucher_option & " Revoucher~~")
-Call write_bullet_and_variable_in_CASE_NOTE("Voucher type", voucher_type)
-Call write_bullet_and_variable_in_CASE_NOTE("Date of revoucher", revoucher_date)
-IF revoucher_option = "Family" then 
-	Call write_variable_in_CASE_NOTE("* HH comp: " & adults & " adults, " & children & " children.")
-	Call write_variable_in_CASE_NOTE("* Revoucher issued for " & shelter_name & " for " & num_nights & " nights.")
-Else
-	Call write_variable_in_CASE_NOTE("* Revoucher issued for " & voucher_type & " shelter for " & num_nights & " nights.")
-END IF
+IF voucher_type = "Self pay" then 
+	Call write_variable_in_CASE_NOTE("### " & voucher_type & " for " & header_date & " at " & shelter_droplist & " for " & num_nights & " nights###")
+Else 
+	Call write_variable_in_CASE_NOTE("### " & voucher_type & " " & revoucher_option & " Voucher " & header_date & " at " & shelter_droplist & " for " & num_nights & " nights###")
+End if	
+IF revoucher_option = "Family" then Call write_variable_in_CASE_NOTE("* HH comp: " & adults & "A," & children & "C")
 IF revoucher_option = "Family" then 
 	Call write_variable_in_CASE_NOTE("--Goals accomplished--")
 Else 
 	Call write_variable_in_CASE_NOTE("--Goals accomplished (18-21 yrs)--")
 END IF
-Call write_bullet_and_variable_in_CASE_NOTE("Goal one", goal_one)
-Call write_bullet_and_variable_in_CASE_NOTE("Goal two", goal_two)
-Call write_bullet_and_variable_in_CASE_NOTE("Goal three", goal_three) 
-Call write_bullet_and_variable_in_CASE_NOTE("Goal four", goal_four)
+Call write_variable_in_CASE_NOTE("1. " & goal_one)
+Call write_variable_in_CASE_NOTE("2. " & goal_two)
+Call write_variable_in_CASE_NOTE("3. " & goal_three) 
+Call write_variable_in_CASE_NOTE("4. " & goal_four)
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE("--Goals for the next voucher--")
-Call write_bullet_and_variable_in_CASE_NOTE("Goal one", next_goal_one)
-Call write_bullet_and_variable_in_CASE_NOTE("Goal two", next_goal_two)
-Call write_bullet_and_variable_in_CASE_NOTE("Goal three", next_goal_three) 
-Call write_bullet_and_variable_in_CASE_NOTE("Goal four", next_goal_four)
+Call write_variable_in_CASE_NOTE("1. " & next_goal_one)
+Call write_variable_in_CASE_NOTE("2. " & next_goal_two)
+Call write_variable_in_CASE_NOTE("3. " & next_goal_three) 
+Call write_variable_in_CASE_NOTE("4. " & next_goal_four)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_bullet_and_variable_in_CASE_NOTE("Bus tickets/tokens issued", bus_issued)
+Call write_bullet_and_variable_in_CASE_NOTE("Bus tokens/cards issued", bus_issued)
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE (worker_signature)

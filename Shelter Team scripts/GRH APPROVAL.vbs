@@ -48,17 +48,17 @@ END IF
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 BeginDialog grh_approval, 0, 0, 266, 80, "GRH Approval"
   EditBox 60, 5, 55, 15, MAXIS_case_number
-  EditBox 180, 5, 80, 15, shelter_name
+  DropListBox 180, 5, 85, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
   CheckBox 35, 35, 85, 10, "GRH notice cancelled", GRH_notice_checkbox
   EditBox 200, 30, 60, 15, ea_available_date
   EditBox 65, 55, 85, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 155, 55, 50, 15
     CancelButton 210, 55, 50, 15
-  Text 5, 60, 60, 10, "Worker Signature:"
   Text 10, 10, 50, 10, "Case Number:"
   Text 130, 35, 65, 10, "EA availalble date:"
-  Text 130, 10, 50, 10, "Shelter Name:"
+  Text 125, 10, 50, 10, "Shelter Name:"
+  Text 5, 60, 60, 10, "Worker Signature:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,10 +70,10 @@ CALL MAXIS_case_number_finder(MAXIS_case_number)
 DO
 	DO
 		err_msg = ""
-		Dialog bus_ticket_dialog
+		Dialog grh_approval
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If shelter_name = "" then err_msg = err_msg & vbNewLine & "* Enter shelter name."		
+		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Enter shelter name."		
 		If ea_available_date = "" then err_msg = err_msg & vbNewLine & "* Enter EA Available date"
 		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
@@ -91,8 +91,8 @@ EMWriteScreen CM_yr, 20, 46
 'The case note'
 start_a_blank_CASE_NOTE	
 Call write_variable_in_CASE_NOTE("### GRH Approved ###")
-Call write_bullet_and_variable_in_CASE_NOTE("Client placed in ", shelter_name & " shelter.")
-Call write_bullet_and_variable_in_CASE_NOTE("EA availalbe date ", ea_available_date)
+Call write_bullet_and_variable_in_CASE_NOTE("Client placed in", shelter_droplist)
+Call write_bullet_and_variable_in_CASE_NOTE("EA available date", ea_available_date)
 If shelter_policy_checkbox = 1 then call write_variable_in_CASE_NOTE("* GRH Notice Cancelled.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE("---")

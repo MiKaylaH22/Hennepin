@@ -79,6 +79,7 @@ CALL MAXIS_case_number_finder(MAXIS_case_number)
 date_checked = date & ""
 
 'Running the initial dialog
+'commented out the foreclosure_date test at reqwust of hennepin shelter Team'
 DO
 	DO
 		err_msg = ""
@@ -88,7 +89,7 @@ DO
 		If IsDate(date_checked) = False then err_msg = err_msg & vbNewLine & "* Enter the property review date."      
 		If property_address = "" then err_msg = err_msg & vbNewLine & "* Enter the property address."
 		If owner_name = "" then err_msg = err_msg & vbNewLine & "* Enter the property owner's name."
-		If IsDate(foreclosure_date) = False then err_msg = err_msg & vbNewLine & "* Enter the property's forclosure date."      
+		'If IsDate(foreclosure_date) = False then err_msg = err_msg & vbNewLine & "* Enter the property's forclosure date."      
 		If occupant_name = "" then err_msg = err_msg & vbNewLine & "* Enter the occupant's name."
 		If occupants_whereabouts = "" then err_msg = err_msg & vbNewLine & "* Enter the occupant's current whereabouts."
 		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
@@ -106,7 +107,7 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note'
 start_a_blank_CASE_NOTE
-Call write_variable_in_CASE_NOTE("###Sheriff foreclosure website checked on: " & date_checked & "###"   )
+Call write_variable_in_CASE_NOTE("### Sheriff foreclosure website checked on: " & date_checked & " ###"   )
 Call write_bullet_and_variable_in_CASE_NOTE("Property address", property_address)
 Call write_bullet_and_variable_in_CASE_NOTE("Owner(s) name", owner_name)
 Call write_bullet_and_variable_in_CASE_NOTE("Foreclosure date", foreclosure_date)

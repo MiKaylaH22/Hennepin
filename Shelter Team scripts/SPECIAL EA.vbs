@@ -84,7 +84,7 @@ EMWriteScreen CM_yr, 20, 46
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("***Special EA***")
+Call write_variable_in_CASE_NOTE("### Special EA ###")
 Call write_variable_in_CASE_NOTE ("* Due to special EA rules, EA is extended until client exits shelter.")
 Call write_bullet_and_variable_in_CASE_NOTE("Special EA notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")
