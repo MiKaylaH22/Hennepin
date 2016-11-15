@@ -60,9 +60,9 @@ EndDialog
 'The script----------------------------------------------------------------------------------------------------
 EMConnect ""		'Connecting to BlueZone
 
-MAXIS_footer_month = "11"
-MAXIS_footer_year = "16"
-employee_number = "150545005"
+'MAXIS_footer_month = "11"
+'MAXIS_footer_year = "16"
+'employee_number = "150545005"
 
 'The main dialog
 Do
