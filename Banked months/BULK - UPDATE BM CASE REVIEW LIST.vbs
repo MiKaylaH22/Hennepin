@@ -40,62 +40,46 @@ IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded
 END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
-'FUNCTIONS that are currently not in the FuncLib that are used in this script----------------------------------------------------------------------------------------------------
-Function File_Selection_System_Dialog(file_selected)
-    'Creates a Windows Script Host object
-    Set wShell=CreateObject("WScript.Shell")
-
-    'Creates an object which executes the "select a file" dialog, using a Microsoft HTML application (MSHTA.exe), and some handy-dandy HTML.
-    Set oExec=wShell.Exec("mshta.exe ""about:<input type=file id=FILE><script>FILE.click();new ActiveXObject('Scripting.FileSystemObject').GetStandardStream(1).WriteLine(FILE.value);close();resizeTo(0,0);</script>""")
-
-    'Creates the file_selected variable from the exit
-    file_selected = oExec.StdOut.ReadLine
-End function
-
-'-------THIS FUNCTION ALLOWS THE USER TO PICK AN EXCEL FILE---------
-Function BrowseForFile()
-    Dim shell : Set shell = CreateObject("Shell.Application")
-    Dim file : Set file = shell.BrowseForFolder(0, "Choose a file:", &H4000, "Computer")
-	IF file is Nothing THEN 
-		script_end_procedure("The script will end.")
-	ELSE
-		BrowseForFile = file.self.Path
-	END IF
-End Function
-
-BeginDialog update_banked_month_status_dialog, 0, 0, 191, 90, "Dialog"
-  DropListBox 80, 10, 105, 15, "Select one..."+chr(9)+"January"+chr(9)+"February"+chr(9)+"March"+chr(9)+"April"+chr(9)+"May"+chr(9)+"June"+chr(9)+"July"+chr(9)+"August"+chr(9)+"September"+chr(9)+"October"+chr(9)+"November"+chr(9)+"December", month_selection
-  EditBox 80, 30, 30, 15, excel_row_to_start
-  ButtonGroup ButtonPressed
-    OkButton 80, 65, 50, 15
-    CancelButton 135, 65, 50, 15
-  Text 15, 35, 60, 10, "Excel row to start:"
-  Text 10, 50, 160, 10, "(NOTE: the 1st row is row 2 (the header is row 1)."
-  Text 5, 15, 70, 10, "Update status month:"
-EndDialog
-
-
 'THE SCRIPT-------------------------------------------------------------------------------------------------------------------------
 EMConnect ""		'Connects to BlueZone
 
-DO
-	'file_location = InputBox("Please enter the file location.")
-	Set objExcel = CreateObject("Excel.Application")
-	Set objWorkbook = objExcel.Workbooks.Open(BrowseForFile)
-	objExcel.Visible = True
-	objExcel.DisplayAlerts = True
+'dialog and dialog DO...Loop	
+Do
+	Do
+			'The dialog is defined in the loop as it can change as buttons are pressed 
+			BeginDialog file_select_dialog, 0, 0, 226, 50, "Select the banked months case review file."
+  				ButtonGroup ButtonPressed
+    			PushButton 175, 10, 40, 15, "Browse...", select_a_file_button
+    			OkButton 110, 30, 50, 15
+    			CancelButton 165, 30, 50, 15
+  				EditBox 5, 10, 165, 15, file_selection_path
+			EndDialog
+			err_msg = ""
+			Dialog file_select_dialog
+			cancel_confirmation
+			If ButtonPressed = select_a_file_button then
+				If file_selection_path <> "" then 'This is handling for if the BROWSE button is pushed more than once'
+					objExcel.Quit 'Closing the Excel file that was opened on the first push'
+					objExcel = "" 	'Blanks out the previous file path'
+				End If
+				call file_selection_system_dialog(file_selection_path, ".xlsx") 'allows the user to select the file'
+			End If
+			If file_selection_path = "" then err_msg = err_msg & vbNewLine & "Use the Browse Button to select the file that has your client data"
+			If err_msg <> "" Then MsgBox err_msg
+		Loop until err_msg = ""
+		If objExcel = "" Then call excel_open(file_selection_path, True, True, ObjExcel, objWorkbook)  'opens the selected excel file'
+		If err_msg <> "" Then MsgBox err_msg
+	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS
+Loop until are_we_passworded_out = false					'loops until user passwords back in
 	
-	confirm_file = MsgBox("Is this the correct file? Press YES to continue. Press NO to try again. Press CANCEL to stop the script.", vbYesNoCancel)
-	IF confirm_file = vbCancel THEN 
-		objWorkbook.Close
-		objExcel.Quit
-		stopscript
-	ELSEIF confirm_file = vbNo THEN 
-		objWorkbook.Close
-		objExcel.Quit
-	END IF
-LOOP UNTIL confirm_file = vbYes
-	
+BeginDialog update_banked_month_status_dialog, 0, 0, 191, 60, "Dialog"
+  DropListBox 80, 10, 105, 15, "Select one..."+chr(9)+"January"+chr(9)+"February"+chr(9)+"March"+chr(9)+"April"+chr(9)+"May"+chr(9)+"June"+chr(9)+"July"+chr(9)+"August"+chr(9)+"September"+chr(9)+"October"+chr(9)+"November"+chr(9)+"December", month_selection
+  ButtonGroup ButtonPressed
+    OkButton 80, 35, 50, 15
+    CancelButton 135, 35, 50, 15
+  Text 5, 15, 70, 10, "Update status month:"
+EndDialog
+
 'DISPLAYS DIALOG
 DO
 	DO
@@ -103,11 +87,10 @@ DO
 		Dialog update_banked_month_status_dialog
 		If ButtonPressed = 0 then StopScript
 		If month_selection = "Select one..." then err_msg = err_msg & vbNewLine & "* Please select the status month to update."
-		If isNumeric(excel_row_to_start) = False then err_msg = err_msg & vbNewLine & "* Please select the excel row to start."
         IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
-Loop until are_we_passworded_out = false					'loops until user passwords back in					
+Loop until are_we_passworded_out = false					'loops until user passwords back in			
 	
 'resets the case number and footer month/year back to the CM (REVS for current month plus two has is going to be a problem otherwise)
 back_to_self
@@ -120,55 +103,55 @@ transmit
 Select Case month_selection
 Case "January"
 	MAXIS_footer_month = "01"
-	MAXIS_footer_year = "16"
-	excel_col = 5
+	MAXIS_footer_year = "17"
+	excel_col = 18
 Case "February"
 	MAXIS_footer_month = "02"
-	MAXIS_footer_year = "16"
-	excel_col = 6
+	MAXIS_footer_year = "17"
+	excel_col = 19
 Case "March"
 	MAXIS_footer_month = "03"
-	MAXIS_footer_year = "16"
-	excel_col = 7
+	MAXIS_footer_year = "17"
+	excel_col = 20
 Case "April"
 	MAXIS_footer_month = "04"
-	MAXIS_footer_year = "16"
-	excel_col = 8
+	MAXIS_footer_year = "17"
+	excel_col = 21
 Case "May"
 	MAXIS_footer_month = "05"
-	MAXIS_footer_year = "16"
-	excel_col = 9
+	MAXIS_footer_year = "17"
+	excel_col = 22
 Case "June"
 	MAXIS_footer_month = "06"
-	MAXIS_footer_year = "16"
-	excel_col = 10
+	MAXIS_footer_year = "17"
+	excel_col = 23
 Case "July"
 	MAXIS_footer_month = "07"
-	MAXIS_footer_year = "16"
-	excel_col = 11
+	MAXIS_footer_year = "17"
+	excel_col = 24
 Case "August"
 	MAXIS_footer_month = "08"
-	MAXIS_footer_year = "16"
-	excel_col = 12
+	MAXIS_footer_year = "17"
+	excel_col = 25
 Case "September"
 	MAXIS_footer_month = "09"
-	MAXIS_footer_year = "16"
-	excel_col = 13
+	MAXIS_footer_year = "17"
+	excel_col = 26
 Case "October"
 	MAXIS_footer_month = "10"
-	MAXIS_footer_year = "16"
-	excel_col = 14
+	MAXIS_footer_year = "17"
+	excel_col = 27
 Case "November"
 	MAXIS_footer_month = "11"
-	MAXIS_footer_year = "16"
-	excel_col = 15
+	MAXIS_footer_year = "17"
+	excel_col = 28
 Case "December"
 	MAXIS_footer_month = "12"
-	MAXIS_footer_year = "16"
-	excel_col = 16
+	MAXIS_footer_year = "17"
+	excel_col = 29
 End Select
 
-excel_row = excel_row_to_start
+excel_row = 2
 DO  
     'Grabs the case number
 	MAXIS_case_number = objExcel.cells(excel_row, 3).value
@@ -205,6 +188,22 @@ DO
 	    Loop until MAXIS_row = 17
         If prog_name <> "FS" then ObjExcel.Cells(excel_row, excel_col).Value = "Inactive"
     END If 
+	
+	'inputs EXEMPT on cases that are active on GA/open on other programs
+	If case_status = "ACTIVE" then 
+		Call navigate_to_MAXIS_screen("STAT", "PROG")
+		EMReadScreen SNAP_prog_status, 4, 10, 74 
+		IF SNAP_prog_status = "INAC" or trim(SNAP_prog_status) = "" then 
+			ObjExcel.Cells(excel_row, excel_col).Value = "Inactive"
+		Else 
+			EMReadScreen cash_prog_status, 4, 6, 74
+			IF cash_prog_status = "ACTV" then 
+				ObjExcel.Cells(excel_row, excel_col).Value = "Exempt"
+			Else
+				ObjExcel.Cells(excel_row, excel_col).Value = ""
+			End if 
+		END IF  
+	END IF
 
     MAXIS_case_number = ""
     excel_row = excel_row + 1
@@ -212,5 +211,4 @@ DO
 LOOP UNTIL objExcel.Cells(excel_row, 3).value = ""	'looping until the list of cases to check for recert is complete
 
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
-
 script_end_procedure("Success! The Excel file now has been update for all inactive SNAP cases.")
