@@ -40,53 +40,9 @@ IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded
 END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
-'FUNCTIONS that are currently not in the FuncLib that are used in this script----------------------------------------------------------------------------------------------------
-Function File_Selection_System_Dialog(file_selected)
-    'Creates a Windows Script Host object
-    Set wShell=CreateObject("WScript.Shell")
-
-    'Creates an object which executes the "select a file" dialog, using a Microsoft HTML application (MSHTA.exe), and some handy-dandy HTML.
-    Set oExec=wShell.Exec("mshta.exe ""about:<input type=file id=FILE><script>FILE.click();new ActiveXObject('Scripting.FileSystemObject').GetStandardStream(1).WriteLine(FILE.value);close();resizeTo(0,0);</script>""")
-
-    'Creates the file_selected variable from the exit
-    file_selected = oExec.StdOut.ReadLine
-End function
-
-'-------THIS FUNCTION ALLOWS THE USER TO PICK AN EXCEL FILE---------
-Function BrowseForFile()
-    Dim shell : Set shell = CreateObject("Shell.Application")
-    Dim file : Set file = shell.BrowseForFolder(0, "Choose a file:", &H4000, "Computer")
-	IF file is Nothing THEN 
-		script_end_procedure("The script will end.")
-	ELSE
-		BrowseForFile = file.self.Path
-	END IF
-End Function
-
-'THE SCRIPT-------------------------------------------------------------------------------------------------------------------------
-EMConnect ""		'Connects to BlueZone
-
-DO
-	'file_location = InputBox("Please enter the file location.")
-	Set objExcel = CreateObject("Excel.Application")
-	Set objWorkbook = objExcel.Workbooks.Open(BrowseForFile)
-	objExcel.Visible = True
-	objExcel.DisplayAlerts = True
-	
-	confirm_file = MsgBox("Is this the correct file? Press YES to continue. Press NO to try again. Press CANCEL to stop the script.", vbYesNoCancel)
-	IF confirm_file = vbCancel THEN 
-		objWorkbook.Close
-		objExcel.Quit
-		stopscript
-	ELSEIF confirm_file = vbNo THEN 
-		objWorkbook.Close
-		objExcel.Quit
-	END IF
-LOOP UNTIL confirm_file = vbYes
-
+'Custom function for this script----------------------------------------------------------------------------------------------------
 FUNCTION get_case_status	
 	back_to_self
-	EMWriteScreen "________", 18, 43
 	EMWriteScreen MAXIS_case_number, 18, 43
 	
 	Call navigate_to_MAXIS_screen("CASE", "CURR")
@@ -100,50 +56,51 @@ FUNCTION get_case_status
 	excel_row = excel_row + 1
 	STATS_counter = STATS_counter + 1
 END FUNCTION
+'End of function----------------------------------------------------------------------------------------------------
 
-'using new variable count to calculate percentages
-IF case_status = "ACTIVE" then active_status = active_status + 1
-IF case_status = "APP CLOS" then app_close_status = app_close_status + 1
-IF case_status = "APP OPEN" then app_open_status = app_open_status + 1
-IF case_status = "INACTIVE" then inactive_status = inactive_status + 1
-IF case_status = "REIN" then rein_status = rein_status + 1
+'THE SCRIPT-------------------------------------------------------------------------------------------------------------------------
+EMConnect ""		'Connects to BlueZone
 
-BeginDialog excel_row_to_start_dialog, 0, 0, 156, 45, "Enter the excel row where the script should start:"
-  EditBox 90, 5, 60, 15, excel_row_to_start
-  ButtonGroup ButtonPressed
-    OkButton 45, 25, 50, 15
-    CancelButton 100, 25, 50, 15
-  Text 5, 10, 85, 10, "Excel row to restart from:"
-EndDialog
-
-Do 	
+'dialog and dialog DO...Loop	
+Do
 	Do
-		dialog excel_row_to_start_dialog
-		If ButtonPressed = 0 then stopscript
-		If isnumeric(excel_row_to_start) = False then msgbox "Enter a valid numeric row to start."
-	Loop until isnumeric(excel_row_to_start) = True
-	call check_for_password(are_we_passworded_out)
-Loop until are_we_passworded_out = false
- 
+			'The dialog is defined in the loop as it can change as buttons are pressed 
+			BeginDialog file_select_dialog, 0, 0, 226, 50, "Select the file with the auto dialer calls."
+			  ButtonGroup ButtonPressed
+			    PushButton 175, 10, 40, 15, "Browse...", select_a_file_button
+			    OkButton 110, 30, 50, 15
+			    CancelButton 165, 30, 50, 15
+			  EditBox 5, 10, 165, 15, file_selection_path
+			EndDialog
+			err_msg = ""
+			Dialog file_select_dialog
+			If ButtonPressed = 0 then stopscript
+			If ButtonPressed = select_a_file_button then
+				If file_selection_path <> "" then 'This is handling for if the BROWSE button is pushed more than once'
+					objExcel.Quit 'Closing the Excel file that was opened on the first push'
+					objExcel = "" 	'Blanks out the previous file path'
+				End If
+				call file_selection_system_dialog(file_selection_path, ".xlsx") 'allows the user to select the file'
+			End If
+			If isnumeric(excel_row_to_start) = False then msgbox "Enter a valid numeric row to start."
+			If file_selection_path = "" then err_msg = err_msg & vbNewLine & "Use the Browse Button to select the file that has your client data"
+			If err_msg <> "" Then MsgBox err_msg
+		Loop until err_msg = ""
+		If objExcel = "" Then call excel_open(file_selection_path, True, True, ObjExcel, objWorkbook)  'opens the selected excel file'
+		If err_msg <> "" Then MsgBox err_msg
+	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS
+Loop until are_we_passworded_out = false					'loops until user passwords back in
+
 'resets the case number and footer month/year back to the CM (REVS for current month plus two has is going to be a problem otherwise)
 back_to_self
-EMwritescreen "________", 18, 43
 EMWriteScreen CM_mo, 20, 43
 EMWriteScreen CM_yr, 20, 46
 transmit
 
 'Gathering case status for answered call cases
-'ObjExcel.ActiveSheet.Name = "Answer"
 objExcel.worksheets("Answer").Activate
-'Zeroing out variables
-stats_counter = 0
-active_status = 0
-app_close_status = 0
-app_open_status = 0
-inactive_status = 0 
-rein_status = 0 
 
-excel_row = excel_row_to_start
+excel_row = 2
 Do 
 	'Grabs the case number
 	MAXIS_case_number = objExcel.cells(excel_row, 1).value
@@ -151,6 +108,28 @@ Do
 	get_case_status
 LOOP UNTIL objExcel.Cells(excel_row, 1).value = ""	'looping until the list of cases to check for recert is complete
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
+
+'Gathering case status for answered call cases
+objExcel.worksheets("No Answer").Activate
+
+excel_row = 2
+Do 
+	'Grabs the case number
+	MAXIS_case_number = objExcel.cells(excel_row, 1).value
+	If MAXIS_case_number = "" then exit do
+	get_case_status
+LOOP UNTIL objExcel.Cells(excel_row, 1).value = ""	'looping until the list of cases to check for recert is complete
+
+script_end_procedure("Success! The Excel file now has been update for all inactive SNAP cases.")
+
+'Code not being used right now for stats----------------------------------------------------------------------------------------------------
+
+''using new variable count to calculate percentages
+'IF case_status = "ACTIVE" then active_status = active_status + 1
+'IF case_status = "APP CLOS" then app_close_status = app_close_status + 1
+'IF case_status = "APP OPEN" then app_open_status = app_open_status + 1
+'IF case_status = "INACTIVE" then inactive_status = inactive_status + 1
+'IF case_status = "REIN" then rein_status = rein_status + 1
 
 'ObjExcel.Cells(1,4).Value = "=COUNTA(B2:B & abs(excel_row))"	'Excel formula
 ''ObjExcel.Cells(row_to_use, col_to_use).Value = "=COUNTA(" & SNAP_letter_col & ":" & SNAP_letter_col & ") - 1"	'Excel formula
@@ -173,13 +152,11 @@ STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted
 'app_open_status = 0
 'inactive_status = 0 
 'rein_status = 0 
-'
-'excel_row = 2
-'Do 
-'	'Grabs the case number
-'	MAXIS_case_number = objExcel.cells(excel_row, 1).value
-'	If MAXIS_case_number = "" then exit do
-'	get_case_status
-'LOOP UNTIL objExcel.Cells(excel_row, 1).value = ""	'looping until the list of cases to check for recert is complete
-'
-script_end_procedure("Success! The Excel file now has been update for all inactive SNAP cases.")
+
+''Zeroing out variables
+'stats_counter = 0
+'active_status = 0
+'app_close_status = 0
+'app_open_status = 0
+'inactive_status = 0 
+'rein_status = 0 
