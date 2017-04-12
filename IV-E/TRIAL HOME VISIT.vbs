@@ -129,7 +129,7 @@ DO
 		err_msg = ""
 		Dialog initial_dialog
         cancel_confirmation
-		IF len(case_number) > 8 or IsNumeric(case_number) = False THEN err_msg = err_msg & vbNewLine & "* Enter a valid case number."
+		IF len(MAXIS_case_number) > 8 or IsNumeric(MAXIS_case_number) = False THEN err_msg = err_msg & vbNewLine & "* Enter a valid case number."
 		IF THV_option = "Select one..." then err_msg = err_msg & vbNewLine & "* Select a trial home visit option."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
@@ -138,7 +138,7 @@ LOOP UNTIL check_for_password(are_we_passworded_out) = False
 
 back_to_SELF
 EMWriteScreen "________", 18, 43
-EMWriteScreen case_number, 18, 43
+EMWriteScreen MAXIS_case_number, 18, 43
 EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
 EMWriteScreen CM_yr, 20, 46
 
