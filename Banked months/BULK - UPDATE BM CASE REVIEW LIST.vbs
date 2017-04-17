@@ -37,6 +37,9 @@ END IF
 'THE SCRIPT-------------------------------------------------------------------------------------------------------------------------
 EMConnect ""		'Connects to BlueZone
 
+'default file path since this is stationary
+file_selection_path = "\\hcgg.fr.co.hennepin.mn.us\lobroot\HSPH\Team\Eligibility Support\Restricted\QI - Quality Improvement\SNAP FS\Banked months data\Master case review list.xlsx"
+
 'dialog and dialog DO...Loop	
 Do
 	Do
