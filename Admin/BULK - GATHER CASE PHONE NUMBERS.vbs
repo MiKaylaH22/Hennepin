@@ -87,6 +87,7 @@ EMWriteScreen CM_yr, 20, 46
 transmit
 
 'starts adding phone numbers at row selected
+Excel_row = 2
 Do
 	'Grabs the case number
 	MAXIS_case_number = objExcel.cells(excel_row, 1).value
