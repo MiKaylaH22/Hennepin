@@ -37,7 +37,6 @@ END IF
 'THE SCRIPT-------------------------------------------------------------------------------------------------------------------------
 EMConnect ""		'Connects to BlueZone
 
-file_selection_path = "C:\Users\ilfe001\Desktop\Report 1 Oct 2016-June 2017 (002).xlsx"
 'dialog and dialog DO...Loop	
 Do
 	Do
