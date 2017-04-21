@@ -46,23 +46,32 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog shelter_alternative_dialog, 0, 0, 351, 120, "Shelter Alternative"
+BeginDialog shelter_alternative_dialog, 0, 0, 301, 200, "Shelter Alternative"
   EditBox 60, 5, 60, 15, MAXIS_case_number
-  EditBox 215, 5, 20, 15, number_of_adults_sheltered
-  EditBox 275, 5, 20, 15, number_of_children_sheltered
-  EditBox 170, 30, 160, 15, reason_not_authorized
-  EditBox 125, 55, 205, 15, other_notes
-  EditBox 125, 85, 90, 15, worker_signature
+  EditBox 210, 5, 20, 15, number_of_adults_sheltered
+  EditBox 255, 5, 20, 15, number_of_children_sheltered
+  EditBox 60, 30, 230, 15, reason_not_authorized
+  EditBox 30, 65, 250, 15, needed_one
+  EditBox 30, 85, 250, 15, needed_two
+  EditBox 30, 105, 250, 15, needed_three
+  EditBox 30, 125, 250, 15, needed_four
+  EditBox 60, 155, 230, 15, other_notes
+  EditBox 70, 180, 110, 15, worker_signature
   ButtonGroup ButtonPressed
-    OkButton 225, 85, 50, 15
-    CancelButton 280, 85, 50, 15
-  Text 10, 10, 45, 10, "Case number:"
-  Text 60, 90, 60, 10, "Worker Signature:"
-  Text 300, 10, 30, 10, "child(ren)"
-  Text 80, 60, 40, 10, "Other notes:"
-  Text 15, 35, 150, 10, "They were not authorized for shelter because:"
+    OkButton 185, 180, 50, 15
+    CancelButton 240, 180, 50, 15
+  Text 25, 35, 35, 10, "Situation:"
   Text 125, 10, 85, 10, "Client seeking shelter for"
-  Text 240, 10, 30, 10, "adult and"
+  Text 235, 10, 20, 10, "A and"
+  Text 10, 10, 45, 10, "Case number:"
+  Text 15, 70, 10, 10, "1."
+  GroupBox 5, 50, 285, 100, "What is needed for shelter?"
+  Text 5, 185, 60, 10, "Worker Signature:"
+  Text 15, 90, 10, 10, "2."
+  Text 280, 10, 10, 10, "C"
+  Text 15, 110, 10, 10, "3."
+  Text 15, 160, 40, 10, "Comments:"
+  Text 15, 130, 10, 10, "4."
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,11 +86,11 @@ DO
 		Dialog shelter_alternative_dialog
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If number_of_adults_sheltered = "" then err_msg = err_msg & vbNewLine & "* Enter the nubmer of adults sheltered"
-		If number_of_children_sheltered = "" then err_msg = err_msg & vbNewLine & "* Enter the number of children sheltered"
+		If IsNumeric(number_of_adults_sheltered) = False then err_msg = err_msg & vbNewLine & "* Enter the nubmer of adults sheltered"
+		If IsNumeric(number_of_children_sheltered) = False then err_msg = err_msg & vbNewLine & "* Enter the number of children sheltered"
 		If reason_not_authorized = "" then err_msg = err_msg & vbNewLine & "* Enter reason not authorized"	
 		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
-		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
+		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter N/A in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
 Loop until are_we_passworded_out = false					'loops until user passwords back in					
@@ -96,11 +105,16 @@ EMWriteScreen CM_yr, 20, 46
 'The case note'
 start_a_blank_CASE_NOTE
 Call write_variable_in_CASE_NOTE("### SHELTER ALTERNATIVE ###")
-Call write_variable_in_CASE_NOTE("* Client seeking shelter for " & number_of_adults_sheltered & " adult(s) and " & number_of_children_sheltered & " child(ren)")
-Call write_bullet_and_variable_in_CASE_NOTE("They were not authorized for shelter because", reason_not_authorized)
-Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
+Call write_variable_in_CASE_NOTE("* Client seeking shelter for " & number_of_adults_sheltered & "A and " & number_of_children_sheltered & "C")
+Call write_bullet_and_variable_in_CASE_NOTE("Situation", reason_not_authorized)
+If trim(needed_one) <> "" or needed_two <> "" or needed_three <> "" or needed_four <> "" then Call write_variable_in_CASE_NOTE("--What is needed for shelter?--")
+If trim(needed_one) <>   "" then Call write_variable_in_CASE_NOTE("1. " & needed_one)
+If trim(needed_two) <>   "" then Call write_variable_in_CASE_NOTE("2. " & needed_two)
+If trim(needed_three) <> "" then Call write_variable_in_CASE_NOTE("3. " & needed_three)
+If trim(needed_four) <>  "" then Call write_variable_in_CASE_NOTE("4. " & needed_four)
+Call write_bullet_and_variable_in_CASE_NOTE("Comments", other_notes)
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
-Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team") 
 
 script_end_procedure("")
