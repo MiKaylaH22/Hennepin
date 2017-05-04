@@ -190,8 +190,10 @@ DO
 	If case_status = "ACTIVE" then 
 		Call navigate_to_MAXIS_screen("STAT", "PROG")
 		EMReadScreen SNAP_prog_status, 4, 10, 74 
-		IF SNAP_prog_status = "INAC" or trim(SNAP_prog_status) = "" then 
+		IF SNAP_prog_status = "INAC" or trim(SNAP_prog_status) = "" or SNAP_prog_status = "DENY" then 
 			ObjExcel.Cells(excel_row, excel_col).Value = "Inactive"
+		Elseif SNAP_prog_status = "PEND" then 
+			ObjExcel.Cells(excel_row, excel_col).Value = "Pending"
 		Else 
 			EMReadScreen cash_prog_status, 4, 6, 74
 			IF cash_prog_status = "ACTV" then 
