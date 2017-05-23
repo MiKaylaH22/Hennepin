@@ -54,6 +54,17 @@ FUNCTION get_case_status
 	ObjExcel.Cells(excel_row, 2).Value = case_status
 	MAXIS_case_number = ""
 	excel_row = excel_row + 1
+	'using new variable count to calculate percentages
+	IF case_status = "ACTIVE" then active_status = active_status + 1
+	IF case_status = "APP OPEN" then active_status = active_status + 1
+	
+	IF case_status = "APP CLOS" then inactive_status = inactive_status + 1
+	IF case_status = "INACTIVE" then inactive_status = inactive_status + 1
+	
+	If case_status = "CAF2 PEN" then pending_status = pending_status + 1
+	If case_status = "CAF1 PEN" then pending_status = pending_status + 1
+	
+	IF case_status = "REIN" then rein_status = rein_status + 1
 	STATS_counter = STATS_counter + 1
 END FUNCTION
 'End of function----------------------------------------------------------------------------------------------------
@@ -99,6 +110,13 @@ transmit
 
 'Gathering case status for answered call cases
 objExcel.worksheets("Answer").Activate
+'Zeroing out variables
+STATS_counter = 1
+'Zeroing out variables
+active_status = 0
+pending_status = 0
+inactive_status = 0 
+rein_status = 0  
 
 excel_row = 2
 Do 
@@ -109,8 +127,21 @@ Do
 LOOP UNTIL objExcel.Cells(excel_row, 1).value = ""	'looping until the list of cases to check for recert is complete
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
 
+ObjExcel.Cells(2, 4).Value = STATS_counter
+ObjExcel.Cells(3, 4).Value = active_status
+ObjExcel.Cells(4, 4).Value = inactive_status
+ObjExcel.Cells(5, 4).Value = pending_status
+ObjExcel.Cells(6, 4).Value = rein_status
+
 'Gathering case status for answered call cases
 objExcel.worksheets("No Answer").Activate
+'Zeroing out variables
+STATS_counter = 1
+'Zeroing out variables
+active_status = 0
+pending_status = 0
+inactive_status = 0 
+rein_status = 0 
 
 excel_row = 2
 Do 
@@ -119,44 +150,15 @@ Do
 	If MAXIS_case_number = "" then exit do
 	get_case_status
 LOOP UNTIL objExcel.Cells(excel_row, 1).value = ""	'looping until the list of cases to check for recert is complete
+STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
+
+'Updating the stat inforamtion for the 'NO ANSWER' calls 
+objExcel.worksheets("Answer").Activate
+
+ObjExcel.Cells(2, 7).Value = STATS_counter
+ObjExcel.Cells(3, 7).Value = active_status
+ObjExcel.Cells(4, 7).Value = inactive_status
+ObjExcel.Cells(5, 7).Value = pending_status
+ObjExcel.Cells(6, 7).Value = rein_status
 
 script_end_procedure("Success! The Excel file now has been update for all inactive SNAP cases.")
-
-'Code not being used right now for stats----------------------------------------------------------------------------------------------------
-
-''using new variable count to calculate percentages
-'IF case_status = "ACTIVE" then active_status = active_status + 1
-'IF case_status = "APP CLOS" then app_close_status = app_close_status + 1
-'IF case_status = "APP OPEN" then app_open_status = app_open_status + 1
-'IF case_status = "INACTIVE" then inactive_status = inactive_status + 1
-'IF case_status = "REIN" then rein_status = rein_status + 1
-
-'ObjExcel.Cells(1,4).Value = "=COUNTA(B2:B & abs(excel_row))"	'Excel formula
-''ObjExcel.Cells(row_to_use, col_to_use).Value = "=COUNTA(" & SNAP_letter_col & ":" & SNAP_letter_col & ") - 1"	'Excel formula
-'
-'''=COUNTA(A2:A7)
-'ObjExcel.Cells(1,1).Value = "Percentage of ACTIVE cases:"		'Row header
-'ObjExcel.Cells(2,1).Value = "Percentage of APP CLOSED cases:"	'Row header
-'ObjExcel.Cells(3,1).Value = "Percentage of APP OPEN cases:"		'Row header
-'ObjExcel.Cells(4,1).Value = "Percentage of INACTIVE cases:"		'Row header
-'ObjExcel.Cells(5,1).Value = "Percentage of REIN cases:"			'Row header
-'
-'objExcel.Cells(1,3).Font.Bold = TRUE							'Row header should be bold
-'ObjExcel.Cells(1,3).NumberFormat = "0.00%"						'Formula should be percent
-''Gathering case status for unanswered call cases
-'objExcel.worksheets("No Answer").Activate	
-''Zeroing out variables
-'stats_counter = 0
-'active_status = 0
-'app_close_status = 0
-'app_open_status = 0
-'inactive_status = 0 
-'rein_status = 0 
-
-''Zeroing out variables
-'stats_counter = 0
-'active_status = 0
-'app_close_status = 0
-'app_open_status = 0
-'inactive_status = 0 
-'rein_status = 0 
