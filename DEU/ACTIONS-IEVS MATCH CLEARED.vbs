@@ -199,7 +199,7 @@ Do
 		err_msg = ""
 	    dialog cleared_match_dialog
         cancel_confirmation
-        If IsNumeric(resolve_time) = false then err_msg = err_msg & vbNewLine & "* Enter a valid numeric resolved time."
+        If IsNumeric(resolve_time) = false or len(resolve_time) > 3 then err_msg = err_msg & vbNewLine & "* Enter a valid numeric resolved time."
 		If Cleared_status = "Select one..." then err_msg = err_msg & vbNewLine & "* Enter an resolved option."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!***" & vbNewLine & err_msg & vbNewLine		
 	Loop until err_msg = ""
@@ -239,7 +239,7 @@ transmit 	'to give reasons for clearing the match
 'resolved notes depending on the Cleared_status
 If Cleared_status = "BC - Case Closed" 	then EMWriteScreen "Case closed. " & other_notes, 8, 6   							'BC
 If Cleared_status = "BE - No Change" then EMWriteScreen "No change. " & other_notes, 8, 6 									'BE
-If cleared_status = "BE - Child" then EMWriteScreen "No change, minor child income excluded." & other_notes, 8, 6 			'BE - child
+If cleared_status = "BE - Child" then EMWriteScreen "No change, minor child income excluded. " & other_notes, 8, 6 			'BE - child
 If Cleared_status = "BN - Already Knew, No Savings" then EMWriteScreen "Already known - No savings. " & other_notes, 8, 6 	'BN
 If Cleared_status = "CC - Claim Entered" then EMWriteScreen "Claim entered. " & other_notes, 8, 6 						 	'CC
 transmit				
