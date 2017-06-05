@@ -164,7 +164,7 @@ programs = trim(programs)
 If right(programs, 1) = "," THEN programs = left(programs, len(programs) - 1) 
 
 '----------------------------------------------------------------------------------------------------Employer info & differnce notice info
-EMReadScreen employer_info, 30, 8, 37
+EMReadScreen employer_info, 27, 8, 37
 employer_info = trim(employer_info)
 
 EMReadScreen diff_notice, 1, 14, 37
