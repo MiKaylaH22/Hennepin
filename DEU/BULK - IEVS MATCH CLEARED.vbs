@@ -44,6 +44,7 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
+call changelog_update("06/05/2017", "Added handling for minor children in school (excluded income) & multiple people per case.", "Ilse Ferris, Hennepin County")
 call changelog_update("03/20/2017", "Initial version.", "Ilse Ferris, Hennepin County")
 
 'Actually displays the changelog. This function uses a text file located in the My Documents folder. It stores the name of the script file and a description of the most recent viewed change.
@@ -315,8 +316,8 @@ DO
 
 		'Case noting the actions taken
         start_a_blank_CASE_NOTE
-        If IEVS_type = "WAGE" then Call write_variable_in_CASE_NOTE(IEVS_quarter & " QTR " & IEVS_year & " WAGE INCOME" & cleared_header_info)
-		If IEVS_type = "BEER" then Call write_variable_in_CASE_NOTE(IEVS_year & " NON WAGE INCOME(B)" & cleared_header_info)
+        If IEVS_type = "WAGE" then Call write_variable_in_CASE_NOTE("-----" & IEVS_quarter & " QTR " & IEVS_year & " WAGE INCOME" & cleared_header_info & "-----")
+		If IEVS_type = "BEER" then Call write_variable_in_CASE_NOTE("-----" & IEVS_year & " NON WAGE INCOME(B)" & cleared_header_info & "-----")
 		Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
 		Call write_bullet_and_variable_in_CASE_NOTE("Programs open", Progs_open)
         Call write_bullet_and_variable_in_CASE_NOTE("Employer name", Employer_name)
