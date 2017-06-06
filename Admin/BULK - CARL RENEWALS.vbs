@@ -535,7 +535,7 @@ objExcel.Cells(4, 2).Value = renewal_date
 objExcel.Cells(5, 2).Value = date
 
 'Saves and closes the Excel workbook
-objExcel.ActiveWorkbook.SaveAs "T:\Eligibility Support\Restricted\Workforce_Management\CARL\Renewals for " & renewal_date & ".xlsx"
+objExcel.ActiveWorkbook.SaveAs "T:\Eligibility Support\Restricted\Workforce_Management\CARL\Renewals.xlsx"
 objExcel.ActiveWorkbook.Close
 objExcel.Application.Quit
 objExcel.Quit
