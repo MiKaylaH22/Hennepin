@@ -67,7 +67,7 @@ Do
   				EditBox 15, 45, 180, 15, file_selection_path
   				GroupBox 10, 5, 250, 80, "Using the SEND MANUAL REFERRAL script"
   				Text 20, 20, 235, 20, "This script should be used when E & T provides you with a list of recipeints that are working with CBO's and a manual referral is needed. "
-  				Text 15, 65, 230, 15, "Select the Excel file that contains the CBO inforamtion by selecting the 'Browse' button, and finding the file."
+  				Text 15, 65, 230, 15, "Select the Excel file that contains the CBO information by selecting the 'Browse' button, and finding the file."
 			EndDialog
 			err_msg = ""
 			Dialog CBO_referral_dialog
