@@ -49,7 +49,7 @@ END IF
 BeginDialog Property_review_dialog, 0, 0, 301, 255, "311"
   EditBox 85, 10, 55, 15, MAXIS_case_number
   EditBox 235, 10, 55, 15, review_date
-  DropListBox 195, 30, 95, 15, "Select one..."+chr(9)+"Called 311"+chr(9)+"Checked website", property_reviewed
+  DropListBox 195, 30, 95, 15, "Select one..."+chr(9)+"Called 311"+chr(9)+"Called city"+chr(9)+"Checked website", property_reviewed
   EditBox 85, 50, 205, 15, property_address
   EditBox 85, 75, 205, 15, open_work_orders
   EditBox 85, 100, 205, 15, rental_license
