@@ -302,17 +302,17 @@ DO
     If case_note_actions = True then		'Formatting for the case note
 	    If IEVS_type = "WAGE" then
 	    	'Updated IEVS_period to write into case note
-	    	If quarter = 1 then IEVS_quarter = "1st"
-	    	If quarter = 2 then IEVS_quarter = "2nd"
-	    	If quarter = 3 then IEVS_quarter = "3rd"
-	    	If quarter = 4 then IEVS_quarter = "4th"
+	    	If quarter = 1 then IEVS_quarter = "1ST"
+	    	If quarter = 2 then IEVS_quarter = "2ND"
+	    	If quarter = 3 then IEVS_quarter = "3RD"
+	    	If quarter = 4 then IEVS_quarter = "4TH"
 	    End if
 
 	    'adding specific wording for case note header for each cleared status
-	    If Cleared_status = "BC" then cleared_header_info = " (" & first_name & ") Cleared BC-CASE CLOSED"
-	    If Cleared_status = "BE" then cleared_header_info = " (" & first_name & ") Cleared BE-NO CHANGE"
-	    If Cleared_status = "BN" then cleared_header_info = " (" & first_name & ") Cleared BN-KNOWN"
-	    If Cleared_status = "CC" then cleared_header_info = " (" & first_name & ") Cleared CC-CLAIM ENTERED"
+	    If Cleared_status = "BC" then cleared_header_info = " (" & first_name & ") CLEARED BC-CASE CLOSED"
+	    If Cleared_status = "BE" then cleared_header_info = " (" & first_name & ") CLEARED BE-NO CHANGE"
+	    If Cleared_status = "BN" then cleared_header_info = " (" & first_name & ") CLEARED BN-KNOWN"
+	    If Cleared_status = "CC" then cleared_header_info = " (" & first_name & ") CLEARED CC-CLAIM ENTERED"
 
 		'Case noting the actions taken
         start_a_blank_CASE_NOTE
@@ -321,10 +321,10 @@ DO
 		Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
 		Call write_bullet_and_variable_in_CASE_NOTE("Programs open", Progs_open)
         Call write_bullet_and_variable_in_CASE_NOTE("Employer name", Employer_name)
-        Call write_variable_in_CASE_NOTE("******************************")
+        call write_variable_in_CASE_NOTE("------ ----- -----")
         If Cleared_status = "BN" or Cleared_status = "BE" then Call write_variable_in_CASE_NOTE("CLIENT REPORTED EARNINGS. INCOME IS IN STAT/JOBS AND BUDGETED.")
         If Cleared_status <> "CC" then Call write_variable_in_CASE_NOTE("NO OVERPAYMENTS OR SAVINGS RELATED TO THIS MATCH.")
-        call write_variable_in_CASE_NOTE("---")
+        call write_variable_in_CASE_NOTE("------ ----- ----- ----- -----")
         Call write_variable_in_CASE_NOTE("DEBT ESTABLISHMENT UNIT 612-348-4290 PROMPTS 1-1-1")
     End if
 	
