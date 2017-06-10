@@ -1,5 +1,5 @@
 'GATHERING STATS===========================================================================================
-name_of_script = "ACTIONS-IEVS MATCH CLEARED.vbs"
+name_of_script = "ACTIONS-WAGE MATCH CLEARED.vbs"
 start_time = timer
 STATS_counter = 1
 STATS_manualtime = 150
@@ -167,6 +167,14 @@ If right(programs, 1) = "," THEN programs = left(programs, len(programs) - 1)
 EMReadScreen employer_info, 27, 8, 37
 employer_info = trim(employer_info)
 
+If instr(employer_info, " AMT: $") then 
+    length = len(employer_info) 						  'establishing the length of the variable
+    position = InStr(employer_info, " AMT: $")    		      'sets the position at the deliminator  
+    employer_name = Left(employer_info, position)  'establishes employer as being before the deliminator
+Else 
+    employer_name = employer_info
+End if 
+
 EMReadScreen diff_notice, 1, 14, 37
 EMReadScreen diff_date, 10, 14, 68
 diff_date = trim(diff_date)
@@ -177,11 +185,11 @@ BeginDialog cleared_match_dialog, 0, 0, 331, 145, "IEVS Match Cleared"
   Text 10, 20, 130, 10, "Case number: " & MAXIS_case_number
   Text 140, 20, 185, 10, "Client name: " & client_name
   Text 10, 40, 125, 10, "Open prog(s): " & programs
-  Text 140, 40, 185, 10, "Income source: " & employer_info
+  Text 140, 40, 185, 10, "Income source: " & employer_name
   Text 10, 60, 125, 10, "Difference notice sent?:  "& diff_notice
   Text 140, 60, 120, 10, "Date sent: "& diff_date
   EditBox 100, 85, 30, 15, resolve_time
-  DropListBox 205, 85, 120, 15, "Select one..."+chr(9)+"BC - Case Closed"+chr(9)+"BN - Already Knew, No Savings"+chr(9)+"BE - Child"+chr(9)+"BE - No Change"+chr(9)+"CC - Claim Entered", Cleared_status
+  DropListBox 205, 85, 120, 15, "Select one..."+chr(9)+"BC - Case Closed"+chr(9)+"BN - Already known, No Savings"+chr(9)+"BE - Child"+chr(9)+"BE - No Change"+chr(9)+"CC - Claim Entered", Cleared_status
   DropListBox 245, 105, 80, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No", change_response_to_notice
   EditBox 55, 125, 170, 15, other_notes
   ButtonGroup ButtonPressed
@@ -235,12 +243,12 @@ For each program in programs_array
 	EMWriteScreen Cleared_status, row + 1, col + 1
 Next 
 
-transmit 	'to give reasons for clearing the match 
+CALL write_value_and_transmit(resolve_time, 12, 46) 
 'resolved notes depending on the Cleared_status
 If Cleared_status = "BC - Case Closed" 	then EMWriteScreen "Case closed. " & other_notes, 8, 6   							'BC
 If Cleared_status = "BE - No Change" then EMWriteScreen "No change. " & other_notes, 8, 6 									'BE
 If cleared_status = "BE - Child" then EMWriteScreen "No change, minor child income excluded. " & other_notes, 8, 6 			'BE - child
-If Cleared_status = "BN - Already Knew, No Savings" then EMWriteScreen "Already known - No savings. " & other_notes, 8, 6 	'BN
+If Cleared_status = "BN - Already known, No Savings" then EMWriteScreen "Already known - No savings. " & other_notes, 8, 6 	'BN
 If Cleared_status = "CC - Claim Entered" then EMWriteScreen "Claim entered. " & other_notes, 8, 6 						 	'CC
 transmit				
 
@@ -258,29 +266,29 @@ If match_cleared = true then
 'Formatting for the case note----------------------------------------------------------------------------------------------------
     If IEVS_type = "WAGE" then
     	'Updated IEVS_period to write into case note
-    	If quarter = 1 then IEVS_quarter = "1st"
-    	If quarter = 2 then IEVS_quarter = "2nd"
-    	If quarter = 3 then IEVS_quarter = "3rd"
-    	If quarter = 4 then IEVS_quarter = "4th"
+    	If quarter = 1 then IEVS_quarter = "1ST"
+    	If quarter = 2 then IEVS_quarter = "2ND"
+    	If quarter = 3 then IEVS_quarter = "3RD"
+    	If quarter = 4 then IEVS_quarter = "4TH"
     End if
      
     'adding specific wording for case note header for each cleared status
-    If Cleared_status = "BC - Case Closed" then cleared_header_info = " (" & first_name & ") Cleared BC-CASE CLOSED"
-    If Cleared_status = "BE - No Change" then cleared_header_info = " (" & first_name & ") Cleared BE-NO CHANGE"
-	If cleared_status = "BE - Child" then cleared_header_info = " (" & first_name & ") Cleared BE-NO CHANGE- MINOR CHILD"
-    If Cleared_status = "BN - Already Knew, No Savings" then cleared_header_info = " (" & first_name & ") Cleared BN-KNOWN"
-    If Cleared_status = "CC - Claim Entered" then cleared_header_info = " (" & first_name & ") Cleared CC-CLAIM ENTERED"
+    If Cleared_status = "BC - Case Closed" then cleared_header_info = " (" & first_name & ") CLEARED BC-CASE CLOSED"
+    If Cleared_status = "BE - No Change" then cleared_header_info = " (" & first_name & ") CLEARED BE-NO CHANGE"
+	If cleared_status = "BE - Child" then cleared_header_info = " (" & first_name & ") CLEARED BE-NO CHANGE- MINOR CHILD"
+    If Cleared_status = "BN - Already known, No Savings" then cleared_header_info = " (" & first_name & ") CLEARED BN-KNOWN"
+    If Cleared_status = "CC - Claim Entered" then cleared_header_info = " (" & first_name & ") CLEARED CC-CLAIM ENTERED"
     
     IEVS_period = replace(IEVS_period, "/", " to ")
     'The casenote----------------------------------------------------------------------------------------------------
     start_a_blank_CASE_NOTE
-    If IEVS_type = "WAGE" then Call write_variable_in_CASE_NOTE(IEVS_quarter & " QTR " & IEVS_year & " WAGE INCOME" & cleared_header_info)
-    If IEVS_type = "BEER" then Call write_variable_in_CASE_NOTE(IEVS_year & " NON WAGE INCOME(B)" & cleared_header_info)
+    If IEVS_type = "WAGE" then Call write_variable_in_CASE_NOTE("-----" & IEVS_quarter & " QTR " & IEVS_year & " WAGE INCOME" & cleared_header_info & "-----")
+    If IEVS_type = "BEER" then Call write_variable_in_CASE_NOTE("-----" & IEVS_year & " NON WAGE INCOME(B)" & cleared_header_info & "-----")
     Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
     Call write_bullet_and_variable_in_CASE_NOTE("Programs open", programs)
-    Call write_bullet_and_variable_in_CASE_NOTE("Employer name", employer_info)
+    Call write_bullet_and_variable_in_CASE_NOTE("Employer name", employer_name)
     Call write_variable_in_CASE_NOTE ("----- ----- -----")
-    If Cleared_status = "BN - Already Knew, No Savings" or Cleared_status = "BE - No Change" then Call write_variable_in_CASE_NOTE("CLIENT REPORTED EARNINGS. INCOME IS IN STAT PANELS AND BUDGETED.")
+    If Cleared_status = "BN - Already known, No Savings" or Cleared_status = "BE - No Change" then Call write_variable_in_CASE_NOTE("CLIENT REPORTED EARNINGS. INCOME IS IN STAT PANELS AND BUDGETED.")
     If cleared_status = "BE - Child" then Call write_variable_in_CASE_NOTE("INCOME IS EXCLUDED FOR MINOR CHILD IN SCHOOL.")
 	If Cleared_status <> "CC - Claim Entered" then Call write_variable_in_CASE_NOTE("NO OVERPAYMENTS OR SAVINGS RELATED TO THIS MATCH.")
     Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
