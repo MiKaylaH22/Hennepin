@@ -208,47 +208,56 @@ For item = 0 to UBound(CBO_array, 2)
 	If CBO_array(make_referral, item) = True then 
 	    'Checking the SNAP status 
 	    Call navigate_to_MAXIS_screen("STAT", "PROG")
-	    EMReadscreen SNAP_active, 4, 10, 74
-	    If SNAP_active <> "ACTV" then 
-	    	CBO_array(make_referral, item) = False
-	    	CBO_array(ref_status, item) = "SNAP Inactive"
-	    Else
-	    	Call navigate_to_MAXIS_screen("STAT", "MEMB")
-	    	Do 
-	    		EMReadscreen member_SSN, 11, 7, 42
-				member_SSN = replace(member_SSN, " ", "")
-	    		If member_SSN = CBO_array(clt_SSN, item) then
-	    			EMReadscreen member_number, 2, 4, 33
-	    			CBO_array(memb_number, item) = member_number
-	    			CBO_array(make_referral, item) = True
-	    			exit do
-	    		Else 
-	    			transmit
-				END IF
-	    		EMReadScreen MEMB_error, 5, 24, 2
-	    	Loop until member_SSN = CBO_array (clt_SSN, item) or MEMB_error = "ENTER"
-	    	IF member_SSN <> CBO_array (clt_SSN, item) then 
-	    		CBO_array(make_referral, item) = False
-				CBO_array(ref_status, item) = "Error"
-	    		CBO_array(error_reason, item) = "Unable to find person's member number."	'Explanation for the rejected report'
-	    	END IF 
-	    END IF
-		 	
-		'Manual referral creation if banked months are used
-		Call navigate_to_MAXIS_screen("INFC", "WF1M")				'navigates to WF1M to create the manual referral'
-		EMWriteScreen "01", 4, 47									'this is the manual referral code that DHS has approved
-		EMWriteScreen "FS", 8, 46									'this is a program for ABAWD's for SNAP is the only option for banked months
-		EMWriteScreen CBO_array(memb_number, item), 8, 9							'enters member number
-		EMWriteScreen "Working with CBO: " & CBO_array(CBO_name, item), 17, 6		'enters notes for E & T regarding the name of the CBO  
-		EMWriteScreen "x", 8, 53																				'selects the ES provider
-		transmit																												'navigates to the ES provider selection screen
-		EMWriteScreen "x", 5, 9									'selects the 1st option'
-		transmit												'transmits back to the main WF1M
-		PF3														'saves referral
-		EMWriteScreen "Y", 11, 64								'Y to confirm save
-		transmit												'confirms saving the referral
-		CBO_array(ref_status, item) = "Referral Made"
-		STATS_counter = STATS_counter + 1						'adds 1 count to the stats_counter
+		EMReadscreen county_code, 2, 21, 23
+		If county_code <> "27" then 
+			CBO_array(make_referral, item) = False
+			CBO_array(ref_status, item) = "Error"
+			CBO_array(error_reason, item) = "Not Hennepin County case, county code is: " & county_code	'Explanation for the rejected report'
+		Else 
+	        EMReadscreen SNAP_active, 4, 10, 74
+	        If SNAP_active <> "ACTV" then 
+	        	CBO_array(make_referral, item) = False
+	        	CBO_array(ref_status, item) = "SNAP Inactive"
+	        Else
+	        	Call navigate_to_MAXIS_screen("STAT", "MEMB")
+	        	Do 
+	        		EMReadscreen member_SSN, 11, 7, 42
+		    		member_SSN = replace(member_SSN, " ", "")
+	        		If member_SSN = CBO_array(clt_SSN, item) then
+	        			EMReadscreen member_number, 2, 4, 33
+	        			CBO_array(memb_number, item) = member_number
+	        			CBO_array(make_referral, item) = True
+	        			exit do
+	        		Else 
+	        			transmit
+		    		END IF
+	        		EMReadScreen MEMB_error, 5, 24, 2
+	        	Loop until member_SSN = CBO_array (clt_SSN, item) or MEMB_error = "ENTER"
+	        	IF member_SSN <> CBO_array (clt_SSN, item) then 
+	        		CBO_array(make_referral, item) = False
+		    		CBO_array(ref_status, item) = "Error"
+	        		CBO_array(error_reason, item) = "Unable to find person's member number."	'Explanation for the rejected report'
+	        	END IF 
+	        END IF
+		End if 
+		 
+		If CBO_array(make_referral, item) = True then 	
+		    'Manual referral creation if banked months are used
+		    Call navigate_to_MAXIS_screen("INFC", "WF1M")				'navigates to WF1M to create the manual referral'
+		    EMWriteScreen "01", 4, 47									'this is the manual referral code that DHS has approved
+		    EMWriteScreen "FS", 8, 46									'this is a program for ABAWD's for SNAP is the only option for banked months
+		    EMWriteScreen CBO_array(memb_number, item), 8, 9							'enters member number
+		    EMWriteScreen "Working with CBO: " & CBO_array(CBO_name, item), 17, 6		'enters notes for E & T regarding the name of the CBO  
+		    EMWriteScreen "x", 8, 53																				'selects the ES provider
+		    transmit																												'navigates to the ES provider selection screen
+		    EMWriteScreen "x", 5, 9									'selects the 1st option'
+		    transmit												'transmits back to the main WF1M
+		    PF3														'saves referral
+		    EMWriteScreen "Y", 11, 64								'Y to confirm save
+		    transmit												'confirms saving the referral
+		    CBO_array(ref_status, item) = "Referral Made"
+		    STATS_counter = STATS_counter + 1						'adds 1 count to the stats_counter
+		End if 
 	END IF
 Next 
 
