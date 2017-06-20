@@ -6,7 +6,7 @@ fso_command.Close
 Execute text_from_the_other_script
 
 'STATS GATHERING----------------------------------------------------------------------------------------------------
-name_of_script = "NOTES - SHELTER INTERVIEW.vbs"
+name_of_script = "NOTES - GRH APPROVAL.vbs"
 start_time = timer
 STATS_counter = 1               'sets the stats counter at one
 STATS_manualtime = 0         	'manual run time in seconds
@@ -46,39 +46,19 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog Shelter_interview, 0, 0, 311, 385, "Shelter Interview: Do no release funds, family in shelter."
-  EditBox 70, 10, 45, 15, MAXIS_case_number
-  DropListBox 210, 10, 90, 15, "Select one..."+chr(9)+"DWP"+chr(9)+"MFIP", cash_type
-  EditBox 240, 45, 60, 15, one_time_issuance
-  EditBox 95, 75, 205, 15, other_income
-  EditBox 95, 95, 205, 15, money_mismanagement
-  EditBox 95, 120, 205, 15, reason_homeless
-  EditBox 95, 145, 205, 15, barriers_housing
-  EditBox 95, 170, 205, 15, shelter_history
-  EditBox 95, 195, 205, 15, social_worker
-  EditBox 95, 220, 205, 15, referrals_made
-  EditBox 95, 245, 205, 15, other_notes
-  EditBox 95, 270, 95, 15, worker_signature
+BeginDialog grh_approval, 0, 0, 266, 80, "GRH Approval"
+  EditBox 60, 5, 55, 15, MAXIS_case_number
+  DropListBox 180, 5, 85, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"SA-HL"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
+  CheckBox 35, 35, 85, 10, "GRH notice cancelled", GRH_notice_checkbox
+  EditBox 200, 30, 60, 15, ea_available_date
+  EditBox 65, 55, 85, 15, worker_signature
   ButtonGroup ButtonPressed
-    OkButton 195, 270, 50, 15
-    CancelButton 250, 270, 50, 15
-  Text 45, 80, 45, 10, "Other income:"
-  Text 10, 100, 80, 10, "Money mismanagement:"
-  Text 30, 275, 60, 10, "Worker signature: "
-  Text 40, 200, 50, 10, "Social worker:"
-  Text 20, 150, 70, 10, "Barrier(s) to housing:"
-  Text 50, 250, 40, 10, "Other notes: "
-  Text 25, 325, 270, 15, "* Explained shelter policies and client options to shelter such as bus tickets, temporary housing, private shelters, etc."
-  Text 25, 350, 265, 15, "* Client given family social services number (348-4111) to discuss any family issues/barriers."
-  GroupBox 10, 295, 295, 75, "Additional text added to case note:"
-  Text 155, 15, 50, 10, "Cash program:"
-  Text 20, 15, 45, 10, "Case number:"
-  Text 30, 225, 60, 10, "Referrals made to:"
-  Text 35, 175, 55, 10, "Shelter history:"
-  Text 25, 310, 225, 10, "* 100% of cash benefit to be issued to HCEA shelter account #52871."
-  Text 5, 125, 90, 10, "Reason for homelessness:"
-  Text 15, 50, 225, 10, "Amt issued to EBT as one-time only (10%) for PN ($20 med co-pays):"
-  GroupBox 10, 30, 295, 40, "If MFIP recipient:"
+    OkButton 155, 55, 50, 15
+    CancelButton 210, 55, 50, 15
+  Text 10, 10, 50, 10, "Case Number:"
+  Text 130, 35, 65, 10, "EA availalble date:"
+  Text 125, 10, 50, 10, "Shelter Name:"
+  Text 5, 60, 60, 10, "Worker Signature:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,16 +70,13 @@ CALL MAXIS_case_number_finder(MAXIS_case_number)
 DO
 	DO
 		err_msg = ""
-		Dialog Shelter_interview
+		Dialog grh_approval
 		cancel_confirmation
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		If cash_type = "Select one..." then err_msg = err_msg & vbNewLine & "* Select the family's cash program."      
-        If cash_type = "MFIP" and one_time_issuance = "" then err_msg = err_msg & vbNewLine & "* Enter the amount to issue as a one-time only payment."      
-        If reason_homeless = "" then err_msg = err_msg & vbNewLine & "* Enter the reason for family's homelessness."
-		If barriers_housing = "" then err_msg = err_msg & vbNewLine & "* Enter the family's barrier(s) to housing."
-		If referrals_made = "" then err_msg = err_msg & vbNewLine & "* Enter referals made for the family."
-        If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
-		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
+		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Enter shelter name."		
+		If ea_available_date = "" then err_msg = err_msg & vbNewLine & "* Enter EA Available date"
+		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
+		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
 Loop until are_we_passworded_out = false					'loops until user passwords back in					
@@ -112,26 +89,12 @@ EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
 EMWriteScreen CM_yr, 20, 46
 
 'The case note'
-start_a_blank_CASE_NOTE
-Call write_variable_in_CASE_NOTE(">>>DO NOT release " & cash_type & " funds, family in shelter<<<")
-Call write_variable_in_CASE_NOTE("* 100% of cash benefit to be issued to HCEA shelter account #52871.") 
-If cash_type = "DWP" then 
-    Call write_variable_in_CASE_NOTE("* DWP families are not eligible for the one-time only personal needs and medical co-pays")
-ELSE 
-    Call write_variable_in_CASE_NOTE(" Except $" & one_time_issuance & " to EBT for one-time only (10%) for personal needs. $20 for medical co-pays.")
-END IF 
-Call write_variable_in_CASE_NOTE("---")
-Call write_bullet_and_variable_in_CASE_NOTE("Other income", other_income)
-Call write_bullet_and_variable_in_CASE_NOTE("Money mismanagement", money_mismanagement)
-Call write_bullet_and_variable_in_CASE_NOTE("Reason for homelessness", reason_homeless)
-Call write_bullet_and_variable_in_CASE_NOTE("Barrier(s) to housing", barriers_housing)
-Call write_bullet_and_variable_in_CASE_NOTE("Shelter history", shelter_history)
-Call write_bullet_and_variable_in_CASE_NOTE("Social worker", social_worker)
-Call write_bullet_and_variable_in_CASE_NOTE("Referrals made to", referrals_made)
+start_a_blank_CASE_NOTE	
+Call write_variable_in_CASE_NOTE("### GRH Approved ###")
+Call write_bullet_and_variable_in_CASE_NOTE("Client placed in", shelter_droplist)
+Call write_bullet_and_variable_in_CASE_NOTE("EA available date", ea_available_date)
+If shelter_policy_checkbox = 1 then call write_variable_in_CASE_NOTE("* GRH Notice Cancelled.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE("---")
-Call write_variable_in_CASE_NOTE("* Explained shelter policies and client options to shelter such as bus tickets, temporary housing, private shelters, etc.") 
-Call write_variable_in_CASE_NOTE("* Client given family social services number (348-4111) to discuss any family issues/barriers.")
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
 

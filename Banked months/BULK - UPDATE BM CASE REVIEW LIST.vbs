@@ -101,51 +101,51 @@ Select Case month_selection
 Case "January"
 	MAXIS_footer_month = "01"
 	MAXIS_footer_year = "17"
-	excel_col = 18
+	excel_col = 17
 Case "February"
 	MAXIS_footer_month = "02"
 	MAXIS_footer_year = "17"
-	excel_col = 19
+	excel_col = 18
 Case "March"
 	MAXIS_footer_month = "03"
 	MAXIS_footer_year = "17"
-	excel_col = 20
+	excel_col = 19
 Case "April"
 	MAXIS_footer_month = "04"
 	MAXIS_footer_year = "17"
-	excel_col = 21
+	excel_col = 20
 Case "May"
 	MAXIS_footer_month = "05"
 	MAXIS_footer_year = "17"
-	excel_col = 22
+	excel_col = 21
 Case "June"
 	MAXIS_footer_month = "06"
 	MAXIS_footer_year = "17"
-	excel_col = 23
+	excel_col = 22
 Case "July"
 	MAXIS_footer_month = "07"
 	MAXIS_footer_year = "17"
-	excel_col = 24
+	excel_col = 23
 Case "August"
 	MAXIS_footer_month = "08"
 	MAXIS_footer_year = "17"
-	excel_col = 25
+	excel_col = 24
 Case "September"
 	MAXIS_footer_month = "09"
 	MAXIS_footer_year = "17"
-	excel_col = 26
+	excel_col = 25
 Case "October"
 	MAXIS_footer_month = "10"
 	MAXIS_footer_year = "17"
-	excel_col = 27
+	excel_col = 26
 Case "November"
 	MAXIS_footer_month = "11"
 	MAXIS_footer_year = "17"
-	excel_col = 28
+	excel_col = 27
 Case "December"
 	MAXIS_footer_month = "12"
 	MAXIS_footer_year = "17"
-	excel_col = 29
+	excel_col = 28
 End Select
 
 excel_row = 2

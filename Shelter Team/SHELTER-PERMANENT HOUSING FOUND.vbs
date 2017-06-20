@@ -65,9 +65,9 @@ BeginDialog perm_housing_found_dialog, 0, 0, 416, 330, "Permanent Housing Found"
   EditBox 350, 110, 55, 15, rent_subsidy
   EditBox 350, 130, 55, 15, MFIP_DWP_income
   EditBox 350, 150, 55, 15, UNEA_income
-  EditBox 60, 185, 145, 15, LL_name
+  EditBox 75, 185, 145, 15, LL_name
   EditBox 60, 205, 200, 15, LL_ADDR
-  EditBox 130, 225, 130, 15, ESP 
+  EditBox 130, 225, 130, 15, ESP
   EditBox 130, 245, 130, 15, REW
   EditBox 130, 265, 80, 15, closed_servicepoint
   EditBox 350, 185, 55, 15, mand_vend_date
@@ -98,12 +98,12 @@ BeginDialog perm_housing_found_dialog, 0, 0, 416, 330, "Permanent Housing Found"
   Text 15, 230, 105, 10, "Employ. Service Provider (ESP):"
   Text 30, 75, 205, 10, "Balance in HCEA Shelter acct available toward rent and/or DD:"
   Text 295, 75, 55, 10, "Other partners:"
-  Text 5, 190, 55, 10, "Landlord name: "
+  Text 5, 190, 65, 10, "LL name/Vendor #: "
   Text 40, 250, 85, 10, "Rapid Exit Worker (REW):"
   Text 300, 210, 50, 10, "Client phone #:"
   Text 300, 115, 45, 10, "Rent subsidy:"
   Text 5, 210, 55, 10, "Landlord ADDR:"
-  Text 635, -10, 40, 10, "MFIP/DWP:"
+  Text 635, 40, 10, 0, "-10"
   Text 5, 40, 115, 10, "Amt vendored to HCEA sheltet acct:"
   Text 295, 95, 55, 10, "Earned income:"
   Text 180, 40, 45, 10, "Shelter cost:"
@@ -111,7 +111,7 @@ BeginDialog perm_housing_found_dialog, 0, 0, 416, 330, "Permanent Housing Found"
   Text 10, 155, 170, 10, "Balance of funds owed to the LL will be issued from:"
   Text 280, 270, 65, 10, "# of days in shelter:"
   GroupBox 5, 60, 405, 115, "Resources for shelter funds:"
-  Text 310, 135, 40, 10, "MFIP/DWP:"
+  Text 295, 135, 55, 10, "MFIP/DWP/HG:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,14 +173,14 @@ Call write_bullet_and_variable_in_CASE_NOTE("Amt of DD needed to move in", DD_ne
 Call write_bullet_and_variable_in_CASE_NOTE("Client funds available", client_funds)
 Call write_bullet_and_variable_in_CASE_NOTE("Other partners", other_partners)
 Call write_bullet_and_variable_in_CASE_NOTE("Earned income", earned_income)
-Call write_bullet_and_variable_in_CASE_NOTE("MFIP/DWP", MFIP_DWP_income)
+Call write_bullet_and_variable_in_CASE_NOTE("MFIP/DWP/HG", MFIP_DWP_income)
 Call write_bullet_and_variable_in_CASE_NOTE("UNEA", UNEA_income)
 Call write_bullet_and_variable_in_CASE_NOTE("Rent subsidy amt", rent_subsidy)
 Call write_bullet_and_variable_in_CASE_NOTE("Rent subsidy paid by", rent_subsidy_paid)
 Call write_bullet_and_variable_in_CASE_NOTE("Balance in HCEA shelter acct to be vendored to LL", vendor_to_LL )
 Call write_bullet_and_variable_in_CASE_NOTE("Balance of funds owed to the LL will be issued from", additional_funds)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_bullet_and_variable_in_CASE_NOTE("Landlord name", LL_name)
+Call write_bullet_and_variable_in_CASE_NOTE("Landlord name/vendor #", LL_name)
 Call write_bullet_and_variable_in_CASE_NOTE("Landlord address", LL_ADDR)
 Call write_bullet_and_variable_in_CASE_NOTE("Employment Services Provider (ESP)", ESP)
 Call write_bullet_and_variable_in_CASE_NOTE("Rapid Exit Worker (REW)", REW)
