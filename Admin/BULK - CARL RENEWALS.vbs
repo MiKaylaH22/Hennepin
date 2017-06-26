@@ -117,13 +117,16 @@ For each worker_type in array_of_worker_types
     
 	'Gathering the information for the Excel spreadsheet
     basket_number_array = split(caseloads_to_search, ",")
+	
+	back_to_self
+	EMWriteScreen CM_mo, 20, 43
+	EMWriteScreen CM_yr, 20, 46
     
     For each basket in basket_number_array
     	back_to_self	'Does this to prevent "ghosting" where the old info shows up on the new screen for some reason
-    	EMWriteScreen CM_mo, 20, 43
-		EMWriteScreen CM_yr, 20, 46
+		EMWriteScreen "REPT", 16, 43
+		EMWriteScreen "ACTV", 21, 70
 		transmit
-		Call navigate_to_MAXIS_screen("rept", "actv")
     	EMWriteScreen basket, 21, 13
     	transmit
     	
