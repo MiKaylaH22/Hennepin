@@ -149,7 +149,6 @@ For each worker_type in array_of_worker_types
                     EMReadScreen client_name, 21, MAXIS_row, 21		         'Reading client name
     				EMReadScreen review_month, 2, MAXIS_row, 42		         'Reading review month
                     EMReadScreen review_year, 2, MAXIS_row, 48		         'Reading review year
-    				ACTV_review_date = review_month & "/" & review_year      'Created new variable to measure against the renewal_date
                     EMReadScreen cash_status, 1, MAXIS_row, 54		         'Reading cash status
     				EMReadScreen SNAP_status, 1, MAXIS_row, 61		         'Reading SNAP status
     				EMReadScreen HC_status, 1, MAXIS_row, 64		         'Reading HC status
