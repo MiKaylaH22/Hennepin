@@ -1,5 +1,5 @@
 'GATHERING STATS===========================================================================================
-name_of_script = "DAIL-SEND DIFF WAGE MATCH NOTICE.vbs"
+name_of_script = "DEU-SEND DIFF MATCH NOTICE.vbs"
 start_time = timer
 STATS_counter = 1
 STATS_manualtime = 180

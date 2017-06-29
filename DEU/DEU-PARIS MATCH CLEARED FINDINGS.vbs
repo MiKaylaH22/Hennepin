@@ -1,4 +1,4 @@
-name_of_script = "NOTES-PARIS MATCH CLEARED FINDINGS.vbs"
+name_of_script = "DEU-PARIS MATCH CLEARED FINDINGS.vbs"
 start_time = timer
 STATS_counter = 1              'sets the stats counter at one
 STATS_manualtime = 90          'manual run time in seconds

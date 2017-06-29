@@ -1,5 +1,5 @@
 'GATHERING STATS===========================================================================================
-name_of_script = "NOTES-Appeal Summary Completed.vbs"
+name_of_script = "DEU-APPEAL SUMMARY COMPLETED.vbs"
 start_time = timer
 STATS_counter = 1
 STATS_manualtime = 0
