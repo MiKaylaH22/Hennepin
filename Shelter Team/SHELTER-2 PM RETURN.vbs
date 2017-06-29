@@ -1,8 +1,8 @@
 'GATHERING STATS===========================================================================================
-name_of_script = "DEU-APPEAL SUMMARY COMPLETED.vbs"
+name_of_script = "SHELTER-2 PM RETURN.vbs"
 start_time = timer
 STATS_counter = 1
-STATS_manualtime = 0
+STATS_manualtime = 180
 STATS_denominatinon = "C"
 'END OF STATS BLOCK===========================================================================================
 
@@ -44,56 +44,53 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
-call changelog_update("04/13/2017", "Initial version.", "MiKayla Handley, Hennepin County")
+call changelog_update("06/26/2017", "Initial version.", "MiKayla Handley")
 
 'Actually displays the changelog. This function uses a text file located in the My Documents folder. It stores the name of the script file and a description of the most recent viewed change.
 changelog_display
+'END CHANGELOG BLOCK =======================================================================================================
 
-'END CHANGELOG BLOCK =======================================================================================================----------
-'connecting to BlueZone and grabbing the case number
-EMConnect ""
-Call MAXIS_case_number_finder(maxis_case_number)
-
-'Initial dialog and do...loop
-BeginDialog , 0, 0, 276, 90, "Appeal Summary Completed"
-  EditBox 60, 5, 60, 15, maxis_case_number
-  EditBox 210, 5, 60, 15, date_appeal_rcvd
-  EditBox 60, 25, 60, 15, claim_number
-  EditBox 210, 25, 60, 15, effective_date
-  EditBox 95, 45, 175, 15, action_client_is_appealing
+'-------------------------------------------------------------------------------------------------DIALOG
+BeginDialog pm_Return_dlg, 0, 0, 186, 85, " 2pm Return "
+  EditBox 70, 5, 65, 15, maxis_case_number
+  EditBox 70, 25, 110, 15, Comments_notes
+  EditBox 70, 45, 110, 15, items_still_needed
   ButtonGroup ButtonPressed
-    OkButton 165, 65, 50, 15
-    CancelButton 220, 65, 50, 15
-  Text 10, 10, 45, 10, "Case number:"
-  Text 130, 30, 80, 10, "Effective date of action:"
-  Text 10, 30, 50, 10, "Claim number:"
-  Text 10, 50, 85, 10, "Action client is appealing:"
-  Text 130, 10, 75, 10, "Date appeal received:"
+    OkButton 75, 65, 50, 15
+    CancelButton 130, 65, 50, 15
+  Text 30, 30, 40, 10, "Comments:"
+  Text 20, 10, 50, 10, "Case Number:"
+  Text 5, 50, 65, 10, "Items Still Needed:"
 EndDialog
 
-Do
-	Do
-        err_msg = "" 
-		Dialog
-		IF ButtonPressed = 0 then StopScript
-		IF IsNumeric(maxis_case_number) = false or len(maxis_case_number) > 8 THEN err_msg = err_msg & vbNewLine & "* Please enter a valid case number."
-		IF Isdate(date_appeal_rcvd) = false THEN err_msg = err_msg & vbNewLine & "* Please enter a date for the appeal."
-		IF IsNumeric(claim_number) = false THEN err_msg = err_msg & vbNewLine & "* Please enter a valid claim number."
-		IF Isdate(effective_date) = false THEN err_msg = err_msg & vbNewLine & "* Please enter the effective date."
-		IF action_client_is_appealing = "" THEN err_msg = err_msg & vbNewLine & "* Please enter action that client is appealing."	
-		IF err_msg <> "" THEN MsgBox "*** NOTICE!***" & vbNewLine & err_msg & vbNewLine	
-    Loop until err_msg = ""	
- 	Call check_for_password(are_we_passworded_out)
-LOOP UNTIL check_for_password(are_we_passworded_out) = False	
+'--------------------------------------------------------------------------------------------------THE SCRIPT
 
-start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode		 
-	Call write_variable_in_CASE_NOTE("-----APPEAL SUMMARY COMPLETED-----")
-	Call write_bullet_and_variable_in_CASE_NOTE("Claim number:", claim_number)
-	Call write_bullet_and_variable_in_CASE_NOTE("Date appeal request received:", date_appeal_rcvd)
-	Call write_bullet_and_variable_in_CASE_NOTE("Effective date of action being appealed:", effective_date)
-	Call write_bullet_and_variable_in_CASE_NOTE("Action client is appealing:", action_client_is_appealing)
-	Call write_bullet_and_variable_in_CASE_NOTE("Emailed Appeals", send_email)
-	Call write_variable_in_CASE_NOTE("----- ----- ----- ----- ----- ----- -----")
-	Call write_variable_in_CASE_NOTE("DEBT ESTABLISHMENT UNIT 612-348-4290 PROMPTS 1-1-1") 
+EMConnect ""
+CALL MAXIS_case_number_finder(MAXIS_case_number)
+
+DO
+	Do
+		Dialog Cash_Cut_Off_dlg
+		cancel_confirmation
+		If (isnumeric(MAXIS_case_number) = False and len(MAXIS_case_number) <> 8) then MsgBox "You must enter either a valid MAXIS case number."
+	Loop until (isnumeric(MAXIS_case_number) = True) or (isnumeric(MAXIS_case_number) = False and len(MAXIS_case_number) = 8)
+	call check_for_password(are_we_passworded_out)  'Adding functionality for MAXIS v.6 Passworded Out issue'
+LOOP UNTIL are_we_passworded_out = false
+back_to_SELF
+EMWriteScreen "________", 18, 43
+EMWriteScreen case_number, 18, 43
+EMWriteScreen CM_mo, 20, 43	 '------------------------------------------------------------------------------''entering current footer month/year
+EMWriteScreen CM_yr, 20, 46
+date_header = CM_mo & "/" & CM_yr
+
+'----------------------------------------------------------------------------------------------------CASENOTE
+start_a_blank_case_note
+CALL write_variable_in_CASE_NOTE("### 2pm Return ###")
+CALL write_variable_in_CASE_NOTE("Client returning at 2pm and requesting shelter. ")
+CALL write_variable_in_CASE_NOTE("Comments: " & Comments_notes)
+CALL write_variable_in_CASE_NOTE("Items Still Needed:" & items_still_needed)
+Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE("Requested by, " & worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")
