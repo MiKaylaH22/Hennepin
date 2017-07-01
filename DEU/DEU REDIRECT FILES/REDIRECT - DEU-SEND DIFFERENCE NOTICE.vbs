@@ -6,7 +6,7 @@ fso_command.Close
 Execute text_from_the_other_script
 
 'LOADING SCRIPT
-url = "https://github.com/IlseFerris/Hennepin/blob/master/DEU/DEU-SEND%20DIFF%20MATCH%20NOTICE.vbs"
+url = "https://raw.githubusercontent.com/IlseFerris/Hennepin/master/DEU/DEU-SEND%20DIFF%20MATCH%20NOTICE.vbs"
 SET req = CreateObject("Msxml2.XMLHttp.6.0")				'Creates an object to get a URL
 req.open "GET", url, FALSE									'Attempts to open the URL
 req.send													'Sends request
