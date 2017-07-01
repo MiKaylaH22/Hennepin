@@ -46,7 +46,7 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog Property_review_dialog, 0, 0, 301, 255, "311"
+BeginDialog Property_review_dialog, 0, 0, 301, 245, "311"
   EditBox 85, 10, 55, 15, MAXIS_case_number
   EditBox 235, 10, 55, 15, review_date
   DropListBox 195, 30, 95, 15, "Select one..."+chr(9)+"Called 311"+chr(9)+"Called city"+chr(9)+"Checked website", property_reviewed
@@ -58,12 +58,10 @@ BeginDialog Property_review_dialog, 0, 0, 301, 255, "311"
   DropListBox 85, 175, 90, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No"+chr(9)+"Inspection pending", passed_inspection
   EditBox 225, 175, 65, 15, vendor_number
   EditBox 85, 200, 205, 15, other_notes
-  EditBox 85, 225, 95, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 185, 225, 50, 15
     CancelButton 240, 225, 50, 15
   Text 10, 105, 75, 10, "Current rental license:"
-  Text 20, 230, 60, 10, "Worker signature: "
   Text 15, 180, 70, 10, "Passed inspection?:"
   Text 150, 15, 80, 10, "Date of property review:"
   Text 20, 55, 60, 10, "Property address:"
@@ -75,6 +73,7 @@ BeginDialog Property_review_dialog, 0, 0, 301, 255, "311"
   Text 190, 180, 35, 10, "Vendor #:"
   Text 20, 80, 60, 10, "Open work orders:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -100,7 +99,6 @@ DO
 		If violations = "" then err_msg = err_msg & vbNewLine & "* Enter the household's net income."
 		If passed_inspection = "Select one..." then err_msg = err_msg & vbNewLine & "* Has the property passed the inspection?"
 		If vendor_number = "" then err_msg = err_msg & vbNewLine & "* Enter the property's vendor #."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						

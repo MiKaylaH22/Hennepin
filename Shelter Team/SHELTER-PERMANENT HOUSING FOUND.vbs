@@ -76,7 +76,6 @@ BeginDialog perm_housing_found_dialog, 0, 0, 416, 330, "Permanent Housing Found"
   EditBox 350, 245, 55, 15, TANF_months
   EditBox 350, 265, 55, 15, num_days_shelter
   EditBox 130, 285, 275, 15, other_notes
-  EditBox 130, 310, 160, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 300, 310, 50, 15
     CancelButton 355, 310, 50, 15
@@ -86,7 +85,6 @@ BeginDialog perm_housing_found_dialog, 0, 0, 416, 330, "Permanent Housing Found"
   Text 15, 95, 80, 10, "Rent needed to move in:"
   Text 180, 15, 45, 10, "Move in date:"
   Text 10, 115, 90, 10, "DD amt needed to move in:"
-  Text 65, 315, 60, 10, "Worker signature: "
   Text 160, 95, 75, 10, "Client funds available:"
   Text 80, 290, 45, 10, "Other notes: "
   Text 160, 115, 75, 10, "Rent subsidy paid by:"
@@ -113,6 +111,7 @@ BeginDialog perm_housing_found_dialog, 0, 0, 416, 330, "Permanent Housing Found"
   GroupBox 5, 60, 405, 115, "Resources for shelter funds:"
   Text 295, 135, 55, 10, "MFIP/DWP/HG:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -148,7 +147,6 @@ DO
 		If client_phone = "" then err_msg = err_msg & vbNewLine & "* Enter the client's phone number."
 		If isNumeric(TANF_months) = False then err_msg = err_msg & vbNewLine & "* Enter numeric number of TANF months used."
 		If isNumeric(num_days_shelter) = False then err_msg = err_msg & vbNewLine & "* Enter the numeric number of days in shelter."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)
@@ -193,6 +191,7 @@ Call write_bullet_and_variable_in_CASE_NOTE("TANF months used", TANF_months)
 Call write_bullet_and_variable_in_CASE_NOTE("Number of days in shelter", num_days_shelter)
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")	

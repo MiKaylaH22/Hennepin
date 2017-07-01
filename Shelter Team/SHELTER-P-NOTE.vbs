@@ -97,20 +97,18 @@ Function write_new_line_in_person_note(x)
 End function
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog pnote_dialog, 0, 0, 316, 130, "P-NOTE"
+BeginDialog pnote_dialog, 0, 0, 316, 105, "P-NOTE"
   EditBox 60, 5, 60, 15, MAXIS_case_number
   EditBox 235, 5, 75, 15, ACF_EA_dates
   EditBox 60, 25, 20, 15, number_nights
   EditBox 175, 25, 20, 15, number_tokens
   EditBox 175, 45, 135, 15, reason_for_homelessness
   EditBox 55, 65, 255, 15, resolution
-  EditBox 55, 85, 255, 15, other_notes
-  EditBox 75, 105, 125, 15, worker_signature
+  EditBox 55, 85, 145, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 205, 105, 50, 15
-    CancelButton 260, 105, 50, 15
+    OkButton 205, 85, 50, 15
+    CancelButton 260, 85, 50, 15
   Text 10, 10, 45, 10, "Case number:"
-  Text 10, 110, 60, 10, "Worker Signature:"
   Text 180, 10, 55, 10, " ACF/EA Dates:"
   Text 15, 90, 40, 10, "Other notes:"
   Text 5, 50, 170, 10, "Funds issued when client become Homeless due to:"
@@ -118,6 +116,7 @@ BeginDialog pnote_dialog, 0, 0, 316, 130, "P-NOTE"
   Text 85, 30, 65, 10, "# nights shelter"
   Text 15, 70, 40, 10, "Resolution:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -136,7 +135,6 @@ DO
 		If ACF_EA_dates = "" then err_msg = err_msg & vbNewLine & "* Enter the ACF/EA dates."
 		If reason_for_homelessness = "" then err_msg = err_msg & vbNewLine & "* Enter the reason for homelessness."
 		If resolution = "" then err_msg = err_msg & vbNewLine & "* Enter the resolution."		
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -168,9 +166,9 @@ ELSE
     Call write_editbox_in_person_note("Funds issued when client become Homeless due to", reason_for_homelessness)
     Call write_editbox_in_person_note("Resolution", resolution)
     Call write_editbox_in_person_note("Other notes", other_notes)
-    Call write_new_line_in_person_note("---")
-    Call write_new_line_in_person_note(worker_signature)
-    Call write_new_line_in_person_note("Hennepin County Shelter Team")
+	Call write_variable_in_CASE_NOTE ("---")
+	Call write_variable_in_CASE_NOTE(worker_signature)
+	Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 END IF
 
 script_end_procedure("")

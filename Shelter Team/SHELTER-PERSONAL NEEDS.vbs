@@ -56,30 +56,24 @@ BeginDialog personal_needs_dialog, 0, 0, 171, 85, "Select a personal needs statu
   Text 35, 15, 45, 10, "Case number:"
 EndDialog
 
-BeginDialog pers_needs_recd_dialog, 0, 0, 296, 95, "Personal needs received"
+BeginDialog pers_needs_recd_dialog, 0, 0, 296, 70, "Personal needs received"
   EditBox 70, 20, 55, 15, amt_issued
   EditBox 225, 20, 55, 15, date_issued
-  EditBox 70, 45, 210, 15, other_notes
-  EditBox 70, 70, 100, 15, worker_signature
+  EditBox 55, 45, 115, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 175, 70, 50, 15
-    CancelButton 230, 70, 50, 15
-  Text 5, 75, 60, 10, "Worker signature: "
+    OkButton 175, 45, 50, 15
+    CancelButton 230, 45, 50, 15
   Text 175, 25, 45, 10, "Date issued:"
-  Text 25, 50, 40, 10, "Other notes: "
+  Text 10, 50, 40, 10, "Other notes: "
   Text 20, 25, 45, 10, "Amt issued:"
   GroupBox 5, 5, 280, 35, "Client received 10% + $20 personal needs:"
 EndDialog
 
-BeginDialog pers_needs_inelig_dialog, 0, 0, 296, 105, "Personal needs ineligible"
+BeginDialog pers_needs_inelig_dialog, 0, 0, 296, 75, "Personal needs ineligible"
   EditBox 90, 25, 190, 15, inelig_reason
-  EditBox 70, 55, 210, 15, other_notes
-  EditBox 70, 80, 100, 15, worker_signature
   ButtonGroup ButtonPressed
-    OkButton 175, 80, 50, 15
-    CancelButton 230, 80, 50, 15
-  Text 5, 85, 60, 10, "Worker signature: "
-  Text 25, 60, 40, 10, "Other notes: "
+    OkButton 175, 55, 50, 15
+    CancelButton 230, 55, 50, 15
   Text 10, 30, 80, 10, "Reason for ineligibility:"
   GroupBox 5, 10, 285, 35, "Client is ineligible for personal needs:"
 EndDialog
@@ -155,7 +149,8 @@ ELSEIF case_note_header = "ineligible" then
 	Call write_bullet_and_variable_in_CASE_NOTE("Reason for ineligibility", inelig_reason)
 END IF
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure ("")

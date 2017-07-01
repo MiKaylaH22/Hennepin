@@ -46,31 +46,29 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog shelter_alternative_dialog, 0, 0, 301, 200, "Shelter Alternative"
-  EditBox 60, 5, 60, 15, MAXIS_case_number
+BeginDialog shelter_alternative_dialog, 0, 0, 301, 180, "Shelter Alternative"
+  EditBox 55, 5, 60, 15, MAXIS_case_number
   EditBox 210, 5, 20, 15, number_of_adults_sheltered
   EditBox 255, 5, 20, 15, number_of_children_sheltered
-  EditBox 60, 30, 230, 15, reason_not_authorized
+  EditBox 55, 30, 225, 15, reason_not_authorized
   EditBox 30, 65, 250, 15, needed_one
   EditBox 30, 85, 250, 15, needed_two
   EditBox 30, 105, 250, 15, needed_three
   EditBox 30, 125, 250, 15, needed_four
-  EditBox 60, 155, 230, 15, other_notes
-  EditBox 70, 180, 110, 15, worker_signature
+  EditBox 45, 155, 135, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 185, 180, 50, 15
-    CancelButton 240, 180, 50, 15
-  Text 25, 35, 35, 10, "Situation:"
+    OkButton 185, 155, 50, 15
+    CancelButton 240, 155, 50, 15
+  Text 20, 35, 35, 10, "Situation:"
   Text 125, 10, 85, 10, "Client seeking shelter for"
   Text 235, 10, 20, 10, "A and"
-  Text 10, 10, 45, 10, "Case number:"
+  Text 5, 10, 45, 10, "Case number:"
   Text 15, 70, 10, 10, "1."
   GroupBox 5, 50, 285, 100, "What is needed for shelter?"
-  Text 5, 185, 60, 10, "Worker Signature:"
   Text 15, 90, 10, 10, "2."
   Text 280, 10, 10, 10, "C"
   Text 15, 110, 10, 10, "3."
-  Text 15, 160, 40, 10, "Comments:"
+  Text 5, 160, 40, 10, "Comments:"
   Text 15, 130, 10, 10, "4."
 EndDialog
 
@@ -89,7 +87,6 @@ DO
 		If IsNumeric(number_of_adults_sheltered) = False then err_msg = err_msg & vbNewLine & "* Enter the nubmer of adults sheltered"
 		If IsNumeric(number_of_children_sheltered) = False then err_msg = err_msg & vbNewLine & "* Enter the number of children sheltered"
 		If reason_not_authorized = "" then err_msg = err_msg & vbNewLine & "* Enter reason not authorized"	
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter N/A in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						

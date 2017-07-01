@@ -46,23 +46,21 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog RRH_screening_appt, 0, 0, 276, 120, "RRH Screening Appointment Scheduled"
+BeginDialog RRH_screening_appt, 0, 0, 271, 100, "RRH Screening Appointment Scheduled"
   EditBox 70, 10, 55, 15, MAXIS_case_number
   EditBox 210, 10, 55, 15, memb_name
   EditBox 70, 30, 55, 15, appt_date
   EditBox 210, 30, 55, 15, appt_time
-  CheckBox 40, 50, 225, 10, "Informed client to bring 3 year rental/ADDR history, and meet with", informed_client
-  EditBox 70, 75, 195, 15, other_notes
-  EditBox 70, 100, 85, 15, worker_signature
+  CheckBox 5, 50, 225, 10, "Informed client to bring 3 year rental/ADDR history, and meet with", informed_client
+  EditBox 45, 75, 110, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 160, 100, 50, 15
-    CancelButton 215, 100, 50, 15
-  Text 55, 60, 190, 10, "the Shelter Team for initial interview after RRH screening."
-  Text 25, 80, 40, 10, "Other notes:"
+    OkButton 160, 75, 50, 15
+    CancelButton 215, 75, 50, 15
+  Text 25, 60, 190, 10, "the Shelter Team for initial interview after RRH screening."
+  Text 5, 80, 40, 10, "Comments:"
   Text 5, 35, 60, 10, "Appointment date:"
   Text 20, 15, 45, 10, "Case number:"
   Text 145, 35, 60, 10, "Appointment time:"
-  Text 10, 105, 60, 10, "Worker signature: "
   Text 155, 15, 50, 10, "Member name:"
 EndDialog
 
@@ -81,7 +79,6 @@ DO
 		IF memb_name = "" then err_msg = err_msg & vbNewLine & "* Enter the referred member's name."
 		If Isdate(appt_date) = False then err_msg = err_msg & vbNewLine & "* Enter the RRH appointment date."
 		If appt_time = "" then err_msg = err_msg & vbNewLine & "* Enter the RRH appointment time."
-		IF worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)
@@ -98,7 +95,8 @@ start_a_blank_case_note      'navigates to case/note and puts case/note into edi
 Call write_variable_in_CASE_NOTE("--RRH Screening Appt. scheduled for " & memb_name & " on " & appt_date & " at " & appt_time & "--")
 If informed_client = 1 then Call write_variable_in_CASE_NOTE("* Informed client to bring 3 years of rental/ADDR history, and meet with the Shelter Team for an initial interview after the RRH screening.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_new_line_in_person_note("---")
+Call write_new_line_in_person_note(worker_signature)
+Call write_new_line_in_person_note("Hennepin County Shelter Team")
 
 script_end_procedure("")

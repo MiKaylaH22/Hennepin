@@ -46,32 +46,29 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog single_client_interview_dialog, 0, 0, 296, 260, "Single client interview"
+BeginDialog single_client_interview_dialog, 0, 0, 301, 245, "Single client interview"
   EditBox 70, 10, 55, 15, MAXIS_case_number
-  DropListBox 195, 10, 60, 15, "Select one..."+chr(9)+"PSP"+chr(9)+"SA-HL", shelter_type
+  DropListBox 190, 10, 60, 15, "Select one..."+chr(9)+"PSP"+chr(9)+"SA-HL", shelter_type
   EditBox 70, 35, 30, 15, num_nights
-  EditBox 195, 35, 90, 15, shelter_dates
+  EditBox 190, 35, 95, 15, shelter_dates
   CheckBox 10, 60, 285, 10, "Explained shelter policies, self pay and client options to shleter such as bus tickets,", shelter_policy_checkbox
   CheckBox 10, 90, 115, 10, "ATR's and data sharing signed.", ATR_checkbox
   CheckBox 10, 110, 280, 10, "MOF given to client to have Dr. complete/return to HSR team to determine GA basis.", MOF_checkbox
   CheckBox 10, 130, 115, 10, "ATR's and data sharing signed.", Check4
-  CheckBox 10, 150, 290, 10, "(18-21 YRS): Form given to client to take to Margo to determine school plan, and return", school_plan_checkbox
-  CheckBox 10, 180, 155, 10, "Set TIKL for revoucher date. Revoucher date:", set_TIKL
-  EditBox 170, 175, 55, 15, revoucher_date
+  CheckBox 10, 150, 255, 10, "(18-21 YRS): Form given to client to take to Margo to determine school plan,", school_plan_checkbox
+  CheckBox 10, 180, 185, 10, "Set TIKL for revoucher date.               Revoucher date:", set_TIKL
+  EditBox 200, 175, 55, 15, revoucher_date
   EditBox 70, 200, 220, 15, GA_pending
-  EditBox 70, 220, 220, 15, other_notes
-  EditBox 70, 240, 110, 15, worker_signature
+  EditBox 70, 220, 105, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 185, 240, 50, 15
-    CancelButton 240, 240, 50, 15
+    OkButton 185, 220, 50, 15
+    CancelButton 240, 220, 50, 15
   Text 20, 70, 135, 10, " temporary housing, private shelters, etc. "
   Text 30, 40, 40, 10, "# of nights:"
   Text 15, 205, 50, 10, "GA pending for:"
-  Text 110, 40, 85, 10, "Dates shelter issued for:"
-  Text 5, 245, 60, 10, "Worker signature: "
-  Text 25, 225, 40, 10, "Other notes: "
-  Text 20, 160, 175, 10, "by the revoucher date in order to get more voucher."
-  Text 135, -85, 45, 10, "Shelter type:"
+  Text 110, 40, 80, 10, "Dates shelter issued for:"
+  Text 30, 225, 40, 10, "Comments: "
+  Text 20, 160, 175, 10, " and return by the revoucher date in order to get more voucher."
   Text 20, 15, 45, 10, "Case number:"
   Text 145, 15, 45, 10, "Shelter type:"
 EndDialog
@@ -93,7 +90,6 @@ DO
 		If shelter_dates = "" then err_msg = err_msg & vbNewLine & "* Enter the dates of the shelter stay."
 		If set_TIKL = 1 and isDate(revoucher_date) = False then err_msg = err_msg & vbNewLine & "* Please enter the revoucher date for the TIKL." 
 		If GA_pending = "" then err_msg = err_msg & vbNewLine & "* Enter the reason GA is pending."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)
@@ -128,7 +124,8 @@ Call write_variable_in_CASE_NOTE ("---")
 Call write_bullet_and_variable_in_CASE_NOTE("GA pending for", GA_pending)
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 If set_TIKL = 1 then 
 	script_end_procedure("A TIKL has been set for " & revoucher_date & " to recheck case.")

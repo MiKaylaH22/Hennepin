@@ -46,7 +46,7 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog acf_dialog, 0, 0, 281, 250, "ACF Request Pending"
+BeginDialog acf_dialog, 0, 0, 281, 215, "ACF Request Pending"
   EditBox 50, 5, 55, 15, MAXIS_case_number
   EditBox 225, 5, 50, 15, date_request_sent
   EditBox 50, 30, 55, 15, monthly_rent
@@ -58,16 +58,14 @@ BeginDialog acf_dialog, 0, 0, 281, 250, "ACF Request Pending"
   EditBox 70, 125, 50, 15, mfip
   EditBox 225, 125, 50, 15, dwp
   EditBox 115, 150, 160, 15, income_used_for
-  EditBox 80, 175, 195, 15, reason_for_issuance
-  EditBox 80, 195, 195, 15, other_notes
-  EditBox 80, 220, 85, 15, worker_signature
+  EditBox 80, 170, 195, 15, reason_for_issuance
+  EditBox 50, 195, 110, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 170, 220, 50, 15
-    CancelButton 225, 220, 50, 15
+    OkButton 170, 195, 50, 15
+    CancelButton 225, 195, 50, 15
   Text 5, 35, 45, 10, "Monthly rent: "
   Text 25, 85, 195, 10, "Balance in HCEA shelter account available towards rent/DD:"
   Text 80, 60, 140, 10, "Amount vendored to HCEA shelter account:"
-  Text 15, 225, 60, 10, "Worker Signature:"
   Text 15, 110, 55, 10, "Earned Income:"
   Text 155, 110, 60, 10, "Unearned Income:"
   Text 5, 155, 105, 10, "Income this month was used for:"
@@ -75,9 +73,9 @@ BeginDialog acf_dialog, 0, 0, 281, 250, "ACF Request Pending"
   Text 45, 125, 20, 10, "MFIP:"
   Text 195, 130, 20, 10, "DWP:"
   Text 20, 10, 25, 10, "Case #"
-  Text 10, 180, 70, 10, "Reason for Issuance:"
+  Text 5, 175, 70, 10, "Reason for Issuance:"
   Text 160, 35, 55, 10, "Damage deposit:"
-  Text 35, 200, 40, 10, "Other notes:"
+  Text 5, 200, 40, 10, "Other notes:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +104,6 @@ DO
 		If dwp = "" then err_msg = err_msg & vbNewLine & "* Enter the DWP amount."
 		If income_used_for = "" then err_msg = err_msg & vbNewLine & "* Enter what the applicant income was used for."
 		If reason_for_issuance = "" then err_msg = err_msg & vbNewLine & "* Enter the reason for Issuance."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -134,7 +131,8 @@ Call write_bullet_and_variable_in_CASE_NOTE("DWP", dwp)
 Call write_bullet_and_variable_in_CASE_NOTE("Applicant income used for", income_used_for)
 Call write_bullet_and_variable_in_CASE_NOTE("Reason for issuance", reason_for_issuance)
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

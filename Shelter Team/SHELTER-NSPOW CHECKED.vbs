@@ -46,23 +46,20 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog nspow_checked_dialog, 0, 0, 331, 120, "NSPOW CHECKED"
+BeginDialog nspow_checked_dialog, 0, 0, 226, 90, "NSPOW CHECKED"
   EditBox 60, 5, 60, 15, MAXIS_case_number
   EditBox 75, 30, 45, 15, date1
   EditBox 145, 30, 75, 15, client_name
-  EditBox 240, 30, 75, 15, worker_name
-  EditBox 110, 55, 205, 15, other_notes
-  EditBox 110, 80, 90, 15, worker_signature
+  EditBox 55, 50, 165, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 210, 80, 50, 15
-    CancelButton 265, 80, 50, 15
-  Text 225, 35, 10, 10, "by"
+    OkButton 115, 70, 50, 15
+    CancelButton 170, 70, 50, 15
   Text 10, 35, 65, 10, "NSPW checked on"
-  Text 45, 85, 60, 10, "Worker Signature:"
   Text 10, 10, 45, 10, "Case number:"
   Text 125, 35, 15, 10, " for"
-  Text 65, 60, 40, 10, "Other notes:"
+  Text 10, 55, 40, 10, "Other notes:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -78,13 +75,11 @@ DO
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
 		If date1 = "" then err_msg = err_msg & vbNewLine & "* Enter a date"
 		If client_name = "" then err_msg = err_msg & vbNewLine & "* Enter a client name"
-		If worker_name = "" then err_msg = err_msg & vbNewLine & "* Enter a worker name."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
 Loop until are_we_passworded_out = false					'loops until user passwords back in					
-		
+	
 'adding the case number 	
 back_to_self
 EMWriteScreen "________", 18, 43
@@ -95,10 +90,11 @@ EMWriteScreen CM_yr, 20, 46
 'The case note'
 start_a_blank_CASE_NOTE
 Call write_variable_in_CASE_NOTE("### NSPOW CHECKED ###")
-Call write_variable_in_CASE_NOTE("* NSPOW checked on" & date1 & " for " & client_name & " by " & worker_name)
+Call write_variable_in_CASE_NOTE("* NSPOW checked on" & date1 & " for " & client_name & " by " & worker_signature)
 Call write_variable_in_CASE_NOTE("* NOT ON WEBSITE.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
+Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
-Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team.")
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

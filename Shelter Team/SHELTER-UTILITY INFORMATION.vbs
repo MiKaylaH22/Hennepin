@@ -46,7 +46,7 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog utilities_info_dialog, 0, 0, 331, 230, "Utilities information"
+BeginDialog utilities_info_dialog, 0, 0, 331, 200, "Utilities information"
   EditBox 70, 5, 60, 15, MAXIS_case_number
   DropListBox 10, 60, 115, 15, "Select one..."+chr(9)+"CenterPoint Energy (VN #44)"+chr(9)+"Xcel Energy (VN #59499)"+chr(9)+"Water Company, MPLS (VN #394)"+chr(9)+"Other", vendor_type_1
   EditBox 140, 60, 60, 15, acct_number_1
@@ -64,20 +64,19 @@ BeginDialog utilities_info_dialog, 0, 0, 331, 230, "Utilities information"
   EditBox 140, 150, 60, 15, acct_number_4
   EditBox 210, 150, 45, 15, balance_4
   EditBox 265, 150, 50, 15, date_4
-  EditBox 70, 180, 245, 15, other_information
-  EditBox 70, 205, 125, 15, worker_signature
+  EditBox 50, 180, 160, 15, other_information
   ButtonGroup ButtonPressed
-    OkButton 205, 205, 50, 15
-    CancelButton 265, 205, 50, 15
+    OkButton 220, 180, 50, 15
+    CancelButton 275, 180, 50, 15
   Text 150, 40, 35, 10, "Account #"
   Text 15, 10, 50, 10, "Case Number"
   Text 30, 40, 55, 10, "Utility company"
   Text 220, 40, 30, 10, "Balance"
-  Text 5, 185, 60, 10, "Other information:"
-  Text 5, 210, 60, 10, "Worker signature:"
+  Text 10, 185, 40, 10, "Comments:"
   Text 265, 40, 45, 10, "Balance date"
   GroupBox 5, 25, 320, 150, "Complete for each of the client(s) utility:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -96,7 +95,6 @@ DO
 		IF (vendor_type_2 <> "Select one..." AND (vendor_number_2 = "" AND acct_number_2 = "" AND balance_2 = "" AND date_2 = "")) THEN err_msg = err_msg & vbCr & "*All vendor information must be completed for the 2nd vendor selected."
 		IF (vendor_type_3 <> "Select one..." AND (vendor_number_3 = "" AND acct_number_3 = "" AND balance_3 = "" AND date_3 = "")) THEN err_msg = err_msg & vbCr & "*All vendor information must be completed for the 3rd vendor selected."
 		IF (vendor_type_4 <> "Select one..." AND (vendor_number_4 = "" AND acct_number_4 = "" AND balance_4 = "" AND date_4 = "")) THEN err_msg = err_msg & vbCr & "*All vendor information must be completed for the 4th vendor selected."
-		IF worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)
@@ -142,6 +140,7 @@ END IF
 
 Call write_bullet_and_variable_in_CASE_NOTE("Other Information", other_information)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")
