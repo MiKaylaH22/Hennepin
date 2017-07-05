@@ -99,8 +99,8 @@ Call write_bullet_and_variable_in_CASE_NOTE("Amount released to client", amt_to_
 Call write_bullet_and_variable_in_CASE_NOTE("Amount vendored to LL for rent/deposit", amt_to_LL)
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 If client_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Informed client funds are being released for basic needs for the month, and shelter will not be available for the entire month." )
-Call write_new_line_in_person_note("---")
-Call write_new_line_in_person_note(worker_signature)
-Call write_new_line_in_person_note("Hennepin County Shelter Team")
+Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

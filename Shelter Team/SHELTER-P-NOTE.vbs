@@ -166,9 +166,9 @@ ELSE
     Call write_editbox_in_person_note("Funds issued when client become Homeless due to", reason_for_homelessness)
     Call write_editbox_in_person_note("Resolution", resolution)
     Call write_editbox_in_person_note("Other notes", other_notes)
-	Call write_variable_in_CASE_NOTE ("---")
-	Call write_variable_in_CASE_NOTE(worker_signature)
-	Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
+	Call write_editbox_in_person_note("---")
+	Call write_editbox_in_person_note(worker_signature)
+	Call write_editbox_in_person_note("Hennepin County Shelter Team")
 END IF
 
 script_end_procedure("")
