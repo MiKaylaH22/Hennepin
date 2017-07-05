@@ -234,8 +234,8 @@ If next_goals <> "" then
     NEXT
 End if 
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_new_line_in_person_note("---")
-Call write_new_line_in_person_note(worker_signature)
-Call write_new_line_in_person_note("Hennepin County Shelter Team")
+Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")
