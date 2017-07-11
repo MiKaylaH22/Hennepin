@@ -65,7 +65,7 @@ Do
     			PushButton 200, 45, 50, 15, "Browse...", select_a_file_button
     			OkButton 145, 90, 50, 15
     			CancelButton 200, 90, 50, 15
-  				EditBox 15, 45, 180, 15, CBO_refferal_path
+  				EditBox 15, 45, 180, 15, file_selection_path
   				GroupBox 10, 5, 250, 80, "Using the SEND MANUAL REFERRAL script"
   				Text 20, 20, 235, 20, "This script should be used when DHS provides your county with a list of recipeints that are working with CBO's and a manual referral is needed."
   				Text 15, 65, 230, 15, "Select the Excel file that contains the CBO information by selecting the 'Browse' button, and finding the file."
@@ -74,16 +74,16 @@ Do
 			Dialog CBO_referral_dialog
 			cancel_confirmation
 			If ButtonPressed = select_a_file_button then
-				If CBO_referral_path <> "" then 'This is handling for if the BROWSE button is pushed more than once'
+				If file_selection_path <> "" then 'This is handling for if the BROWSE button is pushed more than once'
 					objExcel.Quit 'Closing the Excel file that was opened on the first push'
 					objExcel = "" 	'Blanks out the previous file path'
 				End If
-				call file_selection_system_dialog(CBO_referral_path, ".xlsx") 'allows the user to select the file'
+				call file_selection_system_dialog(file_selection_path, ".xlsx") 'allows the user to select the file'
 			End If
-			If CBO_referral_path = "" then err_msg = err_msg & vbNewLine & "Use the Browse Button to select the file that has your client data"
+			If file_selection_path = "" then err_msg = err_msg & vbNewLine & "Use the Browse Button to select the file that has your client data"
 			If err_msg <> "" Then MsgBox err_msg
 		Loop until err_msg = ""
-		If objExcel = "" Then call excel_open(CBO_referral_path, True, True, ObjExcel, objWorkbook)  'opens the selected excel file'
+		If objExcel = "" Then call excel_open(file_selection_path, True, True, ObjExcel, objWorkbook)  'opens the selected excel file'
 		If err_msg <> "" Then MsgBox err_msg
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS
 Loop until are_we_passworded_out = false					'loops until user passwords back in
