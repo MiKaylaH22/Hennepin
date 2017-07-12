@@ -2,6 +2,7 @@
 start_time = timer
 STATS_counter = 1                       'sets the stats counter at one
 STATS_denomination = "C"       			'C is for each CASE
+STATS_manualtime = 25
 'END OF stats block==============================================================================================
 
 'LOADING FUNCTIONS LIBRARY FROM GITHUB REPOSITORY===========================================================================
