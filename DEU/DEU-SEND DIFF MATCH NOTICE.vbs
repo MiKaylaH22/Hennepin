@@ -64,9 +64,65 @@ transmit
 
 CALL check_for_MAXIS(False)
 
-EMReadScreen DAIL_message, 4, 6, 6 'read the DAIL msg'
-If DAIL_message <> "WAGE" then script_end_procedure("This is not a WAGE match. Please select a WAGE match, and run the script again.")
+EMReadScreen IEVS_type, 4, 6, 6 'read the DAIL msg'
+If IEVS_type <> "WAGE" then 
+	if IEVS_type <> "BEER" then 
+		script_end_procedure("This is not a IEVS match. Please select a non-wage match DAIL, and run the script again.")
+	End if 
+End if "This is not a WAGE match. Please select a WAGE match, and run the script again.")
 
+'----------------------------------------------------------------------------------------------------IEVS
+'Navigating deeper into the match interface
+CALL write_value_and_transmit("I", 6, 3)   		'navigates to INFC 
+CALL write_value_and_transmit("IEVP", 20, 71)   'navigates to IEVP
+EMReadScreen error_msg, 7, 24, 2
+If error_msg = "NO IEVS" then script_end_procedure("An error occured in IEVP, please process manually.")'checking for error msg'
+
+row = 7
+'Ensuring that match has not already been resolved.
+Do
+	EMReadScreen days_pending, 5, row, 72
+	days_pending = trim(days_pending)
+	If IsNumeric(days_pending) = false then 
+		script_end_procedure("No pending IEVS match found. Please review IEVP.")
+	ELSE
+		'Entering the IEVS match & reading the difference notice to ensure this has been sent
+		EMReadScreen IEVS_period, 11, row, 47
+		EMReadScreen start_month, 2, row, 47
+		EMReadScreen end_month, 2, row, 53
+		If trim(start_month) = "" or trim(end_month) = "" then 
+			Found_match = False
+		else
+			month_difference = abs(end_month) - abs(start_month)
+			If (IEVS_type = "WAGE" and month_difference = 2) then 'ensuring if it is a wage the match is a quater'
+				found_match = true
+				exit do
+			Elseif (IEVS_type = "BEER" and month_difference = 11) then  'ensuring that if it a beer that the match is a year'
+				found_match = True
+				exit do
+			End if
+		End if
+		row = row + 1
+	END IF
+Loop until row = 17
+
+If found_match = False then script_end_procedure("No pending IEVS match found. Please review IEVP.")
+'----------------------------------------------------------------------------------------------------IULA
+'Entering the IEVS match & reading the difference notice to ensure this has been sent
+CALL write_value_and_transmit("U", row, 3)   'navigates to IULA
+'Reading potential errors for out-of-county cases
+EMReadScreen OutOfCounty_error, 12, 24, 2
+IF OutOfCounty_error = "MATCH IS NOT" then
+	script_end_procedure("Out-of-county case. Cannot update.")
+else
+	IF IEVS_type = "WAGE" then
+		EMReadScreen quarter, 1, 8, 14
+		EMReadScreen IEVS_year, 4, 8, 22
+	Elseif IEVS_type = "BEER" then
+		EMReadScreen IEVS_year, 2, 8, 15
+		IEVS_year = "20" & IEVS_year
+	End if
+End if 
 EMReadScreen MAXIS_case_number, 8, 5, 73
 
 MAXIS_case_number= TRIM(MAXIS_case_number)
@@ -148,7 +204,7 @@ Else
     	
     	length = len(employer_info) 						'establishing the length of the variable
     	position = InStr(employer_info, " AMT:")    		'sets the position at the deliminator                    
-    	employer_name = left(employer_info, length-position)	    'establishes employer as being before the delimiter
+    	employer_info = left(employer_info, length-position)	    'establishes employer as being before the delimiter
     
     	EMReadScreen client_name, 35, 5, 24
         'Formatting the client name for the case note
@@ -224,10 +280,11 @@ IF ATR_on_file_date = "" then ATR_on_file_date = "Not on file."
 
 'The case note'
 start_a_blank_CASE_NOTE
-Call write_variable_in_CASE_NOTE ("-----" & IEVS_quarter & " QTR " & IEVS_year & " WAGE MATCH (" & first_name & ") DIFF NOTICE SENT-----")
+If IEVS_type = "WAGE" then Call write_variable_in_CASE_NOTE ("-----" & IEVS_quarter & " QTR " & IEVS_year & " WAGE MATCH (" & first_name & ") DIFF NOTICE SENT-----")
+If IEVS_type = "BEER" then Call write_variable_in_CASE_NOTE ("-----" & IEVS_year & " NON WAGE MATCH (B) (" & first_name & ") DIFF NOTICE SENT-----")
 Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
 Call write_bullet_and_variable_in_CASE_NOTE("Active Programs", programs)
-Call write_bullet_and_variable_in_CASE_NOTE("Employer info:", employer_name)
+Call write_bullet_and_variable_in_CASE_NOTE("Employer info:", employer_info)
 Call write_variable_in_CASE_NOTE("----- ----- ----- ----- ----- ----- -----")
 Call write_bullet_and_variable_in_CASE_NOTE("Type", Wage_option_type)
 Call write_variable_in_CASE_NOTE("* Verification Requested: EVF and/or ATR")
@@ -312,7 +369,7 @@ start_a_blank_CASE_NOTE
 Call write_variable_in_case_note("-----CLAIM REFERRAL TRACKING - " & Action_Taken & "-----")
 Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
 Call write_bullet_and_variable_in_CASE_NOTE("Active Programs", program_droplist)
-Call write_bullet_and_variable_in_CASE_NOTE("Employer info", employer_name)
+Call write_bullet_and_variable_in_CASE_NOTE("Employer info", employer_info)
 Call write_variable_in_CASE_NOTE("----- ----- ----- ----- ----- ----- -----")
 Call write_bullet_and_variable_in_case_note("Action Date", Action_Date)
 Call write_bullet_and_variable_in_case_note("Other Notes", Other_Notes)
