@@ -61,8 +61,8 @@ function ONLY_create_MAXIS_friendly_date(date_variable)
 	APPL_date = var_month &"/" & var_day & "/" & var_year
 end function
 
+'----------------------------------------------------------------------------------------------------The script
 EMConnect ""
-file_selection_path = "C:\Users\ilfe001\Desktop\Not In Carl 07-11-17.xlsx"
 
 'dialog and dialog DO...Loop	
 Do
@@ -118,7 +118,7 @@ Do                                                              'Loops until the
 	If MAXIS_case_number = "" then exit do
 	
 	Call ONLY_create_MAXIS_friendly_date(APPL_date)			'reformatting the dates to be MM/DD/YY format to measure against the case numbers
-	'msgbox APPL_date
+
 	'Adding client information to the array'
 	ReDim Preserve CARL_array(4, entry_record)	'This resizes the array based on the number of rows in the Excel File'
 	CARL_array (case_number,     entry_record) = MAXIS_case_number		'The client information is added to the array'
@@ -129,9 +129,7 @@ Do                                                              'Loops until the
 	excel_row = excel_row + 1
 Loop
 
-'Once all of the clients have been added to the array, the excel document is closed because we are going to open another document and don't want the script to be confused
-objExcel.Quit
-
+objExcel.Quit		'Once all of the clients have been added to the array, the excel document is closed because we are going to open another document and don't want the script to be confused
 back_to_self
 
 'Now we will get PMI and Member Number for each client on the array.'
@@ -140,8 +138,6 @@ For item = 0 to UBound(CARL_array, 2)
 	APPL_date = CARL_array (app_date, item)			
 
 	Call navigate_to_MAXIS_screen("CASE", "NOTE")
-	'MsgBox MAXIS_case_number
-	
 	'Checking for PRIV cases
 	EMReadScreen priv_check, 6, 24, 14 			'If it can't get into the case needs to skip
 	IF priv_check = "PRIVIL" THEN
@@ -151,7 +147,6 @@ For item = 0 to UBound(CARL_array, 2)
 		CARL_array(worker_numb, item) = ""
 		CARL_array(workers_name, item) = ""
 	ELse
-		'starting at the 1st case note, checking the headers for the NOTES - EXPEDITED SCREENING text or the NOTES - EXPEDITED DETERMINATION text
 		row = 5
 		Do
 			EMReadScreen case_note_date, 8, row, 6
@@ -162,31 +157,24 @@ For item = 0 to UBound(CARL_array, 2)
 				case_note_header = trim(case_note_header)
 				IF instr(case_note_header, "***Intake") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do
 				Elseif instr(case_note_header, "***Reapplication") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do
 				Elseif instr(case_note_header, "***Add program") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do
 				Elseif instr(case_note_header, "***Addendum") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do	
 				Elseif instr(case_note_header, "***Emergency app") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do
 				Elseif instr(case_note_header, "EA Application") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do
 				Elseif instr(case_note_header, "EA APPLICATION") then
 					CAF_note_found = True
-					'EMReadScreen worker_ID, 7, row, 16
 					exit do		
 				else 	
 					CAF_note_found = False
@@ -202,7 +190,6 @@ For item = 0 to UBound(CARL_array, 2)
 			Stats_counter = Stats_counter + 1
 			EMReadScreen worker_ID, 7, row, 16
 			CARL_array (worker_numb, item) = worker_ID
-			'msgbox CAF_note_found & vbcr & worker_ID & vbcr & MAXIS_case_number & vbcr & "row: " & row & vbcr & "appl date: " & appl_date & vbcr & "case note date: " & case_note_date
 			
 			'Enter the worker information here!
 			If worker_ID = "X127D7M" then worker_name = "Ahmed Abdi"
@@ -396,8 +383,7 @@ Next
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
 
 '----------------------------------------------------------------------------------------------------Excel inforamtion
-'Opening the Excel file
-Set objExcel = CreateObject("Excel.Application")
+Set objExcel = CreateObject("Excel.Application")		'Opening the Excel file
 objExcel.Visible = True
 Set objWorkbook = objExcel.Workbooks.Add()
 objExcel.DisplayAlerts = True
@@ -443,7 +429,6 @@ ObjExcel.Cells(2, 7).Value = timer - query_start_time
 ObjExcel.Cells(3, 7).Value = STATS_counter
 
 FOR i = 1 to 7		'formatting the cells'
-	'ObjExcel.columns(i).NumberFormat = "@" 		'formatting as text
 	objExcel.Columns(i).AutoFit()				'sizing the columns'
 NEXT
 
