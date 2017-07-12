@@ -45,7 +45,7 @@ changelog = array()
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
 call changelog_update("05/15/2017", "Initial version.", "Ilse Ferris, Hennepin County")
-
+call changelog_update("07/12/2017", "Updated. MiKayla Handley, Hennepin County")
 'Actually displays the changelog. This function uses a text file located in the My Documents folder. It stores the name of the script file and a description of the most recent viewed change.
 changelog_display
 'END CHANGELOG BLOCK =======================================================================================================
@@ -170,9 +170,9 @@ employer_info = trim(employer_info)
 If instr(employer_info, " AMT: $") then 
     length = len(employer_info) 						  'establishing the length of the variable
     position = InStr(employer_info, " AMT: $")    		      'sets the position at the deliminator  
-    employer_name = Left(employer_info, position)  'establishes employer as being before the deliminator
+    employer_info = Left(employer_info, position)  'establishes employer as being before the deliminator
 Else 
-    employer_name = employer_info
+    employer_info = employer_info
 End if 
 
 EMReadScreen diff_notice, 1, 14, 37
@@ -185,7 +185,7 @@ BeginDialog cleared_match_dialog, 0, 0, 331, 145, "IEVS Match Cleared"
   Text 10, 20, 130, 10, "Case number: " & MAXIS_case_number
   Text 140, 20, 185, 10, "Client name: " & client_name
   Text 10, 40, 125, 10, "Open prog(s): " & programs
-  Text 140, 40, 185, 10, "Income source: " & employer_name
+  Text 140, 40, 185, 10, "Income source: " & employer_info
   Text 10, 60, 125, 10, "Difference notice sent?:  "& diff_notice
   Text 140, 60, 120, 10, "Date sent: "& diff_date
   EditBox 100, 85, 30, 15, resolve_time
@@ -286,7 +286,7 @@ If match_cleared = true then
     If IEVS_type = "BEER" then Call write_variable_in_CASE_NOTE("-----" & IEVS_year & " NON WAGE INCOME(B)" & cleared_header_info & "-----")
     Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
     Call write_bullet_and_variable_in_CASE_NOTE("Programs open", programs)
-    Call write_bullet_and_variable_in_CASE_NOTE("Employer name", employer_name)
+    Call write_bullet_and_variable_in_CASE_NOTE("Employer name", employer_info)
     Call write_variable_in_CASE_NOTE ("----- ----- -----")
     If Cleared_status = "BN - Already known, No Savings" or Cleared_status = "BE - No Change" then Call write_variable_in_CASE_NOTE("CLIENT REPORTED EARNINGS. INCOME IS IN STAT PANELS AND BUDGETED.")
     If cleared_status = "BE - Child" then Call write_variable_in_CASE_NOTE("INCOME IS EXCLUDED FOR MINOR CHILD IN SCHOOL.")
