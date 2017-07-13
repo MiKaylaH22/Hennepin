@@ -52,9 +52,9 @@ changelog_display
 
 EMConnect ""
 
+CALL check_for_MAXIS(False)
 
 'CHECKS TO MAKE SURE THE WORKER IS ON THEIR DAIL
-
 EMReadscreen dail_check, 4, 2, 48
 If dail_check <> "DAIL" then script_end_procedure("You are not in your dail. This script will stop.")
 
@@ -62,16 +62,17 @@ If dail_check <> "DAIL" then script_end_procedure("You are not in your dail. Thi
 EMSendKey "t"
 transmit
 
-CALL check_for_MAXIS(False)
-
 EMReadScreen IEVS_type, 4, 6, 6 'read the DAIL msg'
 If IEVS_type <> "WAGE" then 
 	if IEVS_type <> "BEER" then 
 		script_end_procedure("This is not a IEVS match. Please select a non-wage match DAIL, and run the script again.")
 	End if 
-End if "This is not a WAGE match. Please select a WAGE match, and run the script again.")
+End if 
 
-'----------------------------------------------------------------------------------------------------IEVS
+EMReadScreen MAXIS_case_number, 8, 5, 73
+MAXIS_case_number= TRIM(MAXIS_case_number)
+
+''----------------------------------------------------------------------------------------------------IEVS
 'Navigating deeper into the match interface
 CALL write_value_and_transmit("I", 6, 3)   		'navigates to INFC 
 CALL write_value_and_transmit("IEVP", 20, 71)   'navigates to IEVP
@@ -123,9 +124,7 @@ else
 		IEVS_year = "20" & IEVS_year
 	End if
 End if 
-EMReadScreen MAXIS_case_number, 8, 5, 73
 
-MAXIS_case_number= TRIM(MAXIS_case_number)
 'Navigating to WAGE match
 BeginDialog SEND_WAGE_MATCH_DIFF_NOTICE_dialog , 0, 0, 131, 85, "ACTION-SEND WAGE MATCH DIFF NOTICE"
   EditBox 65, 5, 60, 15, maxis_case_number
@@ -189,8 +188,9 @@ Else
     	'Reading potential errors for out-of-county cases
     	EMReadScreen OutOfCounty_error, 12, 24, 2
     	IF OutOfCounty_error = "MATCH IS NOT" then script_end_procedure("Out-of-county case. Cannot update.")
-    	'sending the notice
-    	EMReadScreen IULA, 4, 2, 52
+    	
+		'sending the notice
+		EMReadScreen IULA, 4, 2, 52
     	IF IULA <> "IULA" then script_end_procedure("Unable to send difference notice please review case.")
     	
     	EMReadScreen quarter, 1, 8, 14
@@ -293,7 +293,7 @@ Call write_bullet_and_variable_in_CASE_NOTE("Date ATR on File", ATR_on_file_date
 Call write_variable_in_CASE_NOTE ("----- ----- ----- ----- ----- ----- -----")
 Call write_variable_in_CASE_NOTE ("DEBT ESTABLISHMENT UNIT 612-348-4290 EXT 1-1-1")
 
-IF Claim_Referral_checkbox = checked then
+'IF Claim_Referral_checkbox = checked then
 
 BeginDialog Claim_Referral_Tracking, 0, 0, 301, 115, "CLAIM REFERRAL TRACKING FS & CASH ONLY"
   EditBox 60, 10, 75, 15, MAXIS_case_number
@@ -378,9 +378,8 @@ Call write_variable_in_case_note("* Entries for these potential claims must be r
 		IF Overpayment_Checkbox = checked then write_variable_in_case_note("* Overpayment exists, collection process to follow.")
 Call write_variable_in_CASE_NOTE ("----- ----- ----- ----- ----- ----- -----")
 Call write_variable_in_CASE_NOTE ("DEBT ESTABLISHMENT UNIT 612-348-4290 EXT 1-1-1")
-	IF Overpayment_Checkbox = checked then 
+IF Overpayment_Checkbox = checked then 
 	script_end_procedure("You have indicated that an overpayment exists. Please follow the agency's procedure(s) for claim entry.")
 Else 
 	script_end_procedure ("Success!  A WAGE MATCH DIFFERENCE NOTICE HAS BEEN SENT." & vbnewline & vbnewline & "Please remember to send out an ATR/EVF from ECF.")
-	END IF
 END IF
