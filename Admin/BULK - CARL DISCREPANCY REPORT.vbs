@@ -99,7 +99,7 @@ Do
 Loop until are_we_passworded_out = false					'loops until user passwords back in
 
 'Starting the query start time (for the query runtime at the end)
-query_start_time = timer
+'query_start_time = timer
 
 Dim CARL_array()
 REdim CARL_array(4, 0)
