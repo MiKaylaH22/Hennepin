@@ -90,7 +90,7 @@ Loop until are_we_passworded_out = false					'loops until user passwords back in
 'ARRAY business----------------------------------------------------------------------------------------------------
 'Sets up the array to store all the information for each client'
 Dim CBO_array ()
-ReDim CBO_array (8, 0)
+ReDim CBO_array (9, 0)
 
 'Sets constants for the array to make the script easier to read (and easier to code)'
 Const clt_SSN         	= 1			'Each of the case numbers will be stored at this position'
@@ -101,6 +101,7 @@ Const CBO_name          = 5
 Const error_reason		= 6
 Const make_referral 	= 7
 Const excel_num			= 8
+Const ABAWD_status		= 9
 
 'Now the script adds all the clients on the excel list into an array for the appropriate county
 excel_row = 2 're-establishing the row to start checking the members for
@@ -116,7 +117,7 @@ Do                                                            'Loops until there
 	name_of_CBO = trim(name_of_CBO)
 	If name_of_CBO = "" then exit do
 	'Adding client information to the array
-	ReDim Preserve CBO_array(8, entry_record)	'This resizes the array based on if the client is in the selected county
+	ReDim Preserve CBO_array(9, entry_record)	'This resizes the array based on if the client is in the selected county
 	CBO_array (clt_SSN,     	entry_record) = client_SSN		'The client information is added to the array
 	CBO_array (case_number, 	entry_record) = MAXIS_case_number
 	CBO_array (ref_status,  	entry_record) = true 			'defaults to true
@@ -125,6 +126,7 @@ Do                                                            'Loops until there
 	CBO_array (make_referral, 	entry_record) = true				'defaulting to true for now
 	CBO_array (memb_number, 	entry_record) = "01"				'defaults to 01 until it gets to PROG
 	CBO_array (excel_num, 		entry_record) = excel_row
+	CBO_array (ABAWD_status, 	entry_record) = ""
 	entry_record = entry_record + 1			'This increments to the next entry in the array
 	
 	excel_row = excel_row + 1
@@ -199,8 +201,8 @@ For item = 0 to UBound(CBO_array, 2)
 		    	LOOP until last_page_check = "THIS IS THE LAST PAGE" or last_page_check = "THIS IS THE ONLY PAGE"
 		    	If CBO_array(make_referral, item) = False then
 		    		CBO_array(make_referral, item) = False
-		    		CBO_array(ref_status, item) = "SNAP Inactive"
-		    	END IF 
+		    		CBO_array(ref_status, item) = "SNAP Inactive" 
+				END IF 
 		    END IF
 		END IF 
 	END IF 
@@ -237,7 +239,28 @@ For item = 0 to UBound(CBO_array, 2)
 	        		CBO_array(make_referral, item) = False
 		    		CBO_array(ref_status, item) = "Error"
 	        		CBO_array(error_reason, item) = "Unable to find person's member number."	'Explanation for the rejected report'
-	        	END IF 
+	        	Else 
+				    'STAT WREG PORTION
+				    Call navigate_to_MAXIS_screen("STAT", "WREG")
+				    EMWriteScreen member_number, 20, 76				'enters member number
+				    transmit
+				    EMReadScreen fset_code, 2, 8, 50
+				    EMReadScreen abawd_code, 2, 13, 50			
+				    WREG_codes = fset_code & "-" & abawd_code
+				    If WREG_codes = "30-11" then 
+				    	CBO_array(make_referral, item) = True
+				    	CBO_array(ABAWD_status, item) = "Volunatary"
+				    Elseif WREG_codes = "30-10" then 
+				    	CBO_array(make_referral, item) = True
+				    	CBO_array(ABAWD_status, item) = "Mandatory - ABAWD"
+				    Elseif WREG_codes = "30-13" then 	
+				    	CBO_array(make_referral, item) = True
+				    	CBO_array(ABAWD_status, item) = "Mandatory - Banked Months"
+				    Else 
+				    	CBO_array(make_referral, item) = True
+				    	CBO_array(ABAWD_status, item) = "Exempt"
+				    End if
+				End if 
 	        END IF
 		End if 
 		 
@@ -266,7 +289,8 @@ For item = 0 to UBound(CBO_array, 2)
 	excel_row = CBO_array(excel_num, item)
 	objExcel.cells(excel_row, 3).Value = CBO_array(case_number,		item)
 	objExcel.cells(excel_row, 6).Value = CBO_array(ref_status, 		item)
-	objExcel.cells(excel_row, 7).Value = CBO_array(error_reason, 	item)
+	objExcel.cells(excel_row, 7).Value = CBO_array(ABAWD_status, 	item)
+	objExcel.cells(excel_row, 8).Value = CBO_array(error_reason, 	item)
 Next 
 	
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
