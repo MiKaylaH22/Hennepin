@@ -44,6 +44,7 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
+call changelog_update("07/13/2017", "Updated title and removed request line.", "MiKayla Handley, Hennepin County")
 call changelog_update("06/06/2017", "Initial version.", "MiKayla Handley, Hennepin County")
 
 'Actually displays the changelog. This function uses a text file located in the My Documents folder. It stores the name of the script file and a description of the most recent viewed change.
@@ -235,8 +236,8 @@ IEVS_period = replace(IEVS_period, "/", " to ")
 diff_date = replace(diff_date, " ", "/")
 
 start_a_blank_CASE_NOTE
-	Call write_variable_in_CASE_NOTE ("-----" & "IEVS DISQ Deleted" & " QTR " & IEVS_year & " WAGE MATCH (" & first_name & ") NON-COOPERATION-----")
-    Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
+	Call write_variable_in_CASE_NOTE ("-----" & IEVS_Quarter & " QTR " & IEVS_year & " WAGE MATCH (" & first_name & ") DISQ DELETED-----")
+	Call write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
 	Call write_bullet_and_variable_in_CASE_NOTE("Active Programs", programs)
 	Call write_bullet_and_variable_in_CASE_NOTE("Employer info", Employer_info)
 	Call write_variable_in_CASE_NOTE("----- ----- ----- ----- ----- ----- -----")
@@ -244,7 +245,6 @@ start_a_blank_CASE_NOTE
 	Call write_variable_in_CASE_NOTE("* Date ATR received: " & date_atr_rcvd)
 	Call write_variable_in_CASE_NOTE("* Employer: " & employer_info)
 	Call write_variable_in_CASE_NOTE("---" & "DEU WILL PROCESS WHEN EMPLOYMENT VERIFICATION IS RETURNED. TEAM CAN REINSTATE CASE IF ALL NECESSARY PAPERWORK TO REINSTATE HAS BEEN RECIEVED---")
-	Call write_variable_in_case_note("* Client needs to provide: ATR, Employment Verification, Difference Notice")     
 	Call write_bullet_and_variable_in_case_note("Other Notes", Other_Notes)
 	Call write_variable_in_CASE_NOTE ("----- ----- ----- ----- ----- ----- -----")
 	Call write_variable_in_CASE_NOTE ("DEBT ESTABLISHMENT UNIT 612-348-4290 EXT 1-1-1")
