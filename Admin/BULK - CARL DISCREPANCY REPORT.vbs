@@ -64,6 +64,8 @@ end function
 '----------------------------------------------------------------------------------------------------The script
 EMConnect ""
 
+file_selection_path = "C:\Users\ilfe001\Desktop\Not In Carl 07-11-17.xlsx"
+
 'dialog and dialog DO...Loop	
 Do
 	Do
@@ -170,12 +172,12 @@ For item = 0 to UBound(CARL_array, 2)
 				Elseif instr(case_note_header, "***Emergency app") then
 					CAF_note_found = True
 					exit do
-				Elseif instr(case_note_header, "EA Application") then
-					CAF_note_found = True
-					exit do
-				Elseif instr(case_note_header, "EA APPLICATION") then
-					CAF_note_found = True
-					exit do		
+				'Elseif instr(case_note_header, "EA Application") then
+				'	CAF_note_found = True
+				'	exit do
+				'Elseif instr(case_note_header, "EA APPLICATION") then
+				'	CAF_note_found = True
+				'	exit do		
 				else 	
 					CAF_note_found = False
 				END IF
@@ -382,24 +384,40 @@ Next
 
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
 
+file_selection_path = "C:\Users\ilfe001\Desktop\CARL discrepancy template.xlsm"
+'dialog and dialog DO...Loop	
+Do
+	Do
+		'The dialog is defined in the loop as it can change as buttons are pressed 
+		BeginDialog output_dialog, 0, 0, 256, 45, "Find the Excel template file to export date "
+  			ButtonGroup ButtonPressed
+    		PushButton 200, 5, 50, 15, "Browse...", select_a_file_button
+    		OkButton 145, 25, 50, 15
+    		CancelButton 200, 25, 50, 15
+  			EditBox 15, 5, 180, 15, file_selection_path
+		EndDialog
+
+		err_msg = ""
+		Dialog output_dialog
+		cancel_confirmation
+		If ButtonPressed = select_a_file_button then
+			If file_selection_path <> "" then 'This is handling for if the BROWSE button is pushed more than once'
+				objExcel.Quit 'Closing the Excel file that was opened on the first push'
+				objExcel = "" 	'Blanks out the previous file path'
+			End If
+			call file_selection_system_dialog(file_selection_path, ".xlsm") 'allows the user to select the file'
+		End If
+		If file_selection_path = "" then err_msg = err_msg & vbNewLine & "Use the Browse Button to select the file that has your client data"
+		If err_msg <> "" Then MsgBox err_msg
+	Loop until err_msg = ""
+	If objExcel = "" Then call excel_open(file_selection_path, True, True, ObjExcel, objWorkbook)  'opens the selected excel file'
+	If err_msg <> "" Then MsgBox err_msg
+	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS
+Loop until are_we_passworded_out = false					'loops until user passwords back in
+
+
 '----------------------------------------------------------------------------------------------------Excel inforamtion
-Set objExcel = CreateObject("Excel.Application")		'Opening the Excel file
-objExcel.Visible = True
-Set objWorkbook = objExcel.Workbooks.Add()
-objExcel.DisplayAlerts = True
-
-'Setting the Excel rows with variables
-ObjExcel.Cells(1, 1).Value = "Case number"
-ObjExcel.Cells(1, 2).Value = "APP Date"
-ObjExcel.Cells(1, 3).Value = "Worker #"
-ObjExcel.Cells(1, 4).Value = "Worker name"
-'ObjExcel.Cells(1, 5).Value = "Region"
-
-FOR i = 1 to 4		'formatting the cells'
-	objExcel.Cells(1, i).Font.Bold = True		'bold font'
-	objExcel.Columns(i).AutoFit()				'sizing the columns'
-NEXT
-
+objExcel.worksheets("Script Data").Activate
 objExcel.Columns(2).NumberFormat = "MM/DD/YY"	'formatting the text			'
 Excel_row = 2
 
@@ -414,21 +432,6 @@ For i = 0 to Ubound(CARL_array, 2)
 Next
 
 FOR i = 1 to 4		'formatting the cells'
-	objExcel.Columns(i).AutoFit()				'sizing the columns'
-NEXT
-
-'Query date/time/runtime info
-ObjExcel.Cells(1, 6).Value = "Query date and time:"	'Goes back one, as this is on the next row
-objExcel.Cells(1, 6).Font.Bold = TRUE
-ObjExcel.Cells(2, 6).Value = "Query runtime (in seconds):"	'Goes back one, as this is on the next row
-objExcel.Cells(2, 6).Font.Bold = TRUE
-ObjExcel.Cells(3, 6).Value = "Case count:"	'Goes back one, as this is on the next row
-objExcel.Cells(3, 6).Font.Bold = TRUE
-ObjExcel.Cells(1, 7).Value = now
-ObjExcel.Cells(2, 7).Value = timer - query_start_time
-ObjExcel.Cells(3, 7).Value = STATS_counter
-
-FOR i = 1 to 7		'formatting the cells'
 	objExcel.Columns(i).AutoFit()				'sizing the columns'
 NEXT
 
