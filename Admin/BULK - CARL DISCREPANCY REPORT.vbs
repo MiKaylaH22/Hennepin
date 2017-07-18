@@ -43,6 +43,7 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
+call changelog_update("07/18/2017", "Fully tested version with South MPLS & South Sub. regions added.", "Ilse Ferris, Hennepin County")
 call changelog_update("07/12/2017", "Initial version.", "Ilse Ferris, Hennepin County")
 
 'Actually displays the changelog. This function uses a text file located in the My Documents folder. It stores the name of the script file and a description of the most recent viewed change.
@@ -64,7 +65,7 @@ end function
 '----------------------------------------------------------------------------------------------------The script
 EMConnect ""
 
-file_selection_path = "C:\Users\ilfe001\Desktop\Not In Carl 07-11-17.xlsx"
+file_selection_path = "C:\Users\ilfe001\Desktop\Not In Carl 07-18-17.xlsx"
 
 'dialog and dialog DO...Loop	
 Do
@@ -172,12 +173,12 @@ For item = 0 to UBound(CARL_array, 2)
 				Elseif instr(case_note_header, "***Emergency app") then
 					CAF_note_found = True
 					exit do
-				'Elseif instr(case_note_header, "EA Application") then
-				'	CAF_note_found = True
-				'	exit do
-				'Elseif instr(case_note_header, "EA APPLICATION") then
-				'	CAF_note_found = True
-				'	exit do		
+				Elseif instr(case_note_header, "EA Application") then
+					CAF_note_found = True
+					exit do
+				Elseif instr(case_note_header, "EA APPLICATION") then
+					CAF_note_found = True
+					exit do		
 				else 	
 					CAF_note_found = False
 				END IF
@@ -384,41 +385,26 @@ Next
 
 STATS_counter = STATS_counter - 1 'removes one from the count since 1 is counted at the beginning (because counting :p)
 
-file_selection_path = "C:\Users\ilfe001\Desktop\CARL discrepancy template.xlsm"
-'dialog and dialog DO...Loop	
-Do
-	Do
-		'The dialog is defined in the loop as it can change as buttons are pressed 
-		BeginDialog output_dialog, 0, 0, 256, 45, "Find the Excel template file to export date "
-  			ButtonGroup ButtonPressed
-    		PushButton 200, 5, 50, 15, "Browse...", select_a_file_button
-    		OkButton 145, 25, 50, 15
-    		CancelButton 200, 25, 50, 15
-  			EditBox 15, 5, 180, 15, file_selection_path
-		EndDialog
-
-		err_msg = ""
-		Dialog output_dialog
-		cancel_confirmation
-		If ButtonPressed = select_a_file_button then
-			If file_selection_path <> "" then 'This is handling for if the BROWSE button is pushed more than once'
-				objExcel.Quit 'Closing the Excel file that was opened on the first push'
-				objExcel = "" 	'Blanks out the previous file path'
-			End If
-			call file_selection_system_dialog(file_selection_path, ".xlsm") 'allows the user to select the file'
-		End If
-		If file_selection_path = "" then err_msg = err_msg & vbNewLine & "Use the Browse Button to select the file that has your client data"
-		If err_msg <> "" Then MsgBox err_msg
-	Loop until err_msg = ""
-	If objExcel = "" Then call excel_open(file_selection_path, True, True, ObjExcel, objWorkbook)  'opens the selected excel file'
-	If err_msg <> "" Then MsgBox err_msg
-	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS
-Loop until are_we_passworded_out = false					'loops until user passwords back in
-
-
 '----------------------------------------------------------------------------------------------------Excel inforamtion
-objExcel.worksheets("Script Data").Activate
-objExcel.Columns(2).NumberFormat = "MM/DD/YY"	'formatting the text			'
+'Opening the Excel file
+Set objExcel = CreateObject("Excel.Application")
+objExcel.Visible = True
+Set objWorkbook = objExcel.Workbooks.Add()
+objExcel.DisplayAlerts = True
+
+'Setting the Excel rows with variables
+ObjExcel.Cells(1, 1).Value = "CASE #"
+ObjExcel.Cells(1, 2).Value = "APP DATE"
+ObjExcel.Cells(1, 3).Value = "WORKER #"
+ObjExcel.Cells(1, 4).Value = "wORKER NAME"
+
+FOR i = 1 to 4		'formatting the cells'
+	objExcel.Cells(1, i).Font.Bold = True		'bold font'
+	objExcel.Columns(i).AutoFit()				'sizing the columns'
+Next
+
+objExcel.Columns(2).NumberFormat = "MM/DD/YY"	'formatting the text
+			'
 Excel_row = 2
 
 'End of setting up the Excel sheet----------------------------------------------------------------------------------------------------
