@@ -46,22 +46,23 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog EA_approval_dialog, 0, 0, 316, 110, "EA Approved "
-  EditBox 65, 10, 55, 15, MAXIS_case_number
-  EditBox 200, 10, 100, 15, approval_dates
-  DropListBox 65, 35, 95, 15, "Select one..."+chr(9)+"FMF "+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
-  CheckBox 170, 40, 140, 10, "Send mandatory vendor MEMO to client.", send_MEMO_checkbox
-  EditBox 65, 60, 235, 15, other_notes
-  EditBox 65, 85, 125, 15, worker_signature
+BeginDialog EA_approval_dialog, 0, 0, 306, 85, "EA Approved"
+  EditBox 60, 5, 55, 15, MAXIS_case_number
+  DropListBox 60, 25, 55, 15, "Select one..."+chr(9)+"1st"+chr(9)+"2nd", approval_number
+  EditBox 190, 25, 100, 15, approval_dates
+  DropListBox 60, 45, 85, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
+  CheckBox 130, 10, 140, 10, "Send mandatory vendor MEMO to client.", send_MEMO_checkbox
+  EditBox 60, 65, 130, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 195, 85, 50, 15
-    CancelButton 250, 85, 50, 15
-  Text 135, 15, 65, 10, "EA approval dates:"
-  Text 20, 65, 40, 10, "Other notes: "
-  Text 15, 15, 45, 10, "Case number:"
-  Text 15, 40, 45, 10, "Shelter name:"
-  Text 5, 90, 60, 10, "Worker signature: "
+    OkButton 195, 65, 50, 15
+    CancelButton 250, 65, 50, 15
+  Text 10, 70, 40, 10, "Other notes: "
+  Text 10, 10, 45, 10, "Case number:"
+  Text 10, 50, 45, 10, "Shelter name:"
+  Text 125, 30, 65, 10, "EA approval dates:"
+  Text 10, 30, 40, 10, "Approval #:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -74,18 +75,17 @@ DO
 		err_msg = ""
 		Dialog EA_approval_dialog
         cancel_confirmation
-		IF len(case_number) > 8 or IsNumeric(case_number) = False THEN err_msg = err_msg & vbNewLine & "* Please enter a valid case number."
+		IF len(MAXIS_case_number) > 8 or IsNumeric(MAXIS_case_number) = False THEN err_msg = err_msg & vbNewLine & "* Please enter a valid case number."
+		IF approval_number = "Select one..." then err_msg = err_msg & vbNewLine & "* Please select the approval number."
 		IF approval_dates = "" then err_msg = err_msg & vbNewLine & "* Please enter the EA approval dates."
 		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Please select the name of the shelter."
-		IF worker_signature = "" then err_msg = err_msg & vbNewLine & "* Please enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)
 LOOP UNTIL check_for_password(are_we_passworded_out) = False
  
 back_to_SELF
-EMWriteScreen "________", 18, 43
-EMWriteScreen case_number, 18, 43
+EMWriteScreen MAXIS_case_number, 18, 43
 EMWriteScreen CM_mo, 20, 43	'entering current footer month/year
 EMWriteScreen CM_yr, 20, 46
 
@@ -138,10 +138,11 @@ END IF
 
 'The case note---------------------------------------------------------------------------------------
 start_a_blank_case_note      'navigates to case/note and puts case/note into edit mode
-Call write_variable_in_CASE_NOTE("### EA approved for: " & approval_dates & " for shelter stay at " & shelter_droplist & " ###")
+Call write_variable_in_CASE_NOTE("###" & approval_number & " EA approved for: " & approval_dates & " for shelter stay at " & shelter_droplist & "###")
 If send_MEMO_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Sent SPEC/MEMO to client re: mandatory vendoring for the next 12 months.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")	

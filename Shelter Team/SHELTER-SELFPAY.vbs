@@ -46,23 +46,21 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog selfpay_dialog, 0, 0, 306, 135, "Self Pay"
+BeginDialog selfpay_dialog, 0, 0, 306, 105, "Self Pay"
   EditBox 60, 5, 60, 15, MAXIS_case_number
   EditBox 205, 5, 30, 15, dollar_amount1
   EditBox 255, 5, 45, 15, date1
   EditBox 110, 30, 30, 15, dollar_amount2
-  DropListBox 155, 30, 80, 15, "Select one..."+chr(9)+"FMF "+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
+  DropListBox 155, 30, 80, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
   EditBox 255, 30, 20, 15, number_of_days
   EditBox 195, 55, 45, 15, voucher_date_start
   EditBox 260, 55, 40, 15, voucher_date_end
-  EditBox 95, 80, 205, 15, other_notes
-  EditBox 95, 105, 90, 15, worker_signature
+  EditBox 55, 80, 135, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 195, 105, 50, 15
-    CancelButton 250, 105, 50, 15
+    OkButton 195, 80, 50, 15
+    CancelButton 250, 80, 50, 15
   Text 145, 35, 10, 10, "at"
   Text 140, 10, 65, 10, "Client will receive $"
-  Text 30, 110, 60, 10, "Worker Signature:"
   Text 280, 35, 25, 10, "nights."
   Text 10, 10, 45, 10, "Case number:"
   Text 240, 10, 10, 10, "on"
@@ -70,7 +68,7 @@ BeginDialog selfpay_dialog, 0, 0, 306, 135, "Self Pay"
   Text 10, 60, 180, 10, "Once self pay is verfied, client can be vouchered from:"
   Text 10, 35, 100, 10, "and has been told to self-pay $"
   Text 245, 60, 10, 10, "to"
-  Text 50, 85, 40, 10, "Other notes:"
+  Text 10, 85, 40, 10, "Comments:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -92,7 +90,6 @@ DO
 		If number_of_days = "" then err_msg = err_msg & vbNewLine & "* Enter the number of days of stay."
 		If voucher_date_start = "" then err_msg = err_msg & vbNewLine & "* Enter a voucher start date or 'n/a'."
 		If voucher_date_end = "" then err_msg = err_msg & vbNewLine & "* Enter a voucher end date or 'n/a'."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -113,6 +110,8 @@ Call write_variable_in_CASE_NOTE("* Once self pay has been verfied, client can b
 Call write_variable_in_CASE_NOTE("* Self-Pay calculation agreement form given to client.")
 Call write_variable_in_CASE_NOTE("* Shelter informed of need to self-pay")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
+Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

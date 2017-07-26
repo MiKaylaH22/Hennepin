@@ -53,7 +53,7 @@ BeginDialog revoucher_dialog, 0, 0, 146, 110, "Select a revoucher option"
   Text 35, 75, 90, 10, "Goals for the next voucher:"
 EndDialog
 
-BeginDialog family_revoucher_dialog, 0, 0, 341, 120, "Family revoucher"
+BeginDialog family_revoucher_dialog, 0, 0, 336, 95, "Family revoucher"
   DropListBox 55, 10, 60, 15, "Select one..."+chr(9)+"ACF"+chr(9)+"EA"+chr(9)+"Self pay", voucher_type
   EditBox 195, 10, 55, 15, revoucher_date
   EditBox 305, 10, 25, 15, num_nights
@@ -61,16 +61,14 @@ BeginDialog family_revoucher_dialog, 0, 0, 341, 120, "Family revoucher"
   EditBox 225, 35, 25, 15, children
   EditBox 305, 35, 25, 15, adults
   EditBox 90, 55, 240, 15, bus_issued
-  EditBox 90, 75, 240, 15, other_notes
-  EditBox 90, 95, 130, 15, worker_signature
+  EditBox 45, 75, 175, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 225, 95, 50, 15
-    CancelButton 280, 95, 50, 15
-  Text 45, 80, 40, 10, "Other notes: "
+    OkButton 225, 75, 50, 15
+    CancelButton 280, 75, 50, 15
+  Text 5, 80, 40, 10, "Comments: "
   Text 180, 40, 45, 10, "# of Children:"
   Text 5, 15, 45, 10, "Voucher type:"
   Text 265, 15, 40, 10, "# of nights:"
-  Text 25, 100, 60, 10, "Worker signature: "
   Text 130, 15, 60, 10, "Date of revoucher:"
   Text 5, 40, 45, 10, "Shelter name:"
   Text 5, 60, 85, 10, "Bus tokens/cards issued:"
@@ -133,7 +131,6 @@ If revoucher_option = "Family" then
 			If IsNumeric(children) = False then err_msg = err_msg & vbNewLine & "* Enter the number of children."
 			If IsNumeric(adults) = False then err_msg = err_msg & vbNewLine & "* Enter the number of adults."
 			If bus_issued = "" then err_msg = err_msg & vbNewLine & "* Enter information about bus cards/tokens issued." 
-			If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 			IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 		LOOP UNTIL err_msg = ""
  	Call check_for_password(are_we_passworded_out)
@@ -152,7 +149,6 @@ If revoucher_option = "Single" then
 			If shelter_type = "Select one..." then err_msg = err_msg & vbNewLine & "* Select the shelter type."
 			If shelter_dates = "" then err_msg = err_msg & vbNewLine & "* Enter the dates of the shelter stay."
 			If bus_issued = "" then err_msg = err_msg & vbNewLine & "* Enter information about bus cards/tokens issued." 
-			If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 			IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 		LOOP UNTIL err_msg = ""
  		Call check_for_password(are_we_passworded_out)
@@ -238,7 +234,8 @@ If next_goals <> "" then
     NEXT
 End if 
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

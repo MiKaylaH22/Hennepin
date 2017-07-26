@@ -46,8 +46,8 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog bus_ticket_dialog, 0, 0, 291, 255, "Bus Ticket Issuances"
-  EditBox 75, 5, 60, 15, MAXIS_case_number
+BeginDialog bus_ticket_dialog, 0, 0, 291, 230, "Bus Ticket Issuances"
+  EditBox 60, 5, 60, 15, MAXIS_case_number
   EditBox 225, 5, 50, 15, ticket_amount
   EditBox 120, 30, 155, 15, what_city
   DropListBox 195, 55, 80, 15, "Select one..."+chr(9)+"Central/NE"+chr(9)+"North"+chr(9)+"Northwest"+chr(9)+"South"+chr(9)+"South Suburban"+chr(9)+"West", region_issued
@@ -55,25 +55,24 @@ BeginDialog bus_ticket_dialog, 0, 0, 291, 255, "Bus Ticket Issuances"
   EditBox 75, 110, 200, 15, staying_with_address
   EditBox 75, 130, 100, 15, staying_with_phone
   EditBox 180, 160, 60, 15, bag_lunches
-  DropListBox 180, 185, 60, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No", HSM_authorized
-  EditBox 70, 205, 205, 15, other_notes
-  EditBox 70, 230, 90, 15, worker_signature
+  DropListBox 180, 180, 60, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No", HSM_authorized
+  EditBox 50, 205, 125, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 170, 230, 50, 15
-    CancelButton 225, 230, 50, 15
+    OkButton 180, 205, 50, 15
+    CancelButton 235, 205, 50, 15
   Text 10, 55, 180, 10, "Regional Accountiung Office Where Ticket Was  Issued:"
   Text 45, 95, 25, 10, "Name:"
   Text 10, 35, 105, 10, "Bus ticket destination City/State:"
   Text 35, 115, 35, 10, "Address:"
-  Text 45, 190, 125, 10, "EA/ACF Issuance authorized by HSM:"
+  Text 45, 185, 125, 10, "EA/ACF Issuance authorized by HSM:"
   Text 15, 135, 50, 10, "Phone Number:"
-  Text 5, 235, 60, 10, "Worker Signature:"
   GroupBox 5, 75, 280, 80, "Client will be staying with:"
   Text 5, 165, 170, 10, "Number of Bag Lunches Issued for pick up at PSP:"
-  Text 25, 210, 40, 10, "Other notes:"
+  Text 5, 210, 40, 10, "Other notes:"
   Text 155, 10, 70, 10, "Bus Ticket Amount: $"
-  Text 25, 10, 45, 10, "Case number:"
+  Text 10, 10, 45, 10, "Case number:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -95,7 +94,6 @@ DO
 		If staying_with_phone = "" then err_msg = err_msg & vbNewLine & "* Enter the phone number of the person the client will be staying with."	
 		If bag_lunches = "" then err_msg = err_msg & vbNewLine & "* Enter the number of bag lunches issued to the client."
 		If HSM_authorized = "Select one..." then err_msg = err_msg & vbNewLine & "* Was EA/ACF approved by HSM?"
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -121,7 +119,8 @@ Call write_variable_in_CASE_NOTE("---")
 Call write_bullet_and_variable_in_CASE_NOTE("Number of Bag Lunches issued for pick up at PSP", bag_lunches)
 Call write_bullet_and_variable_in_CASE_NOTE("Was EA/ACF approved by HSM?", HSM_authorized)
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

@@ -6,7 +6,7 @@ fso_command.Close
 Execute text_from_the_other_script
 
 'LOADING SCRIPT
-url = "https://raw.githubusercontent.com/IlseFerris/Hennepin/master/Shelter%20Team/SHELTER%20Cash%20Cut-Off.vbs"
+url = "https://raw.githubusercontent.com/IlseFerris/Hennepin/master/Shelter%20Team/SHELTER-CASH%20CUT-OFF.vbs"
 SET req = CreateObject("Msxml2.XMLHttp.6.0")				'Creates an object to get a URL
 req.open "GET", url, FALSE									'Attempts to open the URL
 req.send													'Sends request

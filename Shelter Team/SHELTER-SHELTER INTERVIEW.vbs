@@ -57,25 +57,23 @@ BeginDialog Shelter_interview, 0, 0, 311, 325, "Shelter Interview: Do no release
   EditBox 95, 145, 205, 15, shelter_history
   EditBox 95, 165, 205, 15, social_worker
   EditBox 95, 185, 205, 15, referrals_made
-  EditBox 95, 205, 205, 15, other_notes
-  EditBox 95, 225, 100, 15, worker_signature
+  EditBox 95, 205, 100, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 200, 225, 50, 15
-    CancelButton 250, 225, 50, 15
+    OkButton 200, 205, 50, 15
+    CancelButton 250, 205, 50, 15
   Text 45, 70, 45, 10, "Other income:"
   Text 10, 90, 80, 10, "Money mismanagement:"
-  Text 35, 230, 60, 10, "Worker signature: "
   Text 40, 170, 50, 10, "Social worker:"
   Text 20, 130, 70, 10, "Barrier(s) to housing:"
   Text 50, 210, 40, 10, "Other notes: "
-  Text 25, 275, 270, 15, "* Explained shelter policies and client options to shelter such as bus tickets, temporary housing, private shelters, etc."
-  Text 25, 300, 265, 15, "* Client given family social services number (348-4111) to discuss any family issues/barriers."
-  GroupBox 10, 245, 295, 75, "Additional text added to case note:"
+  Text 20, 260, 215, 15, "* Explained shelter policies and client options to shelter such as:   bus tickets, temporary housing, private shelters, etc."
+  Text 25, 285, 265, 15, "* Client given family social services number (348-4111) to discuss any family issues/barriers."
+  GroupBox 5, 230, 295, 75, "Additional text added to case note:"
   Text 155, 15, 50, 10, "Cash program:"
   Text 20, 15, 45, 10, "Case number:"
   Text 30, 190, 60, 10, "Referrals made to:"
   Text 35, 150, 55, 10, "Shelter history:"
-  Text 25, 260, 225, 10, "* 100% of cash benefit to be issued to HCEA shelter account #52871."
+  Text 20, 245, 225, 10, "* 100% of cash benefit to be issued to HCEA shelter account #52871."
   Text 5, 110, 90, 10, "Reason for homelessness:"
   Text 15, 45, 225, 10, "Amt issued to EBT as one-time only (10%) for PN ($20 med co-pays):"
   GroupBox 10, 30, 295, 30, "If MFIP recipient:"
@@ -98,8 +96,7 @@ DO
         If reason_homeless = "" then err_msg = err_msg & vbNewLine & "* Enter the reason for family's homelessness."
 		If barriers_housing = "" then err_msg = err_msg & vbNewLine & "* Enter the family's barrier(s) to housing."
 		If referrals_made = "" then err_msg = err_msg & vbNewLine & "* Enter referals made for the family."
-        If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
-		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
+        IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
 Loop until are_we_passworded_out = false					'loops until user passwords back in					
@@ -134,5 +131,6 @@ Call write_variable_in_CASE_NOTE("* Explained shelter policies and client option
 Call write_variable_in_CASE_NOTE("* Client given family social services number (348-4111) to discuss any family issues/barriers.")
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team") 
 
 script_end_procedure("")

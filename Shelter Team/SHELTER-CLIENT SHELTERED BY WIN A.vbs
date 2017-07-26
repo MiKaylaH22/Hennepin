@@ -59,7 +59,6 @@ BeginDialog client_sheltered_window_A, 0, 0, 301, 245, "Client Sheltered Window 
   EditBox 60, 155, 230, 15, phone_number
   CheckBox 15, 180, 280, 10, "Informed client that they will need to see Rapid ReHousing Screener first, then see ", informed_client_checkbox
   EditBox 70, 205, 220, 15, other_notes
-  EditBox 70, 225, 110, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 185, 225, 50, 15
     CancelButton 240, 225, 50, 15
@@ -67,7 +66,6 @@ BeginDialog client_sheltered_window_A, 0, 0, 301, 245, "Client Sheltered Window 
   Text 15, 140, 45, 10, "Relationship:"
   Text 10, 160, 50, 10, "Phone Number:"
   Text 25, 210, 40, 10, "Other notes:"
-  Text 5, 230, 60, 10, "Worker Signature:"
   Text 10, 50, 100, 10, "Number of Aduilts vouchered:"
   Text 195, 30, 60, 10, "How many nights?"
   Text 155, 50, 105, 10, "Number of Children vouchered:"
@@ -79,6 +77,7 @@ BeginDialog client_sheltered_window_A, 0, 0, 301, 245, "Client Sheltered Window 
   EditBox 75, 5, 65, 15, MAXIS_case_number
   Text 5, 30, 70, 10, "Shelter voucher date:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -101,7 +100,6 @@ DO
 		If name_of_person_verifying = "" then err_msg = err_msg & vbNewLine & "* Enter the name of the person who verified client's homelessness"	
 		If relationship = "" then err_msg = err_msg & vbNewLine & "* Enter the relationship to the client of the person who verified client's homelessness"
 		If phone_number = "" then err_msg = err_msg & vbNewLine & "* Enter the phone number of the person who verified client's homelessness"
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature"		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -142,7 +140,8 @@ Call write_bullet_and_variable_in_CASE_NOTE("   Relationship to the client", rel
 Call write_bullet_and_variable_in_CASE_NOTE("   Phone Number of person verifying client's homelessness", phone_number)
 If informed_client_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Client will need to see Rapid ReHousing Screener first, then see shelter team for interview and revoucher. ")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

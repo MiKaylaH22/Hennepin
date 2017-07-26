@@ -48,12 +48,10 @@ END IF
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 BeginDialog Mand_vendor_dialog, 0, 0, 306, 195, "Mandatory Vendor SPEC/MEMO"
   EditBox 60, 5, 55, 15, MAXIS_case_number
-  EditBox 70, 175, 105, 15, worker_signature
   ButtonGroup ButtonPressed
     OkButton 180, 175, 50, 15
     CancelButton 235, 175, 50, 15
   Text 10, 10, 45, 10, "Case number:"
-  Text 10, 180, 60, 10, "Worker signature: "
   Text 25, 50, 250, 25, "Call 1 (888) 577-2227 to get more information or enroll. You will be placed on mandatory vendor because you have used shelter or have requested assistance for housing issues. "
   Text 25, 80, 250, 25, "You will remain on mandatory vendor for 12 months. If you move, or your rent changes you must let your team know at least 15 days before the end of the month to make this change."
   Text 25, 110, 250, 35, "Call your Human Service Representative Team at the end of this 12 month period if you want them to stop vendoring your rent at that time. Budgeting classes are free to you and available through the Lutheran Social Services. If you have any questions call the Shelter Team at (612)-348-9410."
@@ -74,7 +72,6 @@ DO
 		Dialog Mand_vendor_dialog
         cancel_confirmation
 		IF len(case_number) > 8 or IsNumeric(case_number) = False THEN err_msg = err_msg & vbNewLine & "* Please enter a valid case number."		
-		IF worker_signature = "" then err_msg = err_msg & vbNewLine & "* Please enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)

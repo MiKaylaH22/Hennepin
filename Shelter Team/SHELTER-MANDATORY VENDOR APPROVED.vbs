@@ -46,23 +46,22 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog mandatory_vendor_dialog, 0, 0, 306, 155, "Mandatory vendors approved"
-  EditBox 65, 10, 55, 15, MAXIS_case_number
-  DropListBox 215, 10, 85, 15, "Select one..."+chr(9)+"Using ACF "+chr(9)+"Using County shelters", vendor_reason
+BeginDialog mandatory_vendor_dialog, 0, 0, 306, 125, "Mandatory vendors approved"
+  EditBox 60, 10, 55, 15, MAXIS_case_number
+  DropListBox 215, 10, 85, 15, "Select one..."+chr(9)+"Using ACF"+chr(9)+"Using County shelters", vendor_reason
   CheckBox 20, 35, 280, 10, "Referred client to Luther Social Services for budgeting classes at 1 (888) 577-2227.", client_referred
-  EditBox 65, 55, 235, 15, other_notes
-  CheckBox 20, 90, 140, 10, "Send mandatory vendor MEMO to client.", send_MEMO_checkbox
-  CheckBox 20, 105, 215, 10, "Set TIKL for 11 months to re-evaluate mandatory vendor status.", Set_TIKL
-  EditBox 65, 130, 125, 15, worker_signature
+  EditBox 55, 105, 135, 15, other_notes
+  CheckBox 20, 70, 140, 10, "Send mandatory vendor MEMO to client.", send_MEMO_checkbox
+  CheckBox 20, 85, 215, 10, "Set TIKL for 11 months to re-evaluate mandatory vendor status.", Set_TIKL
   ButtonGroup ButtonPressed
-    OkButton 195, 130, 50, 15
-    CancelButton 250, 130, 50, 15
-  Text 15, 15, 45, 10, "Case number:"
-  Text 5, 135, 60, 10, "Worker signature: "
-  Text 20, 60, 40, 10, "Other notes: "
+    OkButton 195, 105, 50, 15
+    CancelButton 250, 105, 50, 15
+  Text 10, 15, 45, 10, "Case number:"
+  Text 10, 110, 40, 10, "Other notes: "
   Text 125, 15, 90, 10, "Mandatory vendor reason:"
-  GroupBox 5, 75, 295, 45, "Actions:"
+  GroupBox 5, 55, 295, 45, "Actions:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -77,7 +76,6 @@ DO
         cancel_confirmation
 		IF len(MAXIS_case_number) > 8 or IsNumeric(MAXIS_case_number) = False THEN err_msg = err_msg & vbNewLine & "* Enter a valid case number."
 		IF vendor_reason = "Select one..." then err_msg = err_msg & vbNewLine & "* Select a vendor reason."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
  Call check_for_password(are_we_passworded_out)
@@ -156,6 +154,7 @@ If send_MEMO_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Sent SPEC/MEM
 If set_TIKL = 1 then call write_variable_in_CASE_NOTE("* Set TIKL for 11 months to re-evaluate mandatory vendor status.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE ("---")
-Call write_variable_in_CASE_NOTE (worker_signature)
+Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")	

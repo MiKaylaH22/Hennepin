@@ -46,19 +46,17 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog grh_approval, 0, 0, 266, 80, "GRH Approval"
+BeginDialog grh_approval, 0, 0, 121, 105, "GRH Approval"
   EditBox 60, 5, 55, 15, MAXIS_case_number
-  DropListBox 180, 5, 85, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"SA-HL"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
-  CheckBox 35, 35, 85, 10, "GRH notice cancelled", GRH_notice_checkbox
-  EditBox 200, 30, 60, 15, ea_available_date
-  EditBox 65, 55, 85, 15, worker_signature
+  DropListBox 60, 25, 55, 15, "Select one..."+chr(9)+"FMF"+chr(9)+"PSP"+chr(9)+"SA-HL"+chr(9)+"St. Anne's"+chr(9)+"The Drake", shelter_droplist
+  CheckBox 10, 65, 85, 10, "GRH notice cancelled", GRH_notice_checkbox
+  EditBox 60, 45, 55, 15, ea_available_date
   ButtonGroup ButtonPressed
-    OkButton 155, 55, 50, 15
-    CancelButton 210, 55, 50, 15
+    OkButton 10, 85, 50, 15
+    CancelButton 65, 85, 50, 15
   Text 10, 10, 50, 10, "Case Number:"
-  Text 130, 35, 65, 10, "EA availalble date:"
-  Text 125, 10, 50, 10, "Shelter Name:"
-  Text 5, 60, 60, 10, "Worker Signature:"
+  Text 10, 50, 45, 10, "EA avail date:"
+  Text 10, 30, 50, 10, "Shelter Name:"
 EndDialog
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,7 +73,6 @@ DO
 		If MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
 		If shelter_droplist = "Select one..." then err_msg = err_msg & vbNewLine & "* Enter shelter name."		
 		If ea_available_date = "" then err_msg = err_msg & vbNewLine & "* Enter EA Available date"
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -95,7 +92,8 @@ Call write_bullet_and_variable_in_CASE_NOTE("Client placed in", shelter_droplist
 Call write_bullet_and_variable_in_CASE_NOTE("EA available date", ea_available_date)
 If shelter_policy_checkbox = 1 then call write_variable_in_CASE_NOTE("* GRH Notice Cancelled.")
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
-Call write_variable_in_CASE_NOTE("---")
+Call write_variable_in_CASE_NOTE ("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")

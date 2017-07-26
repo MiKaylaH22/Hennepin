@@ -46,29 +46,28 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog sheriff_forclosure, 0, 0, 296, 185, "Sheriff forclosure"
-  EditBox 70, 10, 55, 15, MAXIS_case_number
-  EditBox 235, 10, 55, 15, date_checked
-  EditBox 70, 35, 220, 15, property_address
-  EditBox 70, 60, 100, 15, owner_name
-  EditBox 235, 60, 55, 15, foreclosure_date
-  EditBox 70, 85, 220, 15, occupant_name
-  EditBox 90, 110, 200, 15, occupants_whereabouts
-  EditBox 70, 135, 220, 15, other_notes
-  EditBox 70, 160, 110, 15, worker_signature
+BeginDialog sheriff_forclosure, 0, 0, 286, 175, "Sheriff forclosure"
+  EditBox 55, 10, 55, 15, MAXIS_case_number
+  EditBox 210, 10, 70, 15, date_checked
+  EditBox 70, 35, 210, 15, property_address
+  EditBox 60, 60, 100, 15, owner_name
+  EditBox 225, 60, 55, 15, foreclosure_date
+  EditBox 70, 85, 100, 15, occupant_name
+  EditBox 95, 110, 185, 15, occupants_whereabouts
+  EditBox 50, 135, 230, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 185, 160, 50, 15
-    CancelButton 240, 160, 50, 15
-  Text 10, 65, 55, 10, "Owner(s) name:"
+    OkButton 175, 155, 50, 15
+    CancelButton 230, 155, 50, 15
+  Text 5, 65, 55, 10, "Owner(s) name:"
   Text 5, 90, 60, 10, "Occupant(s) name:"
-  Text 5, 165, 60, 10, "Worker signature: "
-  Text 150, 15, 80, 10, "Date of property review:"
+  Text 125, 15, 80, 10, "Date of property review:"
   Text 5, 40, 60, 10, "Property address:"
-  Text 25, 140, 40, 10, "Other notes: "
-  Text 180, 65, 55, 10, "Forclosure date:"
+  Text 5, 140, 40, 10, "Other notes: "
+  Text 170, 65, 55, 10, "Forclosure date:"
   Text 5, 115, 85, 10, "Occupant(s) whereabouts:"
-  Text 20, 15, 45, 10, "Case number:"
+  Text 5, 15, 45, 10, "Case number:"
 EndDialog
+
 
 'THE SCRIPT--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 'Connecting to BlueZone, grabbing case number
@@ -92,7 +91,6 @@ DO
 		'If IsDate(foreclosure_date) = False then err_msg = err_msg & vbNewLine & "* Enter the property's forclosure date."      
 		If occupant_name = "" then err_msg = err_msg & vbNewLine & "* Enter the occupant's name."
 		If occupants_whereabouts = "" then err_msg = err_msg & vbNewLine & "* Enter the occupant's current whereabouts."
-		If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
@@ -117,5 +115,6 @@ Call write_bullet_and_variable_in_CASE_NOTE("Occupant(s) current whereabouts", o
 Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team") 
 
 script_end_procedure("")

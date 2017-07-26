@@ -46,23 +46,21 @@ END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
 'DIALOGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-BeginDialog reimb_shel_acct, 0, 0, 296, 155, "Reimbursement from shelter account"
+BeginDialog reimb_shel_acct, 0, 0, 296, 125, "### Reimbursement from shelter account ###"
   EditBox 65, 10, 55, 15, MAXIS_case_number
   EditBox 240, 10, 50, 15, amt_to_client
   EditBox 240, 30, 50, 15, amt_to_LL
   EditBox 65, 55, 225, 15, refund_reason
-  CheckBox 15, 80, 280, 10, "Informed client funds are being released for basic needs for the month, and shelter", client_checkbox
-  EditBox 65, 105, 225, 15, other_notes
-  EditBox 65, 130, 115, 15, worker_signature
+  CheckBox 10, 80, 280, 10, "Informed client funds are being released for basic needs for the month, and shelter", client_checkbox
+  EditBox 50, 105, 125, 15, other_notes
   ButtonGroup ButtonPressed
-    OkButton 185, 130, 50, 15
-    CancelButton 240, 130, 50, 15
+    OkButton 185, 105, 50, 15
+    CancelButton 240, 105, 50, 15
   Text 155, 15, 80, 10, "Amt released to client $:"
-  Text 20, 110, 40, 10, "Other notes: "
-  Text 15, 15, 45, 10, "Case number:"
-  Text 30, 90, 140, 10, "will not be available for the entire month."
+  Text 10, 110, 40, 10, "Comments: "
+  Text 10, 15, 45, 10, "Case number:"
+  Text 20, 90, 140, 10, "will not be available for the entire month."
   Text 105, 35, 125, 10, "Amt vendored to LL for rent/deposit $:"
-  Text 5, 135, 60, 10, "Worker signature: "
   Text 10, 60, 50, 10, "Refund reason:"
 EndDialog
 
@@ -81,8 +79,7 @@ DO
 		If amt_to_client = "" then err_msg = err_msg & vbNewLine & "* Enter the amount released to the client."
 		If amt_to_LL = "" then err_msg = err_msg & vbNewLine & "* Enter the amount vendored to the landlord."
 		If refund_reason = "" then err_msg = err_msg & vbNewLine & "* Enter the refund reason."
-        If worker_signature = "" then err_msg = err_msg & vbNewLine & "* Enter your worker signature."
-		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
+        IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP until err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
 Loop until are_we_passworded_out = false					'loops until user passwords back in					
@@ -104,5 +101,6 @@ Call write_bullet_and_variable_in_CASE_NOTE("Other notes", other_notes)
 If client_checkbox = 1 then Call write_variable_in_CASE_NOTE("* Informed client funds are being released for basic needs for the month, and shelter will not be available for the entire month." )
 Call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
+Call write_variable_in_CASE_NOTE("Hennepin County Shelter Team")
 
 script_end_procedure("")
