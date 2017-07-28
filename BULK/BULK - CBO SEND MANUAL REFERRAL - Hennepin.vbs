@@ -44,6 +44,7 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
+call changelog_update("07/28/2017", "Added enhancement to support cases with case number instead of SSN.", "Ilse Ferris, Hennepin County")
 call changelog_update("05/08/2017", "Added new BULK script that will send manual E & T referrals for cases that have been identified by E & T as partcipants working with CBO's (Community Based Organizations).", "Ilse Ferris, Hennepin County")
 call changelog_update("12/12/2016", "Initial version.", "Ilse Ferris, Hennepin County")
 
@@ -205,7 +206,10 @@ For item = 0 to UBound(CBO_array, 2)
 				END IF 
 		    END IF
 		END IF 
-	END IF 
+	Else 
+	 	CBO_array(make_referral, item) = True
+		needs_PMI = true
+	End if
 	
 	If CBO_array(make_referral, item) = True then 
 	    'Checking the SNAP status 
@@ -222,19 +226,37 @@ For item = 0 to UBound(CBO_array, 2)
 	        	CBO_array(ref_status, item) = "SNAP Inactive"
 	        Else
 	        	Call navigate_to_MAXIS_screen("STAT", "MEMB")
-	        	Do 
-	        		EMReadscreen member_SSN, 11, 7, 42
-		    		member_SSN = replace(member_SSN, " ", "")
-	        		If member_SSN = CBO_array(clt_SSN, item) then
-	        			EMReadscreen member_number, 2, 4, 33
-	        			CBO_array(memb_number, item) = member_number
-	        			CBO_array(make_referral, item) = True
-	        			exit do
-	        		Else 
-	        			transmit
-		    		END IF
-	        		EMReadScreen MEMB_error, 5, 24, 2
-	        	Loop until member_SSN = CBO_array (clt_SSN, item) or MEMB_error = "ENTER"
+				if needs_PMI = true then 
+					row = 5
+					HH_count = 0
+					Do 
+						EMReadScreen member_number, 2, row, 3
+						HH_count = HH_count + 1
+						transmit
+						EMReadScreen MEMB_error, 5, 24, 2
+					Loop until MEMB_error = "ENTER"
+					If HH_count = 1 then 
+						CBO_array(memb_number, item) = member_number
+						CBO_array(make_referral, item) = True
+					Else
+						CBO_array(make_referral, item) = False
+						CBO_array(ref_status, item) = "Error"
+						CBO_array(error_reason, item) = "Process manually, more than one person in HH & SSN not provided."	'Explanation for the rejected report'
+					End if 
+				Else 	
+	        	    Do 
+	        	    	EMReadscreen member_SSN, 11, 7, 42
+		    	    	member_SSN = replace(member_SSN, " ", "")
+	        	    	If member_SSN = CBO_array(clt_SSN, item) then
+	        	    		EMReadscreen member_number, 2, 4, 33
+	        	    		CBO_array(memb_number, item) = member_number
+	        	    		CBO_array(make_referral, item) = True
+	        	    		exit do
+	        	    	Else 
+	        	    		transmit
+		    	    	END IF
+	        	    Loop until member_SSN = CBO_array(clt_SSN, item) or MEMB_error = "ENTER"
+				End if 
 	        	IF member_SSN <> CBO_array (clt_SSN, item) then 
 	        		CBO_array(make_referral, item) = False
 		    		CBO_array(ref_status, item) = "Error"
