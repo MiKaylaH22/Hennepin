@@ -100,7 +100,7 @@ Function updated_panel_member_array(stat_panel, output_variable)
 End Function
 
 '----------------------------------------------------------------------------------------------------DIALOGS
-BeginDialog case_number_dialog, 0, 0, 141, 70, "Enter the case number & footer month/year"
+BeginDialog case_number_dialog, 0, 0, 141, 70, "Case number dialog"
   EditBox 75, 5, 55, 15, MAXIS_case_number
   EditBox 85, 25, 20, 15, MAXIS_footer_month
   EditBox 110, 25, 20, 15, MAXIS_footer_year
@@ -216,7 +216,7 @@ Loop until right(panels_updated, 1) <> ","
 
 start_a_blank_CASE_NOTE
 Call write_variable_in_CASE_NOTE("*" & renewal_period & " recert accuracy update for: " & panels_updated & "*")
-Call write_variable_in_CASE_NOTE("This case info has been reviewed and updated by Quality Improvement team. Do not update the following info unless a new change has been reported:")
+Call write_variable_in_CASE_NOTE("This case info has been reviewed and updated by the Quality Improvement team. Do not update the following info unless a new change has been reported:")
 If earned_income <> "" or unearned_income <> "" then 
 	Call write_variable_in_CASE_NOTE("--Income--")
 	Call write_bullet_and_variable_in_CASE_NOTE("JOBS/BUSI/RBIC", earned_income)
