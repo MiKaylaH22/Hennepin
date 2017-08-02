@@ -1,8 +1,8 @@
 'GATHERING STATS===========================================================================================
-name_of_script = "NOTES-ACF Used.vbs"
+name_of_script = "SHELTER-ACF USED.vbs"
 start_time = timer
 STATS_counter = 1
-STATS_manualtime = 180
+STATS_manualtime = 60
 STATS_denominatinon = "C"
 'END OF STATS BLOCK===========================================================================================
 
@@ -75,9 +75,9 @@ Do
 		dialog ACF_used
 		IF buttonpressed = 0 then stopscript 
 		IF MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbnewline & "* Enter a valid case number."
-		IF isdate(shlter_stay_bgn) = "" then err_msg = err_msg & vbnewline & "* Enter a valid date of for the start of shelter stay."
-		IF isdate(shlter_stay_end) = "" then err_msg = err_msg & vbnewline & "* Enter a valid date of for the end of shelter stay."
-        IF isdate(EA_avail_date) = "" then err_msg = err_msg & vbnewline & "* Enter a valid date of for EA availablity."
+		IF isdate(Shelter_stay_bgn) = False then err_msg = err_msg & vbnewline & "* Enter a valid date of for the start of shelter stay."
+		IF isdate(shelter_stay_end) = False then err_msg = err_msg & vbnewline & "* Enter a valid date of for the end of shelter stay."
+        IF isdate(EA_avail_date) = False then err_msg = err_msg & vbnewline & "* Enter a valid date of for EA availablity."
         IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine		'error message including instruction on what needs to be fixed from each mandatory field if incorrect
 	LOOP UNTIL err_msg = ""									'loops until all errors are resolved
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS
@@ -85,10 +85,9 @@ Loop until are_we_passworded_out = false					'loops until user passwords back in
 
 start_a_blank_CASE_NOTE
 	Call write_variable_in_CASE_NOTE ("### ACF Used for Shelter Stay " & Shelter_stay_bgn & "-" & Shelter_stay_end & " ###")
-    Call write_variable_in_CASE_NOTE("* Use ACF for Shelter Stay: " & Shelter_stay_bgn & " to " & Shelter_stay_end)
 	Call write_bullet_and_variable_in_CASE_NOTE("EA will be available", EA_avail_date)
 	Call write_bullet_and_variable_in_case_note("Comments", Comments_Notes)
 	Call write_variable_in_CASE_NOTE ("-----")
 	Call write_variable_in_CASE_NOTE ("Hennepin County Shelter Team")
 
-script_end_procedure ("Success! case note completed.")
+script_end_procedure ("")
