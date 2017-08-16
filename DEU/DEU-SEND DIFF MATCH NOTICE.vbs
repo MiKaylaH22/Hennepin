@@ -79,51 +79,52 @@ CALL write_value_and_transmit("IEVP", 20, 71)   'navigates to IEVP
 EMReadScreen error_msg, 7, 24, 2
 If error_msg = "NO IEVS" then script_end_procedure("An error occured in IEVP, please process manually.")'checking for error msg'
 
-row = 7
-'Ensuring that match has not already been resolved.
-Do
-	EMReadScreen days_pending, 5, row, 72
-	days_pending = trim(days_pending)
-	If IsNumeric(days_pending) = false then 
-		script_end_procedure("No pending IEVS match found. Please review IEVP.")
-	ELSE
-		'Entering the IEVS match & reading the difference notice to ensure this has been sent
-		EMReadScreen IEVS_period, 11, row, 47
-		EMReadScreen start_month, 2, row, 47
-		EMReadScreen end_month, 2, row, 53
-		If trim(start_month) = "" or trim(end_month) = "" then 
-			Found_match = False
-		else
-			month_difference = abs(end_month) - abs(start_month)
-			If (IEVS_type = "WAGE" and month_difference = 2) then 'ensuring if it is a wage the match is a quater'
-				found_match = true
-				exit do
-			Elseif (IEVS_type = "BEER" and month_difference = 11) then  'ensuring that if it a beer that the match is a year'
-				found_match = True
-				exit do
-			End if
-		End if
-		row = row + 1
-	END IF
-Loop until row = 17
-
-If found_match = False then script_end_procedure("No pending IEVS match found. Please review IEVP.")
-'----------------------------------------------------------------------------------------------------IULA
-'Entering the IEVS match & reading the difference notice to ensure this has been sent
-CALL write_value_and_transmit("U", row, 3)   'navigates to IULA
-'Reading potential errors for out-of-county cases
-EMReadScreen OutOfCounty_error, 12, 24, 2
-IF OutOfCounty_error = "MATCH IS NOT" then
-	script_end_procedure("Out-of-county case. Cannot update.")
-else
-	IF IEVS_type = "WAGE" then
-		EMReadScreen quarter, 1, 8, 14
-		EMReadScreen IEVS_year, 4, 8, 22
-	Elseif IEVS_type = "BEER" then
-		EMReadScreen IEVS_year, 2, 8, 15
-		IEVS_year = "20" & IEVS_year
-	End if
-End if 
+'row = 7
+''Ensuring that match has not already been resolved.
+'Do
+'	EMReadScreen days_pending, 5, row, 72
+'	days_pending = trim(days_pending)
+'	If IsNumeric(days_pending) = false then 
+'		script_end_procedure("No pending IEVS match found. Please review IEVP.")
+'	ELSE
+'		'Entering the IEVS match & reading the difference notice to ensure this has been sent
+'		EMReadScreen IEVS_period, 11, row, 47
+'		EMReadScreen start_month, 2, row, 47
+'		EMReadScreen end_month, 2, row, 53
+'		If trim(start_month) = "" or trim(end_month) = "" then 
+'			Found_match = False
+'		else
+'			month_difference = abs(end_month) - abs(start_month)
+'			If (IEVS_type = "WAGE" and month_difference = 2) then 'ensuring if it is a wage the match is a quater'
+'				found_match = true
+'				exit do
+'			Elseif (IEVS_type = "BEER" and month_difference = 11) then  'ensuring that if it a beer that the match is a year'
+'				found_match = True
+'				exit do
+'			End if
+'		End if
+'		row = row + 1
+'		found_match = False
+'	END IF
+'Loop until row = 17
+'
+'If found_match = False then script_end_procedure("No pending IEVS match found. Please review IEVP.")
+''----------------------------------------------------------------------------------------------------IULA
+''Entering the IEVS match & reading the difference notice to ensure this has been sent
+'CALL write_value_and_transmit("U", row, 3)   'navigates to IULA
+''Reading potential errors for out-of-county cases
+'EMReadScreen OutOfCounty_error, 12, 24, 2
+'IF OutOfCounty_error = "MATCH IS NOT" then
+'	script_end_procedure("Out-of-county case. Cannot update.")
+'else
+'	IF IEVS_type = "WAGE" then
+'		EMReadScreen quarter, 1, 8, 14
+'		EMReadScreen IEVS_year, 4, 8, 22
+'	Elseif IEVS_type = "BEER" then
+'		EMReadScreen IEVS_year, 2, 8, 15
+'		IEVS_year = "20" & IEVS_year
+'	End if
+'End if 
 
 'Navigating to WAGE match
 BeginDialog SEND_WAGE_MATCH_DIFF_NOTICE_dialog , 0, 0, 131, 85, "ACTION-SEND WAGE MATCH DIFF NOTICE"
@@ -164,8 +165,8 @@ Else
 	    		row = row + 1
 	    		'msgbox row
         	ELSE
-	    	
-	                 	'Entering the IEVS match & reading the difference notice to ensure this has been sent
+
+	            'Entering the IEVS match & reading the difference notice to ensure this has been sent
             	EMReadScreen IEVS_period, 11, row, 47
         		EMReadScreen start_month, 2, row, 47
         		EMReadScreen end_month, 2, row, 53
