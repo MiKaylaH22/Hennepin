@@ -173,12 +173,12 @@ For item = 0 to UBound(CARL_array, 2)
 				Elseif instr(case_note_header, "***Emergency app") then
 					CAF_note_found = True
 					exit do
-				Elseif instr(case_note_header, "EA Application") then
-					CAF_note_found = True
-					exit do
-				Elseif instr(case_note_header, "EA APPLICATION") then
-					CAF_note_found = True
-					exit do		
+				'Elseif instr(case_note_header, "EA Application") then
+				'	CAF_note_found = True
+				'	exit do
+				'Elseif instr(case_note_header, "EA APPLICATION") then
+				'	CAF_note_found = True
+				'	exit do		
 				else 	
 					CAF_note_found = False
 				END IF
@@ -396,7 +396,7 @@ objExcel.DisplayAlerts = True
 ObjExcel.Cells(1, 1).Value = "CASE #"
 ObjExcel.Cells(1, 2).Value = "APP DATE"
 ObjExcel.Cells(1, 3).Value = "WORKER #"
-ObjExcel.Cells(1, 4).Value = "wORKER NAME"
+ObjExcel.Cells(1, 4).Value = "WORKER NAME"
 
 FOR i = 1 to 4		'formatting the cells'
 	objExcel.Cells(1, i).Font.Bold = True		'bold font'

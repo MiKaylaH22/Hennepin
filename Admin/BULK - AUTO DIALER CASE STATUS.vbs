@@ -7,6 +7,10 @@ Execute text_from_the_other_script
 'STATS GATHERING----------------------------------------------------------------------------------------------------
 name_of_script = "BULK - AUTO DIALER CASE STATUS.vbs" 'BULK script that creates a list of cases that require an interview, and the contact phone numbers'
 start_time = timer
+STATS_counter = 0                          'sets the stats counter at one
+STATS_manualtime = 25                      'manual run time in seconds
+STATS_denomination = "C"       			   'C is for each CASE
+
 
 'LOADING FUNCTIONS LIBRARY FROM GITHUB REPOSITORY===========================================================================
 IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded once
@@ -47,7 +51,7 @@ FUNCTION get_case_status
 	
 	Call navigate_to_MAXIS_screen("CASE", "CURR")
 	EMReadScreen CURR_panel_check, 4, 2, 55
-	If CURR_panel_check <> "CURR" then msgbox MAXIS_case_number & " cannot access CASE/CURR."
+	If CURR_panel_check <> "CURR" then ObjExcel.Cells(excel_row, 2).Value = ""
 	
 	EMReadScreen case_status, 8, 8, 9
 	case_status = trim(case_status)
