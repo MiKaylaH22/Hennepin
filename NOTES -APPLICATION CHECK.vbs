@@ -38,6 +38,44 @@ IF IsEmpty(FuncLib_URL) = TRUE THEN	'Shouldn't load FuncLib if it already loaded
 END IF
 'END FUNCTIONS LIBRARY BLOCK================================================================================================
 
+FUNCTION updated_create_outlook_appointment(appt_date, appt_start_time, appt_end_time, appt_subject, appt_body, appt_location, appt_reminder, reminder_in_minutes, appt_category)
+'--- This function creates a an outlook appointment
+'~~~~~ (appt_date): date of the appointment
+'~~~~~ (appt_start_time): start time of the appointment - format example: "08:00 AM"
+'~~~~~ (appt_end_time): end time of the appointment - format example: "08:00 AM"
+'~~~~~ (appt_subject): subject of the email in quotations or a variable
+'~~~~~ (appt_body): body of the email in quotations or a variable
+'~~~~~ (appt_location): name of location in quotations or a variable
+'~~~~~ (appt_reminder): reminder for appointment. Set to TRUE or FALSE 
+'~~~~~ (reminder_in_minutes): enter the number of minutes prior to the appointment to set the reminder. Set as 0 if at the time of the appoint. Set to "" if appt_reminder is set to FALSE
+'~~~~~ (appt_category): can be left "" or assgin to the set the name of the category in quotations
+'===== Keywords: MAXIS, PRISM, create, outlook, appointment
+
+	'Assigning needed numbers as variables for readability
+	olAppointmentItem = 1
+	olRecursDaily = 0
+
+	'Creating an Outlook object item
+	Set objOutlook = CreateObject("Outlook.Application")
+	Set objAppointment = objOutlook.CreateItem(olAppointmentItem)
+
+	'Assigning individual appointment options
+	objAppointment.Start = appt_date & " " & appt_start_time		'Start date and time are carried over from parameters
+	objAppointment.End = appt_date & " " & appt_end_time			'End date and time are carried over from parameters
+	objAppointment.AllDayEvent = False 								'Defaulting to false for this. Perhaps someday this can be true. Who knows.
+	objAppointment.Subject = appt_subject							'Defining the subject from parameters
+	objAppointment.Body = appt_body									'Defining the body from parameters
+	objAppointment.Location = appt_location							'Defining the location from parameters
+	If appt_reminder = FALSE then									'If the reminder parameter is false, it skips the reminder, otherwise it sets it to match the number here.
+		objAppointment.ReminderSet = False
+	Else
+		objAppointment.ReminderSet = True
+		objAppointment.ReminderMinutesBeforeStart = reminder_in_minutes
+	End if
+	objAppointment.Categories = appt_category						'Defines a category
+	objAppointment.Save												'Saves the appointment
+END FUNCTION
+
 'DIALOGS----------------------------------------------------------------------------------------------------
 BeginDialog case_number_dialog, 0, 0, 131, 50, "Case number dialog"
   EditBox 65, 5, 60, 15, MAXIS_case_number					
@@ -67,6 +105,7 @@ Loop until are_we_passworded_out = false					'loops until user passwords back in
 'information gathering to auto-populate the application date
 'pending programs information
 back_to_self
+MAXIS_background_check
 EMWriteScreen MAXIS_case_number, 18, 43
 Call navigate_to_MAXIS_screen("REPT", "PND2")
 
@@ -199,7 +238,7 @@ End if
 
 BeginDialog application_check_dialog, 0, 0, 341, 165, "Application check: " & application_check
   DropListBox 190, 5, 145, 15, "Select one..."+chr(9)+"Apply MN"+chr(9)+"CAF"+chr(9)+"CAF addendum"+chr(9)+"HC - certain populations"+chr(9)+"HC - LTC"+chr(9)+"HC - EMA Mnsure ", application_type_droplist
-  DropListBox 75, 30, 260, 15, "Select one..."+chr(9)+"Case is ready to approve or deny"+chr(9)+"No verifs rec'd yet (verification request has been sent)"+chr(9)+"Some verifs rec'd & more verification are needed"+chr(9)+"Other", application_status_droplist
+  DropListBox 75, 30, 260, 15, "Select one..."+chr(9)+"Case is ready to approve or deny"+chr(9)+"No verifs rec'd yet(verification request has been sent)"+chr(9)+"Some verifs rec'd & more verification are needed"+chr(9)+"Other", application_status_droplist
   EditBox 75, 50, 260, 15, other_app_notes
   EditBox 75, 70, 260, 15, actions_taken
   EditBox 75, 145, 145, 15, worker_signature
@@ -255,30 +294,33 @@ Loop until are_we_passworded_out = false					'loops until user passwords back in
 'checking for an active MAXIS session
 Call check_for_MAXIS(False)
 
-'Outlook appointment is created in prior to the case note being created
-'Call create_outlook_appointment(appt_date, appt_start_time, appt_end_time, appt_subject, appt_body, appt_location, appt_reminder, appt_category)
-Call create_outlook_appointment(reminder_date, "08:00 AM", "08:00 AM", "Application check: " & reminder_text & " for " & MAXIS_case_number, "", "", FALSE, "")
+If application_status_droplist <> "Case is ready to approve or deny" THEN 
+	'Outlook appointment is created in prior to the case note being created
+	'Call create_outlook_appointment(appt_date, appt_start_time, appt_end_time, appt_subject, appt_body, appt_location, appt_reminder, appt_category)
+	Call updated_create_outlook_appointment(reminder_date, "08:00 AM", "08:00 AM", "Application check: " & reminder_text & " for " & MAXIS_case_number, "", "", TRUE, 5, "")
+	Outlook_remider = True
+End if 
 
 'THE CASE NOTE----------------------------------------------------------------------------------------------------
 start_a_blank_CASE_NOTE
 Call write_variable_in_CASE_NOTE("-------------------------" & application_check & " application check")
-Call write_bullet_and_variable_in_CASE_NOTE("Type of application rec'd", application_type_droplist)
+If application_type_droplist <> "Select one..." then Call write_bullet_and_variable_in_CASE_NOTE("Type of application rec'd", application_type_droplist)
 Call write_bullet_and_variable_in_CASE_NOTE("Program applied for", pending_progs)
 Call write_bullet_and_variable_in_CASE_NOTE("Application date", application_check_date)
 Call write_variable_in_CASE_NOTE("---")
 Call write_bullet_and_variable_in_CASE_NOTE("Application status", application_status_droplist)
 Call write_bullet_and_variable_in_CASE_NOTE("Other application notes", other_app_notes)
 Call write_bullet_and_variable_in_CASE_NOTE("Actions taken", actions_taken)
+If Outlook_remider = True then call write_bullet_and_variable_in_CASE_NOTE("Outlook reminder set for", reminder_date)
 call write_variable_in_CASE_NOTE("---")
 Call write_variable_in_CASE_NOTE(worker_signature)
-
 
 'message boxes based on the application status chosen instructing workers which scripts to use next
 If application_status_droplist = "Case is ready to approve or deny" Then 
 	Msgbox "Success!  You have identified that the case is either ready to approve or deny." & vbNewLine & vbNewLine & _
 	"If your case is ready to approve, please use the ""NOTES - APPROVED PROGRAMS"" script." & vbNewLine & vbNewLine & _
 	"If your case is ready to be denied, please use the ""NOTES -DENIED PROGRAMS"" script."
-ELSEIF application_status_droplist = "No verifs rec'd yet (verification request has been sent)" Then
+ELSEIF application_status_droplist = "No verifs rec'd yet(verification request has been sent)" Then
 	Msgbox "Success!  You have identified that no verifications have been received yet, and a verification request has been sent." & vbNewLine & vbNewLine & _
 	"Please check to see that there is a verification requested case note, and if not, please use the ""NOTES - VERIFICATIONS REQUESTED"" script."
 ELSEIF application_status_droplist = "Some verifs rec'd & more verification are needed" Then 
@@ -288,116 +330,3 @@ ELSEIF application_status_droplist = "Some verifs rec'd & more verification are 
 END IF 
 
 script_end_procedure("")
-
-'CODE FOR LATER----------------------------------------------------------------------------------------------------
-'commented out until we can figure out how to do this.
-'run next script if worker selected one of the "script actions" check boxes
-'IF verifs_needed_check = 1 THEN call run_from_GitHub(script_repository & "NOTES - VERIFICATIONS NEEDED.vbs")
-'IF approved_progs_check = 1 THEN run_another_script(script_repository & "NOTES - APPROVED PROGRAMS.vbs")
-'IF denied_progs_check = 1 THEN run_another_script(script_repository & "NOTES - DENIED PROGRAMS.vbs")
-'IF documents_rec_check = 1 THEN run_another_script(script_repository & "NOTES - DOCUMENTS RECEIVED.vbs")
-
-''THE TIKL's----------------------------------------------------------------------------------------------------
-''DAY 1 
-'If application_check = "Day 1" THEN
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE 	
-'		reminder_date = dateadd("d", 5, application_check_date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day 5. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF
-'END IF	
-'
-''DAY 5
-'If application_check = "Day 5" Then
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 10, application_check_date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day 10. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF 
-'END IF 
-'
-''DAY 10
-'If application_check = "Day 10" Then
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 20, application_check_date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day 20. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF 
-'END IF 
-'
-''DAY 20
-'If application_check = "Day 20" THEN
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 30, application_check_date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day 30. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF 
-'END IF 
-'
-''DAY 30
-'If application_check = "Day 30" THEN
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 45, application_check_date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day 45. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF  
-'END IF 
-'
-''DAY 45
-'If application_check = "Day 45" THEN
-'	If application_status_droplist = "Case is ready to approve or deny" THEN  
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 60, application_check_date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day 60. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF  
-'END IF 
-'
-''DAY 60
-'If application_check = "Day 60" THEN
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'	Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 10, date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day: over 60 days. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF  
-'END IF  
-'
-''OVER 60 DAYS 
-'If application_check = "Over 60 days" THEN
-'	If application_status_droplist = "Case is ready to approve or deny" THEN 
-'		Msgbox "You identified your case is ready to approve or deny.  A TIKL will NOT be made."
-'	ELSE
-'		reminder_date = dateadd("d", 10, date)
-'		Call navigate_to_MAXIS_screen("DAIL", "WRIT")
-'		call create_MAXIS_friendly_date(reminder_date, 0, 5, 18)
-'		Call write_variable_in_TIKL("Application check day: over 60 days. An additional 10 day period has been given to evaluate the case. Please review case, and use the ""NOTES - APPLICATION CHECK"" script.")
-'		PF3
-'	END IF  
-'END IF
