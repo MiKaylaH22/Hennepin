@@ -51,18 +51,17 @@ changelog_display
 'END CHANGELOG BLOCK =======================================================================================================
 
 '-------------------------------------------------------------------------------------------------DIALOG
-BeginDialog initial_dialog, 0, 0, 146, 95, "Application Received"
-  EditBox 60, 5, 80, 15, MAXIS_case_number
-  CheckBox 10, 40, 35, 10, "Active ", Active_checkbox
-  CheckBox 55, 40, 45, 10, "Not Active ", Not_Active_checkbox
-  CheckBox 10, 60, 125, 10, "Check if client is applying for SNAP", SNAP_checkbox
+BeginDialog initial_dialog, 0, 0, 186, 110, "Application Received"
+  EditBox 60, 5, 45, 15, MAXIS_case_number
+  CheckBox 15, 40, 70, 10, "Not Active (APPL)", Not_Active_checkbox
+  CheckBox 15, 55, 85, 10, "Active (add a program) ", Active_checkbox
+  CheckBox 15, 75, 125, 10, "Check if client is applying for SNAP", SNAP_checkbox
   ButtonGroup ButtonPressed
-    OkButton 35, 75, 50, 15
-    CancelButton 90, 75, 50, 15
-  Text 5, 10, 50, 10, "Case Number:"
-  GroupBox 5, 25, 135, 30, "Is Client Active in MAXIS?"
+    OkButton 75, 90, 50, 15
+    CancelButton 130, 90, 50, 15
+  Text 10, 10, 50, 10, "Case Number:"
+  GroupBox 5, 25, 175, 45, "Was client active in MAXIS at time of application?"
 EndDialog
-
 
 '---------------------------------------------------------------------------------------The script
 'Grabs the case number
@@ -72,15 +71,16 @@ CALL MAXIS_case_number_finder (MAXIS_case_number)
 'Runs the first dialog - which confirms the case number 
 Do
 	Do 
+		err_msg = ""
 		Dialog initial_dialog
-		IF buttonpressed = cancel THEN stopscript
+		IF buttonpressed = 0 THEN stopscript
 		IF MAXIS_case_number = "" or IsNumeric(MAXIS_case_number) = False or len(MAXIS_case_number) > 8 then err_msg = err_msg & vbNewLine & "* Enter a valid case number."
-		IF Active_checkbox = UNCHECKED and Not_Active_checkbox = UNCHECKED THEN MsgBox "Please select if the client is active or not."
-		IF Active_checkbox = CHECKED and Not_Active_checkbox = CHECKED THEN MsgBox "Please select only box if the client is active or not."
+		IF Active_checkbox = UNCHECKED and Not_Active_checkbox = UNCHECKED then err_msg = err_msg & vbNewLine & "* Please select if the client is active or not."
+		IF Active_checkbox = CHECKED and Not_Active_checkbox = CHECKED then err_msg = err_msg & vbNewLine & "* Please select only box if the client is active or not."
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
 CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
-Loop until are_we_passworded_out = false					'loops until user passwords back in	
+LOOP UNTIL are_we_passworded_out = false					'loops until user passwords back in	
 
 '-------------------------------------------------------------------DIALOG NO snap?'	
 'Gathers Date of application and creates MAXIS friendly dates to be sure to navigate to the correct time frame
@@ -104,6 +104,9 @@ END IF
 'Determines which programs are currently pending in the month of application
 CALL navigate_to_MAXIS_screen("STAT","PROG")
 
+EMReadScreen err_msg, 7, 24, 02
+IF err_msg = "BENEFIT" THEN	script_end_procedure ("Case must be in PEND II status for script to run, please update MAXIS panels TYPE & PROG (HCRE for HC) and run the script again.")
+
 EMReadScreen cash1_pend, 4, 6, 74
 EMReadScreen cash2_pend, 4, 7, 74
 EMReadScreen emer_pend, 4, 8, 74
@@ -112,8 +115,6 @@ EMReadScreen fs_pend, 4, 10, 74
 EMReadScreen ive_pend, 4, 11, 74
 EMReadScreen hc_pend, 4, 12, 74
 EMReadScreen cca_pend, 4, 14, 74
-
-IF err_msg <> "" THEN msgbox "PROG DOES NOT EXIST FOR THIS CASE PLEASE UPDATE PROG & TYPE THEN RERUN THE SCRIPT" & err_msg
 
 'Assigns a value so the programs pending will show up in check boxes
 IF cash1_pend = "PEND" THEN
@@ -168,6 +169,9 @@ END IF
 
 'Defaults the date pended to today
 pended_date = date & ""
+
+IF fs_pend = CHECKED OR cash_pend = CHECKED THEN send_appt_ltr = TRUE
+'----------------------------------------------------------------------------------------------------dialogs
 
 BeginDialog appl_detail_dialog, 0, 0, 296, 145, "APPLICATION RECEIVED"
   DropListBox 80, 5, 65, 15, "Select One:"+chr(9)+"Online"+chr(9)+"Mail"+chr(9)+"Fax", how_app_rcvd
@@ -232,8 +236,8 @@ IF Not_Active_checkbox = CHECKED THEN
     		IF how_app_rcvd = "Select One:" then err_msg = err_msg & vbNewLine & "* Please enter how the application was received to the agency."
 			IF app_type = "Select One:" then err_msg = err_msg & vbNewLine & "* Please enter the type of application received."
     		IF isdate(date_of_app) = False then err_msg = err_msg & vbNewLine & "* Please enter a valid application date."
-			IF worker_number = "" OR len(worker_number) <> 3 then Merr_msg = err_msg & vbNewLine & "* You must enter the worker number of the worker if you would like the case to be transfered by the script."
-    		IF team_number = "" OR len(team_number) <> 3 then Merr_msg = err_msg & vbNewLine & "* You must enter the team number of the worker if you would like the case to be transfered by the script."
+			IF worker_number = "" OR len(worker_number) <> 3 then err_msg = err_msg & vbNewLine & "* You must enter the worker number of the worker if you would like the case to be transfered by the script."
+    		IF team_number = "" OR len(team_number) <> 3 then err_msg = err_msg & vbNewLine & "* You must enter the team number of the worker if you would like the case to be transfered by the script."
     		IF app_type = "ApplyMN" AND isnumeric(confirmation_number) = FALSE THEN err_msg = err_msg & vbNewLine & "If an ApplyMN was received, you must enter the confirmation number and time received"
 			IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
 		LOOP UNTIL err_msg = ""
@@ -272,13 +276,6 @@ programs_applied_for = trim(programs_applied_for)
 'takes the last comma off of programs_applied_for when autofilled into dialog if more more than one app date is found and additional app is selected
 If right(programs_applied_for, 1) = "," THEN programs_applied_for = left(programs_applied_for, len(programs_applied_for) - 1) 
 
-'Determining if a case will be transferred or not. All cases will be transferred except addendum app types.
-IF app_type = "Addendum" THEN 
-	transfer_case = false
-Else 
-	transfer_case = true
-End if 
-
 '--------------------------------------------------------------------------------inital case note
 start_a_blank_case_note
 CALL write_variable_in_CASE_NOTE ("~ Application Received (" & app_type & ") rec'vd via " & how_app_rcvd & " on " & date_of_app & " ~")
@@ -299,144 +296,152 @@ CALL write_variable_in_CASE_NOTE ("---")
 CALL write_variable_in_CASE_NOTE (worker_signature)
 
 '----------------------------------------------------------------------------------------------------EXPEDITED SCREENING!
-IF SNAP_checkbox = CHECKED THEN
-    BeginDialog exp_screening_dialog, 0, 0, 181, 165, "Expedited Screening"
-      EditBox 100, 5, 50, 15, MAXIS_case_number
-      EditBox 100, 25, 50, 15, income
-      EditBox 100, 45, 50, 15, assets
-      EditBox 100, 65, 50, 15, rent
-      CheckBox 15, 95, 55, 10, "Heat (or AC)", heat_AC_check
-      CheckBox 75, 95, 45, 10, "Electricity", electric_check
-      CheckBox 130, 95, 35, 10, "Phone", phone_check
-      ButtonGroup ButtonPressed
-        OkButton 70, 115, 50, 15
-        CancelButton 125, 115, 50, 15
-      Text 10, 140, 160, 15, "The income, assets and shelter costs fields will default to $0 if left blank. "
-      Text 5, 30, 95, 10, "Income received this month:"
-      Text 5, 50, 95, 10, "Cash, checking, or savings: "
-      Text 5, 70, 90, 10, "AMT paid for rent/mortgage:"
-      GroupBox 5, 85, 170, 25, "Utilities claimed (check below):"
-      Text 50, 10, 50, 10, "Case number: "
-      GroupBox 0, 130, 175, 30, "**IMPORTANT**"
-    EndDialog
-	
-    '------------------------------------------------------------------------------------------DATE BASED LOGIC FOR UTILITY AMOUNTS
-    IF date >= cdate("10/01/2016") THEN			'these variables need to change every October
-    	heat_AC_amt = 532
-    	electric_amt = 141
-    	phone_amt = 38
-    ELSE
-    	heat_AC_amt = 454
-    	electric_amt = 141
-    	phone_amt = 38
-    END IF
-    
-    '----------------------------------------------------------------------------------------------------THE SCRIPT
-    CALL MAXIS_case_number_finder(MAXIS_case_number)
-    Do 
-        Do
-    		err_msg = ""
-        	Dialog exp_screening_dialog
-        	cancel_confirmation
-        	If isnumeric(MAXIS_case_number) = False THEN err_msg = err_msg & vbnewline & "* You must enter a valid case number."
-    		If (income <> "" and isnumeric(income) = false) or (assets <> "" and isnumeric(assets) = false) or (rent <> "" and isnumeric(rent) = false) THEN err_msg = err_msg & vbnewline & "* The income/assets/rent fields must be numeric only. Do not put letters or symbols in these sections."
-    		If err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
-        LOOP UNTIL err_msg = ""
-    	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
-    Loop until are_we_passworded_out = false					'loops until user passwords back in	
-    
-    ''----------------------------------------------------------------------------------------------------LOGIC AND CALCULATIONS
-    'Logic for figuring out utils. The highest priority for the if...THEN is heat/AC, followed by electric and phone, followed by phone and electric separately.
-    IF heat_AC_check = checked THEN
-       utilities = heat_AC_amt
-    ELSEIF electric_check = checked and phone_check = checked THEN
-       utilities = phone_amt + electric_amt					'Phone standard plus electric standard.
-    ELSEIF phone_check = checked and electric_check = unchecked THEN
-       utilities = phone_amt
-    ELSEIF electric_check = checked and phone_check = unchecked THEN
-       utilities = electric_amt
-    END IF
-    
-    'in case no options are clicked, utilities are set to zero.
-    IF phone_check = unchecked and electric_check = unchecked and heat_AC_check = unchecked THEN utilities = 0
-    'If nothing is written for income/assets/rent info, we set to zero.
-    IF income = "" THEN income = 0
-    IF assets = "" THEN assets = 0
-    IF rent = "" THEN rent = 0
-    
-    'Calculates expedited status based on above numbers
-    IF (int(income) < 150 and int(assets) <= 100) or ((int(income) + int(assets)) < (int(rent) + cint(utilities))) THEN expedited_status = "Client Appears Expedited"
-    IF (int(income) + int(assets) >= int(rent) + cint(utilities)) and (int(income) >= 150 or int(assets) > 100) THEN expedited_status = "Client Does Not Appear Expedited"
-    '----------------------------------------------------------------------------------------------------checking DISQ
-    
-    CALL navigate_to_MAXIS_screen("STAT", "DISQ")
-    'grabbing footer month and year
-    CALL MAXIS_footer_finder(MAXIS_footer_month, MAXIS_footer_year)
-    
-    'Reads the DISQ info for the case note.
-    EMReadScreen DISQ_member_check, 34, 24, 2
-    IF DISQ_member_check = "DISQ DOES NOT EXIST FOR ANY MEMBER" THEN
-       has_DISQ = False
-    ELSE
-       has_DISQ = True
-    END IF
-    '
-    'Reads MONY/DISB to see if EBT account is open
-    IF expedited_status = "Client Appears Expedited" THEN
-       CALL navigate_to_MAXIS_screen("MONY", "DISB")
-       EMReadScreen EBT_account_status, 1, 14, 27
-	   MsgBox "This Client Appears EXPEDITED. A same day interview needs to be offered."
-	   Send_email = true
-    END IF
-	
-	IF expedited_status = "Client does not appear expedited" THEN
-		MsgBox "This client does NOT appear expedited. A same day interview does not need to be offered."
-	END IF		
+	IF SNAP_checkbox = CHECKED THEN
+    	BeginDialog exp_screening_dialog, 0, 0, 181, 165, "Expedited Screening"
+      	EditBox 100, 5, 50, 15, MAXIS_case_number
+      	EditBox 100, 25, 50, 15, income
+      	EditBox 100, 45, 50, 15, assets
+      	EditBox 100, 65, 50, 15, rent
+      	CheckBox 15, 95, 55, 10, "Heat (or AC)", heat_AC_check
+      	CheckBox 75, 95, 45, 10, "Electricity", electric_check
+      	CheckBox 130, 95, 35, 10, "Phone", phone_check
+      	ButtonGroup ButtonPressed
+        	OkButton 70, 115, 50, 15
+        	CancelButton 125, 115, 50, 15
+      	Text 10, 140, 160, 15, "The income, assets and shelter costs fields will default to $0 if left blank. "
+      	Text 5, 30, 95, 10, "Income received this month:"
+      	Text 5, 50, 95, 10, "Cash, checking, or savings: "
+      	Text 5, 70, 90, 10, "AMT paid for rent/mortgage:"
+      	GroupBox 5, 85, 170, 25, "Utilities claimed (check below):"
+      	Text 50, 10, 50, 10, "Case number: "
+      	GroupBox 0, 130, 175, 30, "**IMPORTANT**"
+    	EndDialog
 		
-    '-----------------------------------------------------------------------------------------------EXPCASENOTE
-    start_a_blank_CASE_NOTE
-    CALL write_variable_in_CASE_NOTE("~ Received Application for SNAP, " & expedited_status & " ~")
-    CALL write_variable_in_CASE_NOTE("---")
-    CALL write_variable_in_CASE_NOTE("     CAF 1 income claimed this month: $" & income)
-    CALL write_variable_in_CASE_NOTE("         CAF 1 liquid assets claimed: $" & assets)
-    CALL write_variable_in_CASE_NOTE("         CAF 1 rent/mortgage claimed: $" & rent)
-    CALL write_variable_in_CASE_NOTE("        Utilities (amt/HEST claimed): $" & utilities)
-    CALL write_variable_in_CASE_NOTE("---")
-    IF has_DISQ = TRUE THEN CALL write_variable_in_CASE_NOTE("A DISQ panel exists for someone on this case.")
-    IF has_DISQ = FALSE THEN CALL write_variable_in_CASE_NOTE("No DISQ panels were found for this case.")
-    IF expedited_status = "Client appears expedited" AND EBT_account_status = "Y" THEN CALL write_variable_in_CASE_NOTE("* EBT Account IS open.  Recipient will NOT be able to get a replacement card in the agency.  Rapid Electronic Issuance (REI) with caution.")
-    IF expedited_status = "Client appears expedited" AND EBT_account_status = "N" THEN CALL write_variable_in_CASE_NOTE("* EBT Account is NOT open.  Recipient is able to get initial card in the agency.  Rapid Electronic Issuance (REI) can be used, but only to avoid an emergency issuance or to meet EXP criteria.")
-    CALL write_variable_in_CASE_NOTE("---")
-    IF expedited_status = "Client does not appear expedited" THEN CALL write_variable_in_CASE_NOTE("Client does not appear expedited. Application sent to ECF.")
-    IF expedited_status = "Client appears expedited" THEN CALL write_variable_in_CASE_NOTE("Client appears expedited. Application sent to ECF. Emailed Triagers.")
-	CALL write_variable_in_CASE_NOTE("---")
-	CALL write_variable_in_CASE_NOTE(worker_signature)
-	
-	'-------------------------------------------------------------------------------------Transfers the case to the assigned worker if this was selected in the second dialog box
-	IF transfer_case = TRUE THEN 
-		CALL navigate_to_MAXIS_screen ("SPEC", "XFER")
-		EMWriteScreen "x", 7, 16
-		transmit
-		PF9
-		EMWriteScreen "X127" & worker_number, 18, 61
-		transmit
-		EMReadScreen worker_check, 9, 24, 2
-	
+    	'------------------------------------------------------------------------------------------DATE BASED LOGIC FOR UTILITY AMOUNTS
+    	IF date >= cdate("10/01/2016") THEN			'these variables need to change every October
+    		heat_AC_amt = 532
+    		electric_amt = 141
+    		phone_amt = 38
+    	ELSE
+    		heat_AC_amt = 454
+    		electric_amt = 141
+    		phone_amt = 38
+    	END IF
+    	
+    	'----------------------------------------------------------------------------------------------------THE SCRIPT
+    	CALL MAXIS_case_number_finder(MAXIS_case_number)
+    	Do 
+        	Do
+    			err_msg = ""
+        		Dialog exp_screening_dialog
+        		cancel_confirmation
+        		If isnumeric(MAXIS_case_number) = False THEN err_msg = err_msg & vbnewline & "* You must enter a valid case number."
+    			If (income <> "" and isnumeric(income) = false) or (assets <> "" and isnumeric(assets) = false) or (rent <> "" and isnumeric(rent) = false) THEN err_msg = err_msg & vbnewline & "* The income/assets/rent fields must be numeric only. Do not put letters or symbols in these sections."
+    			If err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & err_msg & vbNewLine
+        	LOOP UNTIL err_msg = ""
+    		CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
+    	Loop until are_we_passworded_out = false					'loops until user passwords back in	
+    	
+    	''----------------------------------------------------------------------------------------------------LOGIC AND CALCULATIONS
+    	'Logic for figuring out utils. The highest priority for the if...THEN is heat/AC, followed by electric and phone, followed by phone and electric separately.
+    	IF heat_AC_check = checked THEN
+       	utilities = heat_AC_amt
+    	ELSEIF electric_check = checked and phone_check = checked THEN
+       	utilities = phone_amt + electric_amt					'Phone standard plus electric standard.
+    	ELSEIF phone_check = checked and electric_check = unchecked THEN
+       	utilities = phone_amt
+    	ELSEIF electric_check = checked and phone_check = unchecked THEN
+       	utilities = electric_amt
+    	END IF
+    	
+    	'in case no options are clicked, utilities are set to zero.
+    	IF phone_check = unchecked and electric_check = unchecked and heat_AC_check = unchecked THEN utilities = 0
+    	'If nothing is written for income/assets/rent info, we set to zero.
+    	IF income = "" THEN income = 0
+    	IF assets = "" THEN assets = 0
+    	IF rent = "" THEN rent = 0
+    	
+    	'Calculates expedited status based on above numbers
+    	IF (int(income) < 150 and int(assets) <= 100) or ((int(income) + int(assets)) < (int(rent) + cint(utilities))) THEN expedited_status = "Client Appears Expedited"
+    	IF (int(income) + int(assets) >= int(rent) + cint(utilities)) and (int(income) >= 150 or int(assets) > 100) THEN expedited_status = "Client Does Not Appear Expedited"
+    	'----------------------------------------------------------------------------------------------------checking DISQ
+    	
+    	CALL navigate_to_MAXIS_screen("STAT", "DISQ")
+    	'grabbing footer month and year
+    	CALL MAXIS_footer_finder(MAXIS_footer_month, MAXIS_footer_year)
+    	
+    	'Reads the DISQ info for the case note.
+    	EMReadScreen DISQ_member_check, 34, 24, 2
+    	IF DISQ_member_check = "DISQ DOES NOT EXIST FOR ANY MEMBER" THEN
+       	has_DISQ = False
+    	ELSE
+       	has_DISQ = True
+    	END IF
+    	'
+    	'Reads MONY/DISB to see if EBT account is open
+    	IF expedited_status = "Client Appears Expedited" THEN
+       	CALL navigate_to_MAXIS_screen("MONY", "DISB")
+       	EMReadScreen EBT_account_status, 1, 14, 27
+	   	MsgBox "This Client Appears EXPEDITED. A same day interview needs to be offered."
+	   	Send_email = true
+    	END IF
 		
-		IF worker_check = "SERVICING" THEN
-			MsgBox "The correct worker number was not entered, this X-Number is not a valid worker in MAXIS. You will need to transfer the case manually"
-			PF10
-			transfer_case = unchecked
-		END IF
+		IF expedited_status = "Client does not appear expedited" THEN
+			MsgBox "This client does NOT appear expedited. A same day interview does not need to be offered."
+			END IF		
+			
+    	'-----------------------------------------------------------------------------------------------EXPCASENOTE
+    	start_a_blank_CASE_NOTE
+    	CALL write_variable_in_CASE_NOTE("~ Received Application for SNAP, " & expedited_status & " ~")
+    	CALL write_variable_in_CASE_NOTE("---")
+    	CALL write_variable_in_CASE_NOTE("     CAF 1 income claimed this month: $" & income)
+    	CALL write_variable_in_CASE_NOTE("         CAF 1 liquid assets claimed: $" & assets)
+    	CALL write_variable_in_CASE_NOTE("         CAF 1 rent/mortgage claimed: $" & rent)
+    	CALL write_variable_in_CASE_NOTE("        Utilities (amt/HEST claimed): $" & utilities)
+    	CALL write_variable_in_CASE_NOTE("---")
+    	IF has_DISQ = TRUE THEN CALL write_variable_in_CASE_NOTE("A DISQ panel exists for someone on this case.")
+    	IF has_DISQ = FALSE THEN CALL write_variable_in_CASE_NOTE("No DISQ panels were found for this case.")
+    	IF expedited_status = "Client appears expedited" AND EBT_account_status = "Y" THEN CALL write_variable_in_CASE_NOTE("* EBT Account IS open.  Recipient will NOT be able to get a replacement card in the agency.  Rapid Electronic Issuance (REI) with caution.")
+    	IF expedited_status = "Client appears expedited" AND EBT_account_status = "N" THEN CALL write_variable_in_CASE_NOTE("* EBT Account is NOT open.  Recipient is able to get initial card in the agency.  Rapid Electronic Issuance (REI) can be used, but only to avoid an emergency issuance or to meet EXP criteria.")
+    	CALL write_variable_in_CASE_NOTE("---")
+    	IF expedited_status = "Client does not appear expedited" THEN CALL write_variable_in_CASE_NOTE("Client does not appear expedited. Application sent to ECF.")
+    	IF expedited_status = "Client appears expedited" THEN CALL write_variable_in_CASE_NOTE("Client appears expedited. Application sent to ECF. Emailed Triagers.")
+		CALL write_variable_in_CASE_NOTE("---")
+		CALL write_variable_in_CASE_NOTE(worker_signature)
+	END IF 
+'-------------------------------------------------------------------------------------Transfers the case to the assigned worker if this was selected in the second dialog box
+'Determining if a case will be transferred or not. All cases will be transferred except addendum app types. THIS IS NOT CORRECT AND NEEDS TO BE DISCUSSED WITH QI
+IF Active_checkbox = CHECKED THEN 		
+	transfer_case = FALSE
+ELSE 
+	transfer_case = true
+END IF 
+
+IF transfer_case = TRUE THEN 
+	CALL navigate_to_MAXIS_screen ("SPEC", "XFER")
+	EMWriteScreen "x", 7, 16
+	transmit
+	PF9
+	EMWriteScreen "X127" & worker_number, 18, 61
+	transmit
+	EMReadScreen worker_check, 9, 24, 2
+
+	
+	IF worker_check = "SERVICING" THEN
+		MsgBox "The correct worker number was not entered, this X-Number is not a valid worker in MAXIS. You will need to transfer the case manually"
+		PF10
+		transfer_case = unchecked
 	END IF
+END IF
 	
-	IF Send_email = true then
+	IF Send_email = TRUE THEN
 		'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
-		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "mikayla.handley@hennepin.us", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)		
+		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "  EOM.", "", "", TRUE)		
 		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
 	End if 
 	
 '----------------------------------------------------------------------------------------------------NOTICE APPT LETTER Dialog
+IF send_appt_ltr = TRUE THEN
     BeginDialog Hennepin_appt_dialog, 0, 0, 296, 75, "APPOINTMENT LETTER"
       EditBox 205, 25, 55, 15, interview_date
       EditBox 65, 50, 115, 15, worker_signature
@@ -459,7 +464,7 @@ IF SNAP_checkbox = CHECKED THEN
 	interview_date = dateadd("d", 7, date_of_app)
 	If interview_date <= date then interview_date = dateadd("d", 7, date)
 	interview_date = interview_date & ""		'turns interview date into string for variable
-
+ 'need to handle for if we dont need an appt letter, which would be...'
 	Do
 		Do
     		err_msg = ""
@@ -559,7 +564,7 @@ IF SNAP_checkbox = CHECKED THEN
     transmit
     PF3
     
-    'Navigates to CASE/NOTE and starts a blank one
+    'Navigates to CASENOTE and starts a blank one
     start_a_blank_CASE_NOTE
     CALL write_variable_in_CASE_NOTE("~ Appointment letter sent in MEMO ~")
     CALL write_bullet_and_variable_in_CASE_NOTE("Appointment date", interview_date)
@@ -571,7 +576,6 @@ IF SNAP_checkbox = CHECKED THEN
     If forms_to_swkr = "Y" then CALL write_variable_in_CASE_NOTE("* Copy of notice sent to Social Worker.")     'Defined above
     CALL write_variable_in_CASE_NOTE("---")
     CALL write_variable_in_CASE_NOTE(worker_signature)
-End if 
+END IF
 
-
-script_end_procedure ("Case has been updated please ensure it was processed correctly.")
+script_end_procedure ("Case has been updated please review to ensure it was processed correctly.")
