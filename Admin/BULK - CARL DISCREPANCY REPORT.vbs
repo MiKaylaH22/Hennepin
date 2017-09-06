@@ -65,8 +65,6 @@ end function
 '----------------------------------------------------------------------------------------------------The script
 EMConnect ""
 
-file_selection_path = "C:\Users\ilfe001\Desktop\Not In Carl 07-18-17.xlsx"
-
 'dialog and dialog DO...Loop	
 Do
 	Do
@@ -153,7 +151,6 @@ For item = 0 to UBound(CARL_array, 2)
 		row = 5
 		Do
 			EMReadScreen case_note_date, 8, row, 6
-			'msgbox appl_date & vbcr & case_note_date
 			If trim(case_note_date) = "" then exit do
 			If case_note_date => appl_date then          'if the case note date is equal to or greater than the application date then the case note header is read
 				EMReadScreen case_note_header, 55, row, 25
@@ -172,13 +169,7 @@ For item = 0 to UBound(CARL_array, 2)
 					exit do	
 				Elseif instr(case_note_header, "***Emergency app") then
 					CAF_note_found = True
-					exit do
-				'Elseif instr(case_note_header, "EA Application") then
-				'	CAF_note_found = True
-				'	exit do
-				'Elseif instr(case_note_header, "EA APPLICATION") then
-				'	CAF_note_found = True
-				'	exit do		
+					exit do	
 				else 	
 					CAF_note_found = False
 				END IF
