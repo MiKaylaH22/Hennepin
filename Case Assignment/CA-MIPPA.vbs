@@ -248,7 +248,7 @@ CALL create_outlook_email("", "mikayla.handley@hennepin.us;", maxis_name & maxis
 	
 '---------------------------------------------------------------------------------------------------------------------------------case note
 start_a_blank_CASE_NOTE 'appl_date needs to be fixed to read 08/08/08 instead of 08 08 08'
-CALL write_variable_in_CASE_NOTE ("~ HC PENDED - MIPAA recieved via REPT/MLAR on " & appl_date & " ~")
+CALL write_variable_in_CASE_NOTE ("~ HC PENDED - MIPAA received via REPT/MLAR on " & appl_date & " ~")
 IF select_answer = "NO - APPL (Known)" THEN 
 	CALL write_variable_in_CASE_NOTE("** APPL'd case using the MIPPA record and case information applicant is   known to MAXIS by SSN or name search.")
 	CALL write_variable_in_CASE_NOTE ("* Pended on: " & date)
