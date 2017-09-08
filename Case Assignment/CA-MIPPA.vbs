@@ -57,6 +57,9 @@ CALL check_for_MAXIS(FALSE)
 CALL navigate_to_MAXIS_screen("REPT", "MLAR")
 
 MAXIS_row = 11 'this part should be a for next?' can we jsut do a cursor read for now?
+EMReadscreen msg_check, 1, MAXIS_row, 03
+If msg_check <> "_" then script_end_procedure("You are not on a MIPPA message. This script will stop.")
+
 EMwritescreen "X", MAXIS_row, 03 'this will take us to REPT/MLAD'
 transmit
 	'navigates to MLAD
@@ -65,10 +68,25 @@ EMReadScreen SSN_first, 3, 7, 20
 EMReadScreen SSN_mid, 2, 7, 24
 EMReadScreen SSN_last, 4, 7, 27
 EMReadScreen appl_date, 8, 11, 20
+
+'used for the dialog to appl
+EMReadScreen birth_date, 8, 8, 20
+EMReadScreen medi_number, 10, 10, 20 
+EMReadScreen rcvd_date, 8, 12, 20
+EMReadScreen gender_ask, 1, 9, 20
+EMReadScreen addr_street, 19, 9, 56
+EMReadScreen apt_addr, 19, 8, 56
+EMReadScreen addr_city, 22, 12, 56
+EMReadScreen addr_state, 2, 13, 56
+EMReadScreen addr_zip, 5, 13, 65
+EMReadScreen addr_county, 22, 14, 56
+EMReadScreen addr_phone, 12, 15, 56
+EMReadScreen appl_status, 2, 4, 20
+
 appl_date = replace(appl_date, " ", "/")
 PF2 'navigates to PERS'
 
-'Ilse help to write the name or IF that is a good idea here take the PERS search to the next level'
+
 EMwritescreen SSN_first, 14, 36
 EMwritescreen SSN_mid, 14, 40
 EMwritescreen SSN_last, 14, 43 
@@ -155,7 +173,8 @@ Do
 	CALL check_for_password(are_we_passworded_out)  
 LOOP UNTIL are_we_passworded_out = false
 
-IF select_answer = "NO - APPL (Known)" or select_answer = "NO - APPL (Not known)" THEN MsgBox ("APPL this case in MAXIS using the application date from REPT/MLAR & case note as appropriate.")
+IF select_answer = "NO - APPL (Known)" or select_answer = "NO - APPL (Not known)" THEN APPL_box = MsgBox("This information is read from REPT/MLAR:" & vbcr & appl_date & vbcr & maxis_name & vbcr & SSN_first & SSN_mid & SSN_last & vbcr & birth_date & vbcr & gender_ask & vbcr & addr_street & apt_addr & addr_city & addr_state & "" & addr_zip & vbcr & addr_phone & vbcr & "APPL case and click OK if you wish to continue running the script and CANCEL if you want to exit.",  vbOKCancel)
+	If APPL_box = vbCancel then script_end_procedure("The script has ended. Please review the REPT/MLAR as you indicated that you wish to exit the script")
 
 DO
 	DO
@@ -225,7 +244,7 @@ END IF
 
 'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
 
-CALL create_outlook_email("Monica.Socha@hennepin.us;", "mikayla.handley@hennepin.us;", maxis_name & maxis_case_number & " MIPAA case need Application sent EOM.", "", "", TRUE)	
+CALL create_outlook_email("", "mikayla.handley@hennepin.us;", maxis_name & maxis_case_number & " MIPPA case need Application sent EOM.", "", "", FALSE)	
 	
 '---------------------------------------------------------------------------------------------------------------------------------case note
 start_a_blank_CASE_NOTE 'appl_date needs to be fixed to read 08/08/08 instead of 08 08 08'
@@ -244,10 +263,10 @@ END IF
 IF select_answer = "YES - Update MLAD" THEN CALL write_variable_in_CASE_NOTE("** Please review the MIPPA record and case information for consistency and follow-up with any inconsistent information, as appropriate.")
 
 CALL write_variable_in_case_NOTE ("* Requesting: HC")
-CALL write_variable_in_CASE_NOTE ("* REPT/MLAR Appl Date: " & appl_date)
+CALL write_variable_in_CASE_NOTE ("* REPT/MLAR APPL Date: " & appl_date)
 CALL write_variable_in_CASE_NOTE ("* Application mailed: " & date) 'this we do not want if team is mailing HCAPP enahance to send email possibly'
-If transfer_case = true THEN CALL write_variable_in_CASE_NOTE ("* Case transferred to Team " & worker_to_transfer_to & " in MAXIS. (" & team_region & " " & population_team & ")")
-CALL write_variable_in_CASE_NOTE ("* MIPPA rcvd acted on per: TE 02.07.459")
+If transfer_case = true THEN CALL write_variable_in_CASE_NOTE ("* Case transferred to Team " & worker_to_transfer_to & " in MAXIS. ("  & worker_team_number & " " & team_region & " " & population_team & ")")
+CALL write_variable_in_CASE_NOTE ("* MIPPA rcvd and acted on per: TE 02.07.459")
 CALL write_variable_in_CASE_NOTE ("---")
 CALL write_variable_in_CASE_NOTE (worker_signature)
 
