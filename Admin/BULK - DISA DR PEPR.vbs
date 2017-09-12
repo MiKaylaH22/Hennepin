@@ -77,9 +77,9 @@ Do
     			OkButton 145, 90, 50, 15
     			CancelButton 200, 90, 50, 15
   				EditBox 15, 45, 180, 15, file_selection_path
-  				GroupBox 10, 5, 250, 80, "Using the SEND MANUAL REFERRAL script"
-  				Text 20, 20, 235, 20, "This script should be used when E & T provides you with a list of recipeints that are working with CBO's and a manual referral is needed. "
-  				Text 15, 65, 230, 15, "Select the Excel file that contains the CBO information by selecting the 'Browse' button, and finding the file."
+  				GroupBox 10, 5, 250, 80, "Using the DISA DR. PEPR script"
+  				Text 20, 20, 235, 20, "This script should be used when the DISA PEPR messages are run, and additional information needs to be added (for Charles). "
+  				Text 15, 65, 230, 15, "Select the Excel file that contains the PEPR information by selecting the 'Browse' button, and finding the file."
 			EndDialog
 			err_msg = ""
 			Dialog CBO_referral_dialog

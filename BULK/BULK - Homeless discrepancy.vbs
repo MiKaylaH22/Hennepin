@@ -100,42 +100,53 @@ End if
 
 'start of the FOR...next loop
 For each worker in worker_array
-	If trim(worker) = "" then exit for
-	Call navigate_to_MAXIS_screen("rept", "actv")
-	'writing in the worker number in the correct col
-	EMWriteScreen worker, 21, 13
-	transmit
-	
-    'Skips workers with no info
-    EMReadScreen has_content_check, 1, 7, 8
-    If has_content_check <> " " then
-    	'Grabbing each case number on screen
-    	Do
-    		'Set variable for next do...loop
-    		MAXIS_row = 7
-    
-    		'Checking for the last page of cases.
-    		EMReadScreen last_page_check, 21, 24, 2	'because on REPT/ACTV it displays right away, instead of when the second F8 is sent
-    		Do
-    			EMReadScreen MAXIS_case_number, 8, MAXIS_row, 12		 'Reading case number
-    			MAXIS_case_number = trim(MAXIS_case_number)
-    			If MAXIS_case_number = "" then exit do			'Exits do if we reach the end
-    
-    			'Doing this because sometimes BlueZone registers a "ghost" of previous data when the script runs. This checks against an array and stops if we've seen this one before.
-    			If trim(MAXIS_case_number) <> "" and instr(all_case_numbers_array, MAXIS_case_number) <> 0 then exit do
-    			all_case_numbers_array = trim(all_case_numbers_array & " " & MAXIS_case_number)
-    			If MAXIS_case_number <> "" then case_number_list = case_number_list & MAXIS_case_number & "," 
-    			
-    			MAXIS_row = MAXIS_row + 1
-    		Loop until MAXIS_row = 19
-    		PF8
-    	Loop until last_page_check = "THIS IS THE LAST PAGE"
-    End if
+    back_to_self	'Does this to prevent "ghosting" where the old info shows up on the new screen for some reason
+	Call navigate_to_MAXIS_screen("REPT", "ACTV")
+    EMWriteScreen worker, 21, 13
+    transmit
+
+	'Skips workers with no info
+	EMReadScreen has_content_check, 1, 7, 8
+	If has_content_check <> " " then
+		Do						'Grabbing each case number on screen
+			row = 7		'Set variable for next do...loop
+			'Checking for the last page of cases.
+			EMReadScreen last_page_check, 21, 24, 2	'because on REPT/ACTV it displays right away, instead of when the second F8 is sent
+			Do
+				EMReadScreen MAXIS_case_number, 8, row, 12	'Reading case number
+				MAXIS_case_number = trim(MAXIS_case_number)
+				If MAXIS_case_number = "" then exit do			'Exits do if we reach the end
+
+				'Cash requires different handling due to containing multiple program types in one column
+				EMReadScreen cash_status, 9, row, 51
+				cash_status = trim(cash_status)
+				
+				EMReadScreen snap_status, 1, row, 61
+				
+				If snap_status = "A" then 
+					add_to_array = True
+				Elseif instr(cash_status, "MF A") then 
+					add_to_array = True
+				Else 
+					add_to_array = False 
+				End if 
+				
+				If add_to_array = True then 
+					'Doing this because sometimes BlueZone registers a "ghost" of previous data when the script runs. This checks against an array and 	stops if we've seen this one before.
+					If MAXIS_case_number <> "" and instr(all_case_numbers_array, MAXIS_case_number) <> 0 then exit do
+					all_case_numbers_array = trim(all_case_numbers_array & MAXIS_case_number & ",")
+				End if 
+				row = row + 1
+				MAXIS_case_number = ""			'Blanking out variable
+			Loop until row = 19
+			PF8
+		Loop until last_page_check = "THIS IS THE LAST PAGE"
+	End if
 next
 
-case_number_list = trim(case_number_list)
-If right(case_number_list, 1) = "," then case_number_list = left(case_number_list, len(case_number_list) - 1)
-case_numbers_array = split(case_number_list, ",")
+all_case_numbers_array = trim(all_case_numbers_array)
+If right(all_case_numbers_array, 1) = "," then all_case_numbers_array = left(all_case_numbers_array, len(all_case_numbers_array) - 1)
+case_number_array = split(all_case_numbers_array, ",")
 
 discrep_amt = 0
 DIM cases_array 
@@ -155,7 +166,7 @@ const addr_STATE	= 9
 const addr_ZIP		= 10
 
 'msgbox case_number_list
-For each MAXIS_case_number in case_numbers_array
+For each MAXIS_case_number in case_number_array
     IF MAXIS_case_number = "" then exit for 
     Call navigate_to_MAXIS_screen ("STAT", "ADDR") 
     EMReadScreen priv_check, 4, 2, 50

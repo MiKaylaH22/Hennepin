@@ -1,5 +1,5 @@
 'Required for statistical purposes===============================================================================
-name_of_script = "BULK - SEND MANUAL REFERRAL FOR CBO - Hennepin.vbs "
+name_of_script = "BULK - SEND CBO MANUAL REFERRALS.vbs"
 start_time = timer
 STATS_counter = 1                          'sets the stats counter at one
 STATS_manualtime = 120                     'manual run time in seconds
@@ -110,10 +110,10 @@ entry_record = 0
 
 Do                                                            'Loops until there are no more cases in the Excel list
 	
-	client_SSN  = objExcel.cells(excel_row, 4).Value		'Pulls the client's known information 
-	client_SSN = replace(client_SSN, "-", "")
 	MAXIS_case_number = objExcel.cells(excel_row, 3).Value
 	MAXIS_case_number = trim(MAXIS_case_number)
+	client_SSN  = objExcel.cells(excel_row, 4).Value		'Pulls the client's known information 
+	client_SSN = replace(client_SSN, "-", "")
 	name_of_CBO = objExcel.cells(excel_row, 5).Value
 	name_of_CBO = trim(name_of_CBO)
 	If name_of_CBO = "" then exit do
@@ -129,8 +129,8 @@ Do                                                            'Loops until there
 	CBO_array (excel_num, 		entry_record) = excel_row
 	CBO_array (ABAWD_status, 	entry_record) = ""
 	entry_record = entry_record + 1			'This increments to the next entry in the array
-	
 	excel_row = excel_row + 1
+	
 	'blanking out variables
 	client_SSN = ""
 	MAXIS_case_number = ""
@@ -150,7 +150,8 @@ For item = 0 to UBound(CBO_array, 2)
 	MAXIS_case_number = CBO_array(case_number, item)			
 	client_SSN = CBO_array(clt_SSN, item)
 	
-	If CBO_array(case_number, item) = "" then 
+	If client_SSN <> ""
+	 	msgbox client_SSN = ""
 		CBO_array(make_referral, item) = False
 		call navigate_to_MAXIS_screen("pers", "____")
 		
@@ -235,6 +236,7 @@ For item = 0 to UBound(CBO_array, 2)
 						transmit
 						EMReadScreen MEMB_error, 5, 24, 2
 					Loop until MEMB_error = "ENTER"
+					'msgbox HH_count
 					If HH_count = 1 then 
 						CBO_array(memb_number, item) = member_number
 						CBO_array(make_referral, item) = True
@@ -254,14 +256,12 @@ For item = 0 to UBound(CBO_array, 2)
 	        	    		exit do
 	        	    	Else 
 	        	    		transmit
+							CBO_array(make_referral, item) = False
 		    	    	END IF
 	        	    Loop until member_SSN = CBO_array(clt_SSN, item) or MEMB_error = "ENTER"
 				End if 
-	        	IF member_SSN <> CBO_array (clt_SSN, item) then 
-	        		CBO_array(make_referral, item) = False
-		    		CBO_array(ref_status, item) = "Error"
-	        		CBO_array(error_reason, item) = "Unable to find person's member number."	'Explanation for the rejected report'
-	        	Else 
+	        	
+				IF CBO_array(make_referral, item) = True then 
 				    'STAT WREG PORTION
 				    Call navigate_to_MAXIS_screen("STAT", "WREG")
 				    EMWriteScreen member_number, 20, 76				'enters member number
