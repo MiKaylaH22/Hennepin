@@ -441,6 +441,12 @@ END IF
 		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
 	End if 
 	
+	If (Active_checkbox = 1 and send_email <> true) then 
+		'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
+		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "", maxis_case_number, "Client submitted an add-a-program application.", "", TRUE)		
+		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
+	End if 
+	
 '----------------------------------------------------------------------------------------------------NOTICE APPT LETTER Dialog
 IF send_appt_ltr = TRUE THEN
     BeginDialog Hennepin_appt_dialog, 0, 0, 296, 75, "APPOINTMENT LETTER"
