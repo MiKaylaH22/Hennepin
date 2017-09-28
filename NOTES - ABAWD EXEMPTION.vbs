@@ -139,7 +139,7 @@ If ABAWD_selection <> "Other" then
 Else 
 	BeginDialog Incap_child_dialog, 0, 0, 276, 140, "ABAWD exemption"
 		'This droplist is too damn big to enter into the dialog editor. You WILL break the dialog editor if you paste this code into it. 
-		DropListBox 75, 10, 190, 15, "Select one..."+chr(9)+"03 Unfit for Employment"+chr(9)+"05 Age 60 or older"+chr(9)+"06 Under age 16"+chr(9)+"07 Age 16-17 living w/ parent/caregiver"+chr(9)+"09 Empl 30 hr/wk or earnings = to min wage x 30 hr/wk"+chr(9)+"10 Matching grant participant"+chr(9)+"11 Receiving or applied for unemployment"+chr(9)+"12 Enrolled in school, training program or higher education"+chr(9)+"13 Participating In CD Program"+chr(9)+"14 Receiving MFIP"+chr(9)+"20 Pending/Receiving DWP Or WB"+chr(9)+"15 Age 16-17 Not Lvg W/Pare/Crgvr"+chr(9)+"16 50-59 years old"+chr(9)+"21 Resp For Care Of Child < 18"+chr(9)+"17 Receiving RCA Or GA"+chr(9)+"18 Providing In-Home Schooling", Exemption_droplist
+		DropListBox 75, 10, 190, 15, "Select one..."+chr(9)+"03 Unfit for Employment"+chr(9)+"05 Age 60 or older"+chr(9)+"06 Under age 16"+chr(9)+"07 Age 16-17 living w/ parent/caregiver"+chr(9)+"09 Empl 30 hr/wk or earnings = to min wage x 30 hr/wk"+chr(9)+"10 Matching grant participant"+chr(9)+"11 Receiving or applied for unemployment"+chr(9)+"12 Enrolled in school, training program or higher education"+chr(9)+"13 Participating In CD Program"+chr(9)+"14 Receiving MFIP"+chr(9)+"20 Pending/Receiving DWP Or WB"+chr(9)+"15 Age 16-17 Not Lvg W/Pare/Crgvr"+chr(9)+"16 50-59 years old"+chr(9)+"21 Resp For Care Of Child < 18"+chr(9)+"17 Receiving RCA Or GA", Exemption_droplist
   		DropListBox 80, 50, 50, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No", verifs_required
   		DropListBox 215, 50, 50, 15, "Select one..."+chr(9)+"Yes"+chr(9)+"No", verifs_rec
   		EditBox 65, 70, 200, 15, verif_info
@@ -210,7 +210,6 @@ Else
 	If FSET_exemption_code = "12" then ABAWD_input_code = "01"
 	If FSET_exemption_code = "13" then ABAWD_input_code = "01"
 	If FSET_exemption_code = "14" then ABAWD_input_code = "01"
-	If FSET_exemption_code = "18" then ABAWD_input_code = "01"
 	If FSET_exemption_code = "20" then ABAWD_input_code = "01"
 	
 	If FSET_exemption_code = "15" then ABAWD_input_code = "02"

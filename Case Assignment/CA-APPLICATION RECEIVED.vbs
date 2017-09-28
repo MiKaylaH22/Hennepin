@@ -202,9 +202,9 @@ BeginDialog appl_detail_dialog, 0, 0, 296, 145, "APPLICATION RECEIVED"
 EndDialog
 
 BeginDialog add_detail_dialog, 0, 0, 281, 110, "ADD A PROGRAM"
-  DropListBox 80, 5, 55, 15, "Select One:"+chr(9)+"Online"+chr(9)+"Mail"+chr(9)+"Fax", how_app_rcvd
+  DropListBox 80, 5, 65, 15, "Select One:"+chr(9)+"Online"+chr(9)+"Mail"+chr(9)+"Fax", how_app_rcvd
   EditBox 215, 5, 60, 15, date_of_app
-  DropListBox 80, 25, 55, 15, "Select One:"+chr(9)+"ApplyMN"+chr(9)+"CAF", app_type
+  DropListBox 80, 25, 65, 15, "Select One:"+chr(9)+"Addendum"+chr(9)+"ApplyMN"+chr(9)+"CAF"+chr(9)+"6696"+chr(9)+"HCAPP"+chr(9)+"HC-Certain Pop"+chr(9)+"LTC"+chr(9)+"MHCP B/C Cancer", app_type
   EditBox 215, 25, 60, 15, confirmation_number
   CheckBox 50, 50, 30, 10, "Cash", cash_pend
   CheckBox 85, 50, 25, 10, "CCA", cca_pend
@@ -217,12 +217,13 @@ BeginDialog add_detail_dialog, 0, 0, 281, 110, "ADD A PROGRAM"
     OkButton 170, 90, 50, 15
     CancelButton 225, 90, 50, 15
   Text 5, 30, 65, 10, "Type of Application:"
-  Text 145, 30, 50, 10, "Confirmation #:"
-  Text 145, 10, 65, 10, "Date of Application:"
+  Text 165, 30, 50, 10, "Confirmation #:"
+  Text 150, 10, 65, 10, "Date of Application:"
   Text 5, 50, 40, 10, "Applied for:"
   Text 5, 75, 45, 10, "Other Notes:"
   Text 5, 10, 70, 10, "Application Received:"
 EndDialog
+
 
 'possible to naviagte to the geocoder here...need handling for prv cases xfer must be the last step'
 '------------------------------------------------------------------------------------DIALOG APPL
@@ -318,15 +319,19 @@ CALL write_variable_in_CASE_NOTE (worker_signature)
     	EndDialog
 		
     	'------------------------------------------------------------------------------------------DATE BASED LOGIC FOR UTILITY AMOUNTS
-    	IF date >= cdate("10/01/2016") THEN			'these variables need to change every October
-    		heat_AC_amt = 532
-    		electric_amt = 141
-    		phone_amt = 38
-    	ELSE
-    		heat_AC_amt = 454
-    		electric_amt = 141
-    		phone_amt = 38
-    	END IF
+		If date >= cdate("10/01/2017") then			'these variables need to change every October
+			heat_AC_amt = 536
+			electric_amt = 172
+			phone_amt = 41
+		ElseIf date >= cdate("10/01/2016") then			'these variables need to change every October
+			heat_AC_amt = 532
+			electric_amt = 141
+			phone_amt = 38
+		Else
+			heat_AC_amt = 454
+			electric_amt = 141
+			phone_amt = 38
+		End if
     	
     	'----------------------------------------------------------------------------------------------------THE SCRIPT
     	CALL MAXIS_case_number_finder(MAXIS_case_number)
@@ -437,6 +442,12 @@ END IF
 	IF Send_email = TRUE THEN
 		'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
 		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "  EOM.", "", "", TRUE)		
+		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
+	End if 
+	
+	If (Active_checkbox = 1 and send_email <> true) then 
+		'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
+		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "", maxis_case_number, "Client submitted an add-a-program application.", "", TRUE)		
 		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
 	End if 
 	

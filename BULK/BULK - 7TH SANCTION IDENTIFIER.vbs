@@ -66,7 +66,6 @@ EndDialog
 'THE SCRIPT----------------------------------------------------------------------------------------------------
 'Connects to BlueZone
 EMConnect ""
-worker_number = "X1272IW, x127966"
 
 'Shows dialog
 Do
@@ -204,8 +203,7 @@ Do
 	    		case_name = trim(case_name)
             	If case_name <> client_name then row = row + 1
         	LOOP until case_name = client_name  
-	    	EMWriteScreen "x", row, 36		'going into the SANC panel to get case info
-			msgbox row & " for content for member"     
+	    	EMWriteScreen "x", row, 36		'going into the SANC panel to get case info     
 	    Else 
 	    	EMWriteScreen "x", 7, 36		'going into the SANC panel to get case info
 	    End if 
@@ -233,7 +231,6 @@ Do
             objRange.Delete				'all other cases that are not due for a recert will be deleted
             IF excel_row = 2 then 
                 excel_row = excel_row
-	    		msgbox "excel row " & excel_row
             Else 
                 excel_row = excel_row - 1
             End if 

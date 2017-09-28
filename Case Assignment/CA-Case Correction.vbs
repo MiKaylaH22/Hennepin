@@ -255,16 +255,19 @@ CALL write_variable_in_CASE_NOTE (worker_signature)
     	EndDialog
 		
     	'------------------------------------------------------------------------------------------DATE BASED LOGIC FOR UTILITY AMOUNTS
-    	IF date >= cdate("10/01/2016") THEN			'these variables need to change every October
-    		heat_AC_amt = 532
-    		electric_amt = 141
-    		phone_amt = 38
-    	ELSE
-    		heat_AC_amt = 454
-    		electric_amt = 141
-    		phone_amt = 38
-    	END IF
-    	
+		If date >= cdate("10/01/2017") then			'these variables need to change every October
+			heat_AC_amt = 536
+			electric_amt = 172
+			phone_amt = 41
+		ElseIf date >= cdate("10/01/2016") then			'these variables need to change every October
+			heat_AC_amt = 532
+			electric_amt = 141
+			phone_amt = 38
+		Else
+			heat_AC_amt = 454
+			electric_amt = 141
+			phone_amt = 38
+		End if
     	'----------------------------------------------------------------------------------------------------THE SCRIPT
     	CALL MAXIS_case_number_finder(MAXIS_case_number)
     	Do 
@@ -325,7 +328,7 @@ CALL write_variable_in_CASE_NOTE (worker_signature)
 		
 		IF expedited_status = "Client does not appear expedited" THEN
 			MsgBox "This client does NOT appear expedited. A same day interview does not need to be offered."
-			END IF		
+		END IF		
 			
     	'-----------------------------------------------------------------------------------------------EXPCASENOTE
     	start_a_blank_CASE_NOTE
@@ -374,6 +377,12 @@ END IF
 	IF Send_email = TRUE THEN
 		'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
 		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "  EOM.", "", "", TRUE)		
+		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
+	End if 
+	
+	If (Active_checkbox = 1 and send_email <> true) then 
+		'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
+		CALL create_outlook_email("HSPH.EWS.Triagers@hennepin.us", "", maxis_case_number, "Client submitted an add-a-program application.", "", TRUE)		
 		'CALL create_outlook_email("Ilse.Ferris@hennepin.us;", "mikayla.handley@hennepin.us;", MAXIS_case_name & maxis_case_number & " Expedited case to be assigned, transferred to team " & worker_number & "EOM.", "", "", TRUE)	
 	End if 
 	

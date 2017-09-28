@@ -150,8 +150,7 @@ For item = 0 to UBound(CBO_array, 2)
 	MAXIS_case_number = CBO_array(case_number, item)			
 	client_SSN = CBO_array(clt_SSN, item)
 	
-	If client_SSN <> ""
-	 	msgbox client_SSN = ""
+	If client_SSN <> "" then 
 		CBO_array(make_referral, item) = False
 		call navigate_to_MAXIS_screen("pers", "____")
 		
@@ -236,7 +235,6 @@ For item = 0 to UBound(CBO_array, 2)
 						transmit
 						EMReadScreen MEMB_error, 5, 24, 2
 					Loop until MEMB_error = "ENTER"
-					'msgbox HH_count
 					If HH_count = 1 then 
 						CBO_array(memb_number, item) = member_number
 						CBO_array(make_referral, item) = True

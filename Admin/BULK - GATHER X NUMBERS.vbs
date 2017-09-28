@@ -1,5 +1,5 @@
 ''STATS GATHERING----------------------------------------------------------------------------------------------------
-name_of_script = "ADMIN - GATHER X NUMBERS.vbs"
+name_of_script = "BULK - GATHER X NUMBERS.vbs"
 start_time = timer
 STATS_counter = 1                       'sets the stats counter at one
 STATS_manualtime = "20"                'manual run time in seconds
