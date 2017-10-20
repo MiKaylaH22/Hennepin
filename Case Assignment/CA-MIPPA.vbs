@@ -67,11 +67,7 @@ EMwritescreen "X", MAXIS_row, 03 'this will take us to REPT/MLAD'
 transmit
 	'navigates to MLAD
 EMReadScreen MLAD_maxis_name, 22, 6, 20
-MLAD_maxis_name = TRIM(MLAD_maxis_name)
-
-IF maxis_name <> MLAD_maxis_name THEN MLAR_case = MsgBox("Is this name a match?", vbYesNoCancel)
- IF MLAR_case = vbCancel then stopscript
- 
+	MLAD_maxis_name = TRIM(MLAD_maxis_name)
 EMReadScreen SSN_first, 3, 7, 20
 EMReadScreen SSN_mid, 2, 7, 24
 EMReadScreen SSN_last, 4, 7, 27
@@ -152,16 +148,18 @@ BeginDialog MIPPA_active_dialog, 0, 0, 206, 70, "MIPAA"
 EndDialog
 
 '----------------------------------------------------------------------------------------TRANSFER DIALOG'
-BeginDialog transfer_dialog, 0, 0, 141, 85, "MIPAA Transfer"
+BeginDialog transfer_dialog, 0, 0, 141, 110, "MIPAA Transfer"
   ButtonGroup ButtonPressed
-    PushButton 20, 5, 100, 15, "Geocoder", Geo_coder_button
-  EditBox 105, 25, 30, 15, spec_xfer_worker
-  EditBox 105, 45, 30, 15, team_number
+    PushButton 20, 25, 100, 15, "Geocoder", Geo_coder_button
+  Text 5, 10, 50, 10, "Case Number:"
+  EditBox 55, 5, 65, 15, maxis_case_number
+  Text 5, 50, 100, 10, "Transfer to (last 3 digit of X#):"
+  EditBox 105, 45, 30, 15, spec_xfer_worker
+  Text 5, 70, 90, 10, "Assigned to (3 digit team #):"
+  EditBox 105, 65, 30, 15, team_number
   ButtonGroup ButtonPressed
-    OkButton 50, 65, 40, 15
-    CancelButton 95, 65, 40, 15
-  Text 5, 30, 100, 10, "Transfer to (last 3 digit of X#):"
-  Text 5, 50, 90, 10, "Assigned to (3 digit team #):"
+    OkButton 40, 90, 45, 15
+    CancelButton 90, 90, 45, 15
 EndDialog
 
 '----------------------------------------------------------------------------------------Case number DIALOG'
