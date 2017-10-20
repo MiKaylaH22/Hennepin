@@ -42,6 +42,7 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
+call changelog_update("10/10/2017", "Updates to correct dialog box error message and ensure the correct case number pulls through the whole script/", "MiKayla Handley, Hennepin County")
 call changelog_update("10/10/2017", "Updates to correct action when case noting and updating REPT/MLAR", "MiKayla Handley, Hennepin County")
 call changelog_update("09/29/2017", "Updates to correct action if HC is already pending", "MiKayla Handley, Hennepin County")
 call changelog_update("08/21/2017", "Initial version.", "MiKayla Handley, Hennepin County")
@@ -100,7 +101,7 @@ IF error_msg = "SSN DOES NOT EXIST" THEN script_end_procedure ("Unable to find p
 
 EMReadscreen PAGE_confirmation, 4, 2, 51 
 IF PAGE_confirmation = "PERS" THEN script_end_procedure ("Please search by person name and run script again.")
-IF PAGE_confirmation = "MTCH" THEN script_end_procedure ("PMI NBR ASSIGNED - Ensure duplicate PMIs have been reported if found, APPL using oldest PMI")
+IF PAGE_confirmation = "MTCH" THEN script_end_procedure ("PMI NBR ASSIGNED THRU SMI OR PMIN - NO MAXIS CASE EXISTS - Ensure duplicate PMIs have been reported if found, APPL using oldest PMI")
 IF PAGE_confirmation <> "DSPL" THEN script_end_procedure("Unable to access DSPL screen. Please review your case, and process manually if necessary.")
 
 EMwritescreen "HC", 07, 22 
@@ -184,8 +185,9 @@ Do
 LOOP UNTIL are_we_passworded_out = false
 
 IF select_answer <> "YES - Update MLAD" THEN APPL_box = MsgBox("This information is read from REPT/MLAR:" & vbcr & MLAD_maxis_name & vbcr & appl_date & vbcr & maxis_name & vbcr & SSN_first & SSN_mid & SSN_last & vbcr & birth_date & vbcr & gender_ask & vbcr & addr_street & apt_addr & addr_city & addr_state & "" & addr_zip & vbcr & addr_phone & vbcr & "APPL case and click OK if you wish to continue running the script and CANCEL if you want to exit." & vbcr & "HCRE must be updated when adding HC", vbOKCancel)
-	IF APPL_box = vbCancel then script_end_procedure("The script has ended. Please review the REPT/MLAR as you indicated that you wish to exit the script")
+IF APPL_box = vbCancel then script_end_procedure("The script has ended. Please review the REPT/MLAR as you indicated that you wish to exit the script")
 
+Call MAXIS_case_number_finder(MAXIS_case_number)
 '-------------------------------------------------------------------------------------Transfers the case to the assigned worker if this was selected in the second dialog box
 'Determining if a case will be transferred or not. All cases will be transferred except addendum app types. THIS IS NOT CORRECT AND NEEDS TO BE DISCUSSED WITH QI
 IF transfer_case_checkbox = UNCHECKED THEN 		
