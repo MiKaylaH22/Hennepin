@@ -43,6 +43,7 @@ changelog = array()
 
 'INSERT ACTUAL CHANGES HERE, WITH PARAMETERS DATE, DESCRIPTION, AND SCRIPTWRITER. **ENSURE THE MOST RECENT CHANGE GOES ON TOP!!**
 'Example: call changelog_update("01/01/2000", "The script has been updated to fix a typo on the initial dialog.", "Jane Public, Oak County")
+CALL changelog_update("11/14/2017", "Email functionality for METS retro cases. Changed team email to team 603.", "Ilse Ferris, Hennepin County")
 CALL changelog_update("11/03/2017", "Email functionality - only expedited emails will be sent to Triagers or METS cases.", "Ilse Ferris, Hennepin County")
 CALL changelog_update("10/25/2017", "Email functionality - will create email, and send for all CASH and FS applications.", "MiKayla Handley, Hennepin County")
 CALL changelog_update("10/12/2017", "Email functionality will create email, but not send it. Staff will need to send email after reviewing email.", "Ilse Ferris, Hennepin County")
@@ -526,6 +527,6 @@ IF send_appt_ltr = TRUE THEN
 END IF
 
 'Function create_outlook_email(email_recip, email_recip_CC, email_subject, email_body, email_attachment, send_email)
-IF mnsure_retro_checkbox = CHECKED THEN CALL create_outlook_email("", "", MAXIS_case_name & maxis_case_number & " Retro Request Complete EOM.", "", "", FALSE)	
+IF mnsure_retro_checkbox = CHECKED THEN CALL create_outlook_email("HSPH.EWS.TEAM.603@hennepin.us", "", MAXIS_case_name & maxis_case_number & " Retro Request Complete EOM.", "", "", FALSE)	
 
 script_end_procedure ("Case has been updated please ensure it was processed correctly.")
