@@ -140,6 +140,9 @@ ELSE
 	END IF
 END IF 
 
+IF IEVS_type = "WAGE" THEN type_match = "U"
+IF IEVS_type = "BEER" THEN type_match = "B"
+
 '--------------------------------------------------------------------Client name
 EMReadScreen client_name, 35, 5, 24
 client_name = trim(client_name)                         'trimming the client name
@@ -257,8 +260,7 @@ IF send_notice_checkbox = CHECKED THEN
     IF right(pending_verifs, 1) = "," THEN pending_verifs = left(pending_verifs, len(pending_verifs) - 1)
     
 	Due_date = dateadd("d", 10, date)	'defaults the due date for all verifications at 10 days
-	IF IEVS_type = "WAGE" THEN type_match = "U"
-	IF IEVS_type = "BEER" THEN type_match = "B"
+	
 	'---------------------------------------------------------------------DIFF NOTC case note
     start_a_blank_CASE_NOTE
     CALL write_variable_in_CASE_NOTE ("-----" & IEVS_year & " WAGE MATCH " & "(" & type_match & ") " & "(" & first_name &  ") DIFF NOTICE SENT-----")
@@ -387,7 +389,7 @@ MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The s
 		PF3 'back to the DAIL'
 	   '----------------------------------------------------------------the case match CLEARED note
 		start_a_blank_CASE_NOTE
-		IF IEVS_type = "WAGE" THEN CALL write_variable_in_CASE_NOTE("-----" & IEVS_quarter & " QTR " & IEVS_year & " NON-WAGE MATCH (" & type_match & ") " & "(" & first_name &  ") CLEARED " & rez_status & "-----")
+		IF IEVS_type = "WAGE" THEN CALL write_variable_in_CASE_NOTE("-----" & IEVS_quarter & " QTR " & IEVS_year & " WAGE MATCH (" & type_match & ") " & "(" & first_name &  ") CLEARED " & rez_status & "-----")
 	    IF IEVS_type = "BEER" THEN CALL write_variable_in_CASE_NOTE("-----" & IEVS_year & " NON-WAGE MATCH (" & type_match & ") " & "(" & first_name &  ") CLEARED " & rez_status & "-----")
 	    CALL write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
 	   	CALL write_bullet_and_variable_in_CASE_NOTE("Active Programs", active_programs)
