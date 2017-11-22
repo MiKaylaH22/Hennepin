@@ -282,7 +282,7 @@ IF send_notice_checkbox = CHECKED THEN
 END IF
 
 IF clear_action_checkbox = CHECKED or notice_sent = "Y" THEN
-MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The script will now navigate to clear the Non-wage match.")
+MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The script will now navigate to clear the match.")
     BeginDialog cleared_match_dialog, 0, 0, 311, 175, "WAGE MATCH CLEARED"
       GroupBox 5, 5, 300, 55, "WAGE MATCH"
       Text 10, 20, 110, 10, "Case number:" & MAXIS_case_number
