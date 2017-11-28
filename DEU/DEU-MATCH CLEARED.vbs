@@ -78,12 +78,15 @@ EMSendKey "t"
 Call check_for_MAXIS(FALSE)
 
 EMReadScreen IEVS_type, 4, 6, 6 'read the DAIL msg'
-'msgbox IEVS_type
+
 IF IEVS_type = "WAGE" or IEVS_type = "BEER" THEN
 	match_found = TRUE
 Else
 	script_end_procedure("This is not a IEVS match. Please select a WAGE match DAIL, and run the script again.")
 End if
+
+IF IEVS_type = "WAGE" THEN type_match = "U"
+IF IEVS_type = "BEER" THEN type_match = "B"
 
 EMReadScreen MAXIS_case_number, 8, 5, 73
 MAXIS_case_number= TRIM(MAXIS_case_number)
@@ -140,9 +143,6 @@ ELSE
 	END IF
 END IF 
 
-IF IEVS_type = "WAGE" THEN type_match = "U"
-IF IEVS_type = "BEER" THEN type_match = "B"
-
 '--------------------------------------------------------------------Client name
 EMReadScreen client_name, 35, 5, 24
 client_name = trim(client_name)                         'trimming the client name
@@ -178,14 +178,18 @@ programs = trim(programs)
 IF right(programs, 1) = "," THEN programs = left(programs, len(programs) - 1) 
 
 '----------------------------------------------------------------------------------------------------Employer info & dIFfernce notice info
-EMReadScreen source_income, 27, 8, 37
-source_income = trim(source_income)
-IF instr(source_income, " AMT: $") THEN 
-    length = len(source_income) 						  'establishing the length of the variable
+EMReadScreen source_income, 44, 8, 37
+source_income = trim(source_income)	
+length = len(source_income)		'establishing the length of the variable
+
+IF instr(source_income, " AMOUNT: $") THEN 						  
+    position = InStr(source_income, " AMOUNT: $")    		      'sets the position at the deliminator  
+    source_income = Left(source_income, position)  'establishes employer as being before the deliminator
+Elseif instr(source_income, " AMT:") THEN 					  'establishing the length of the variable
     position = InStr(source_income, " AMT: $")    		      'sets the position at the deliminator  
     source_income = Left(source_income, position)  'establishes employer as being before the deliminator
-ELSE 
-    source_income = source_income
+Else
+    source_income = source_income	'catch all variable 
 END IF 
 
 '----------------------------------------------------------------------------------------------------Employer info & difference notice info
@@ -263,9 +267,9 @@ IF send_notice_checkbox = CHECKED THEN
 	
 	'---------------------------------------------------------------------DIFF NOTC case note
     start_a_blank_CASE_NOTE
-    CALL write_variable_in_CASE_NOTE ("-----" & IEVS_year & " WAGE MATCH " & "(" & type_match & ") " & "(" & first_name &  ") DIFF NOTICE SENT-----")
+    CALL write_variable_in_CASE_NOTE ("-----" & IEVS_year & " WAGE MATCH " & "(" & type_match & ") " & "(" & first_name & ") DIFF NOTICE SENT-----")
     CALL write_bullet_and_variable_in_CASE_NOTE("Client Name", Client_Name)
-    CALL write_bullet_and_variable_in_CASE_NOTE("Active Programs", active_programs)
+    CALL write_bullet_and_variable_in_CASE_NOTE("Active Programs", programs)
 	CALL write_bullet_and_variable_in_CASE_NOTE("Source of income", source_income)
 	CALL write_variable_in_CASE_NOTE("* Type of income:")
     CALL write_variable_in_CASE_NOTE ("----- ----- -----")
@@ -278,12 +282,12 @@ IF send_notice_checkbox = CHECKED THEN
 END IF
 
 IF clear_action_checkbox = CHECKED or notice_sent = "Y" THEN
-MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The script will now navigate to clear the Non-wage match.")
+MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The script will now navigate to clear the match.")
     BeginDialog cleared_match_dialog, 0, 0, 311, 175, "WAGE MATCH CLEARED"
       GroupBox 5, 5, 300, 55, "WAGE MATCH"
       Text 10, 20, 110, 10, "Case number:" & MAXIS_case_number
       Text 120, 20, 165, 10, "Client name:" & client_name
-      Text 10, 40, 105, 10, "Active Programs:" & active_programs
+      Text 10, 40, 105, 10, "Active Programs:" & programs
       Text 120, 40, 175, 15, "Income source:" & source_income
       DropListBox 75, 65, 110, 15, "Select One:"+chr(9)+"BC - Case Closed"+chr(9)+"BN - Already known, No Savings"+chr(9)+"BE - Child"+chr(9)+"BE - No Change"+chr(9)+"BO - Other"+chr(9)+"CC - Claim Entered", resolution_status
       DropListBox 125, 85, 60, 15, "Select One:"+chr(9)+"Yes"+chr(9)+"No", change_response
@@ -340,8 +344,7 @@ MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The s
 		EMSearch cleared_header, row, col
 		EMWriteScreen resolution_status, row + 1, col + 1
 	Next 
-	
-	'msgbox "where am I"		
+		
 	EMwritescreen rez_status, 12, 58
 	IF change_response = "YES" THEN
 		EMwritescreen "Y", 15, 37
@@ -349,7 +352,6 @@ MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The s
 		EMwritescreen "N", 15, 37
 	END IF
 	
-	'msgbox "did all information get added?"
 	transmit	
 
 	IF resolution_status = "BC - Case Closed" 	THEN EMWriteScreen "Case closed. " & other_notes, 8, 6   							'BC
@@ -357,9 +359,7 @@ MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The s
 	IF resolution_status = "BE - Child" THEN EMWriteScreen "No change, minor child income excluded. " & other_notes, 8, 6 			'BE - child
 	IF resolution_status = "BN - Already known, No Savings" THEN EMWriteScreen "Already known - No savings. " & other_notes, 8, 6 	'BN
 	IF resolution_status = "BO - Other" THEN EMWriteScreen "HC Claim entered. " & other_notes, 8, 6 								'BO
-	IF resolution_status = "CC - Claim Entered" THEN EMWriteScreen "Claim entered. " & other_notes, 8, 6 						 	'CC
-	'msgbox "did the notes input?"
-	
+	IF resolution_status = "CC - Claim Entered" THEN EMWriteScreen "Claim entered. " & other_notes, 8, 6 						 	'CC	
 	TRANSMIT
 	PF3
 	PF3	
@@ -379,20 +379,20 @@ MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The s
 	IF match_cleared = TRUE THEN 
 	    If IEVS_type = "WAGE" then
         	'Updated IEVS_period to write into case note
-        	If quarter = 1 then IEVS_quarter = "1ST"
-        	If quarter = 2 then IEVS_quarter = "2ND"
-        	If quarter = 3 then IEVS_quarter = "3RD"
-        	If quarter = 4 then IEVS_quarter = "4TH"
+        	If IEVS_quarter = 1 then quarter = "1ST"
+        	If IEVS_quarter = 2 then quarter = "2ND"
+        	If IEVS_quarter = 3 then quarter = "3RD"
+        	If IEVS_quarter = 4 then quarter = "4TH"
         End if
 		IEVS_period = replace(IEVS_period, "/", " to ")
 		Due_date = dateadd("d", 10, date)	'defaults the due date for all verifications at 10 days requested for HEADER of casenote'
 		PF3 'back to the DAIL'
 	   '----------------------------------------------------------------the case match CLEARED note
 		start_a_blank_CASE_NOTE
-		IF IEVS_type = "WAGE" THEN CALL write_variable_in_CASE_NOTE("-----" & IEVS_quarter & " QTR " & IEVS_year & " WAGE MATCH (" & type_match & ") " & "(" & first_name &  ") CLEARED " & rez_status & "-----")
+		IF IEVS_type = "WAGE" THEN CALL write_variable_in_CASE_NOTE("-----" & quarter & " QTR " & IEVS_year & " WAGE MATCH (" & first_name & ") CLEARED " & rez_status & "-----")
 	    IF IEVS_type = "BEER" THEN CALL write_variable_in_CASE_NOTE("-----" & IEVS_year & " NON-WAGE MATCH (" & type_match & ") " & "(" & first_name &  ") CLEARED " & rez_status & "-----")
-	    CALL write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
-	   	CALL write_bullet_and_variable_in_CASE_NOTE("Active Programs", active_programs)
+		CALL write_bullet_and_variable_in_CASE_NOTE("Period", IEVS_period)
+	   	CALL write_bullet_and_variable_in_CASE_NOTE("Active Programs", programs)
 		CALL write_bullet_and_variable_in_CASE_NOTE("Source of income", source_income)
 		CALL write_variable_in_CASE_NOTE ("----- ----- -----")
 	    IF resolution_status = "BN - Already known, No Savings" or resolution_status = "BE - No Change" THEN CALL write_variable_in_CASE_NOTE("CLIENT REPORTED EARNINGS. INCOME IS IN STAT PANELS AND BUDGETED.")
@@ -406,4 +406,4 @@ MsgBox("A difference notice was sent on " & sent_date & "." & vbNewLine & "The s
 	END IF
 END IF 
 
-script_end_procedure ("Match has been cleared. Please take any additional action needed for your case.")   
+script_end_procedure ("Match actions selected have been taken. Please complete any additional work or actions needed.")   
