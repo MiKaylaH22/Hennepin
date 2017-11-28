@@ -142,7 +142,7 @@ DO
 		IF number_nights = "" then err_msg = err_msg & vbNewLine & "* Enter the number of nights of shelter"
 		IF shelter_stay_dates = "" then err_msg = err_msg & vbNewLine & "* Please enter the dates of shelter"
 		IF reason_for_homelessness = "" then err_msg = err_msg & vbNewLine & "* Enter the reason for homelessness."
-		IF resolution = "" then err_msg = err_msg & vbNewLine & "* Enter the resolution."		
+		IF resolution_reason = "" then err_msg = err_msg & vbNewLine & "* Enter the resolution."		
 		IF err_msg <> "" THEN MsgBox "*** NOTICE!!! ***" & vbNewLine & "(enter NA in all fields that do not apply)" & vbNewLine & err_msg & vbNewLine
 	LOOP UNTIL err_msg = ""
 	CALL check_for_password(are_we_passworded_out)			'function that checks to ensure that the user has not passworded out of MAXIS, allows user to password back into MAXIS						
